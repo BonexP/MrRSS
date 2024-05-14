@@ -1,24 +1,16 @@
-package backend
+package feed
 
 import (
 	"database/sql"
 	"log"
 
 	_ "github.com/glebarez/go-sqlite"
+
+	"MrRSS/backend"
 )
 
-func GetFeedList() []FeedsInfo {
-	result := []FeedsInfo{}
-
-	if dbFilePath == "" {
-		log.Fatal("Database file path is not set")
-	}
-
-	db, err := sql.Open("sqlite", dbFilePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
+func GetFeedList(db *sql.DB) []backend.FeedsInfo {
+	result := []backend.FeedsInfo{}
 
 	// Print the feeds in the Feeds table
 	rows, err := db.Query("SELECT [Link], [Category] FROM [Feeds]")
@@ -34,7 +26,7 @@ func GetFeedList() []FeedsInfo {
 		if err != nil {
 			log.Fatal(err)
 		}
-		result = append(result, FeedsInfo{Link: link, Category: category})
+		result = append(result, backend.FeedsInfo{Link: link, Category: category})
 	}
 	err = rows.Err()
 	if err != nil {

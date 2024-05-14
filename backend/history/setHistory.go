@@ -1,22 +1,21 @@
-package backend
+package history
 
 import (
 	"database/sql"
 	"log"
 
 	_ "github.com/glebarez/go-sqlite"
+
+	"MrRSS/backend"
 )
 
-func SetHistory(history []FeedContentsInfo) {
-	if dbFilePath == "" {
-		log.Fatal("Database file path is not set")
-	}
-
-	db, err := sql.Open("sqlite", dbFilePath)
+func SetHistory(db *sql.DB, history []backend.FeedContentsInfo) {
+	var err error
+	// Clear the History table before inserting new data
+	_, err = db.Exec("DELETE FROM [History]")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
 
 	// Insert history into the History table
 	tx, err := db.Begin()
@@ -38,17 +37,7 @@ func SetHistory(history []FeedContentsInfo) {
 	tx.Commit()
 }
 
-func SetHistoryReaded(history FeedContentsInfo) {
-	if dbFilePath == "" {
-		log.Fatal("Database file path is not set")
-	}
-
-	db, err := sql.Open("sqlite", dbFilePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
+func SetHistoryReaded(db *sql.DB, history backend.FeedContentsInfo) {
 	// Update the Readed field in the History table
 	tx, err := db.Begin()
 	if err != nil {
@@ -67,17 +56,7 @@ func SetHistoryReaded(history FeedContentsInfo) {
 	tx.Commit()
 }
 
-func ClearHistory() {
-	if dbFilePath == "" {
-		log.Fatal("Database file path is not set")
-	}
-
-	db, err := sql.Open("sqlite", dbFilePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
+func ClearHistory(db *sql.DB) {
 	// Clear the History table
 	tx, err := db.Begin()
 	if err != nil {

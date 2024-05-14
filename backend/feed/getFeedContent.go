@@ -1,7 +1,8 @@
-package backend
+package feed
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -9,6 +10,9 @@ import (
 	"time"
 
 	"github.com/mmcdole/gofeed"
+
+	"MrRSS/backend"
+	"MrRSS/backend/history"
 )
 
 type FeedOriginContentsInfo struct {
@@ -17,8 +21,8 @@ type FeedOriginContentsInfo struct {
 	Item  gofeed.Item
 }
 
-func GetFeedContent() []FeedContentsInfo {
-	feedList := GetFeedList()
+func GetFeedContent(db *sql.DB) []backend.FeedContentsInfo {
+	feedList := GetFeedList(db)
 
 	var feedOriginContent []FeedOriginContentsInfo
 
@@ -60,7 +64,7 @@ func GetFeedContent() []FeedContentsInfo {
 		return feedOriginContent[i].Item.PublishedParsed.After(*feedOriginContent[j].Item.PublishedParsed)
 	})
 
-	var feedContent []FeedContentsInfo
+	var feedContent []backend.FeedContentsInfo
 
 	for _, item := range feedOriginContent {
 		// Get the image URL
@@ -75,7 +79,7 @@ func GetFeedContent() []FeedContentsInfo {
 		// Get the time since the item was published
 		timeSinceStr := getTimeSince(item.Item.PublishedParsed)
 
-		feedContentItem := FeedContentsInfo{
+		feedContentItem := backend.FeedContentsInfo{
 			FeedTitle: item.Title,
 			FeedImage: item.Image,
 			Title:     item.Item.Title,
@@ -88,8 +92,8 @@ func GetFeedContent() []FeedContentsInfo {
 		}
 
 		// Check if the item is in the history
-		if CheckInHistory(feedContentItem) {
-			feedContentItem.Readed = GetHistoryReaded(feedContentItem)
+		if history.CheckInHistory(db, feedContentItem) {
+			feedContentItem.Readed = history.GetHistoryReaded(db, feedContentItem)
 		}
 
 		// Append the item to the feedContent

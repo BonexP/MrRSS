@@ -5,7 +5,7 @@ import RssList from './RssList.vue'
 import RssListButton from './RssListButton.vue'
 import RssContent from './RssContent.vue'
 import RssContentButton from './RssContentButton.vue'
-import { GetFeedContent, GetHistory, SetHistory, SetHistoryReaded, ClearHistory } from '../../wailsjs/go/main/App'
+import { GetFeedContent, GetHistory, SetHistory, SetHistoryReaded, ClearHistory } from '../../../wailsjs/go/main/App'
 
 type FeedContent = {
   FeedTitle: string
@@ -25,22 +25,6 @@ const feedContent = reactive({
 
 const selectedFeed = ref<FeedContent | undefined>(undefined)
 
-async function fetchFeedContent() {
-  const result: FeedContent[] = await GetFeedContent()
-  feedContent.feedList = result
-  return feedContent
-}
-
-async function fetchHistoryContent() {
-  const result: FeedContent[] = await GetHistory()
-  feedContent.feedList = result
-  return feedContent
-}
-
-async function setHistoryContent() {
-  await SetHistory(feedContent.feedList)
-}
-
 async function deleteHistoryContent() {
   feedContent.feedList = []
   await ClearHistory()
@@ -51,9 +35,9 @@ const isRefreshing = ref(false)
 
 async function handleClickRefresh() {
   isRefreshing.value = true
-  await fetchHistoryContent()
-  await fetchFeedContent()
-  await setHistoryContent()
+  feedContent.feedList = await GetHistory()
+  feedContent.feedList = await GetFeedContent()
+  await SetHistory(feedContent.feedList)
   isRefreshing.value = false
 }
 
@@ -94,59 +78,18 @@ onMounted(async () => {
 
 <template>
   <aside>
-    <rss-list-button 
-      @delete-history-content="deleteHistoryContent" 
-      @handle-click-refresh="handleClickRefresh" 
-      :isRefreshing="isRefreshing"
-    />
-    <rss-list 
-      @feed-clicked="handleFeedClicked" 
-      :feedContent="feedContent" 
-    />
+    <rss-list-button @delete-history-content="deleteHistoryContent" @handle-click-refresh="handleClickRefresh"
+      :isRefreshing="isRefreshing" />
+    <rss-list @feed-clicked="handleFeedClicked" :feedContent="feedContent" />
   </aside>
   <main>
-    <rss-content-button 
-      v-if="selectedFeed !== undefined"
-      @modify-feed-content-readed="modifyFeedContentReaded" 
-      :selectedFeed="selectedFeed"
-    />
-    <rss-content 
-      v-if="selectedFeed" 
-      :selectedFeed="selectedFeed" 
-    />
+    <rss-content-button v-if="selectedFeed !== undefined" @modify-feed-content-readed="modifyFeedContentReaded"
+      :selectedFeed="selectedFeed" />
+    <rss-content v-if="selectedFeed" :selectedFeed="selectedFeed" />
     <div v-else class="NoSelectedFeed"></div>
   </main>
 </template>
 
-<style>
-aside {
-  display: flex;
-  flex-direction: column;
-
-  min-width: 344px;
-  max-width: 344px;
-  height: 100vh;
-
-  color: #000000;
-  background-color: #f0f0f0;
-
-  word-wrap: normal;
-}
-
-main {
-  display: flex;
-  flex-direction: column;
-
-  width: calc(100vw - 344px);
-
-  border-left: 1px solid #ccc;
-
-  height: 100vh;
-}
-
-.NoSelectedFeed {
-  width: 100%;
-  height: 100%;
-  background-color: #f0f0f0;
-}
+<style lang="scss">
+@import '../../styles/home/Home.scss';
 </style>

@@ -1,0 +1,188 @@
+article {
+  padding: 32px;
+  background-color: #f9f9f9;
+  overflow-x: hidden;
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #999;
+    }
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+  }
+
+  h1 {
+    font-size: 32px;
+    margin-bottom: 16px;
+    max-width: 720px;
+    margin: auto;
+  }
+
+  .RssInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding-top: 32px;
+    padding-bottom: 64px;
+    max-width: 720px;
+    margin: auto;
+
+    .RssTitle {
+      display: flex;
+      align-items: center;
+
+      .RssImage {
+        min-width: 16px;
+        max-width: 16px;
+        min-height: 16px;
+        max-height: 16px;
+        margin-right: 4px;
+      }
+
+      p {
+        margin: 0;
+      }
+    }
+
+    time {
+      color: #666;
+    }
+  }
+
+  .Content {
+    max-width: 720px;
+    margin: auto;
+
+    &:deep(h1, h2, h3, h4, h5, h6) {
+      margin-top: 32px;
+      margin-bottom: 16px;
+    }
+
+    &:deep(p) {
+      text-align: left;
+      margin-top: 16px;
+      margin-bottom: 16px;
+      line-height: 24px;
+    }
+
+    &:deep(ul, ol) {
+      text-align: left;
+    }
+
+    &:deep(li) {
+      text-align: left;
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+
+    &:deep(a) {
+      text-decoration: underline;
+      color: #666;
+    }
+
+    &:deep(a:hover) {
+      color: #333;
+    }
+
+    &:deep(blockquote) {
+      margin-left: 8px;
+      margin-right: 8px;
+      padding: 8px;
+      border-left: 2px solid #666;
+      color: #666;
+      background-color: #f0f0f0;
+    }
+
+    &:deep(img) {
+      max-width: 100%;
+      height: auto;
+    }
+
+    &:deep(img:only-child) {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: auto;
+    }
+
+    &:deep(pre) {
+      text-align: left;
+      margin-top: 16px;
+      margin-bottom: 16px;
+      padding: 8px;
+      border: 1px solid #666;
+      background-color: #f0f0f0;
+      white-space: pre-wrap;
+      font-family: 'Fira Code', monospace;
+    }
+
+    &:deep(code) {
+      text-align: left;
+      background-color: #f0f0f0;
+      padding: 2px;
+      border-radius: 4px;
+      font-family: 'Fira Code', monospace;
+    }
+
+    &:deep(table) {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    &:deep(th, td) {
+      border: 1px solid #666;
+      padding: 8px;
+    }
+
+    &:deep(th) {
+      background-color: #f0f0f0;
+    }
+
+    &:deep(tr:nth-child(even)) {
+      background-color: #f9f9f9;
+    }
+
+    &:deep(tr:nth-child(odd)) {
+      background-color: #f0f0f0;
+    }
+
+    &:deep(iframe) {
+      width: 100%;
+      height: 400px;
+    }
+
+    &:deep(hr) {
+      margin-top: 32px;
+      margin-bottom: 32px;
+      border: none;
+      border-top: 1px solid #666;
+    }
+
+    &:deep(figure) {
+      margin-top: 16px;
+      margin-bottom: 16px;
+    }
+
+    &:deep(figcaption) {
+      text-align: center;
+      font-size: small;
+      color: #666;
+    }
+
+    &:deep(button) {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,25 @@
+.ContentFunction {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  background-color: #e0e0e0;
+
+  .btn {
+    width: 32px;
+    height: 32px;
+    font-size: large;
+    background-color: #e0e0e0;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+      background-color: #d0d0d0;
+    }
+  }
+}

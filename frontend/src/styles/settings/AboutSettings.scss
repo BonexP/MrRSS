@@ -1,0 +1,53 @@
+h2 {
+  margin: 8px 0;
+}
+
+h4 {
+  margin: 0;
+  font-weight: 400;
+  color: #666;
+}
+
+.logo {
+  min-width: 240px;
+  max-width: 240px;
+  height: 240px;
+  margin: 0 auto;
+  display: block;
+}
+
+.version {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  .btn {
+    width: 32px;
+    height: 32px;
+    font-size: large;
+    color: black;
+    background-color: #e0e0e0;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+      background-color: #d0d0d0;
+    }
+  }
+}
+
+.copyright {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: small;
+
+  a {
+    color: #000;
+  }
+}

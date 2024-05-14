@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from './components/Home.vue'
-import Settings from './components/Settings.vue'
-import RssSettings from './components/RssSettings.vue'
-import PreferenceSettings from './components/PreferenceSettings.vue'
-import AboutSettings from './components/AboutSettings.vue'
+import Home from './components/home/Home.vue'
+import Settings from './components/settings/Settings.vue'
+import RssSettings from './components/settings/RssSettings.vue'
+import PreferenceSettings from './components/settings/PreferenceSettings.vue'
+import AboutSettings from './components/settings/AboutSettings.vue'
 
 const routes = [
   { 

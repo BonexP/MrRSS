@@ -2,7 +2,7 @@
 import { ref, watchEffect, onMounted } from 'vue';
 import { Icon } from '@iconify/vue';
 
-import { GetFeedList, SetFeedList, DeleteFeedList } from '../../wailsjs/go/main/App'
+import { GetFeedList, SetFeedList, DeleteFeedList } from '../../../wailsjs/go/main/App'
 
 type FeedList = {
   Link: string
@@ -13,7 +13,6 @@ const feedList = ref([] as FeedList[])
 
 async function getFeedList() {
   const result: FeedList[] = await GetFeedList()
-  console.log(result)
   feedList.value = result
 }
 
@@ -25,9 +24,6 @@ async function setFeedList() {
     Link: subscribeUrl.value,
     Category: selectedSubscribeType.value
   }
-
-  console.log(feed)
-  console.log([feed] as FeedList[])
 
   await SetFeedList([feed] as FeedList[])
   await getFeedList()
@@ -101,133 +97,6 @@ onMounted(() => {
   </ul>
 </template>
 
-<style scoped>
-.btn {
-  width: 32px;
-  height: 32px;
-  font-size: large;
-  background-color: #e0e0e0;
-  border: none;
-  cursor: pointer;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.btn:hover {
-  background-color: #d0d0d0;
-}
-
-form {
-  width: 100%;
-
-  display: grid;
-  gap: 8px;
-  grid-template-columns: 80px 1fr auto;
-  grid-template-rows: 1fr 1fr;
-}
-
-form label {
-  grid-column: 1 / 2;
-  text-align: left;
-  font-weight: bold;
-  line-height: 24px;
-}
-
-form select,
-form input {
-  grid-column: 2 / 3;
-  background-color: #f9f9f9;
-  border: none;
-}
-
-form select:focus,
-form input:focus {
-  outline: none;
-}
-
-form .btn {
-  grid-column: 3 / 4;
-  grid-row: 1 / 3;
-  height: 56px;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-  width: 100%;
-  max-height: 320px;
-  overflow-y: scroll;
-
-  border: 1px solid #ccc;
-  background-color: #f9f9f9;
-
-  display: flex;
-  flex-direction: column;
-}
-
-ul::-webkit-scrollbar {
-  width: 8px;
-}
-
-ul::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  cursor: pointer;
-}
-
-ul::-webkit-scrollbar-track {
-  background-color: #f1f1f1;
-}
-
-ul::-webkit-scrollbar-thumb:hover {
-  background-color: #999;
-}
-
-li:nth-child(2n) {
-  background-color: #f0f0f0;
-}
-
-li {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: 32px 1fr 80px auto;
-  text-align: left;
-}
-
-li:hover {
-  background-color: #e0e0e0;
-}
-
-li .img {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-li img {
-  width: 16px;
-  height: 16px;
-}
-
-li span {
-  align-self: center;
-}
-
-li .link {
-  overflow-x: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-li .btn {
-  justify-self: flex-end;
-  visibility: hidden;
-}
-
-li:hover .btn {
-  visibility: visible;
-}
+<style lang="scss" scoped>
+@import '../../styles/settings/RssSettings.scss';
 </style>

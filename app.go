@@ -1,19 +1,25 @@
 package main
 
 import (
-	"MrRSS/backend"
-
 	"context"
+	"database/sql"
+
+	"MrRSS/backend"
+	"MrRSS/backend/feed"
+	"MrRSS/backend/history"
 )
 
 // App struct
 type App struct {
 	ctx context.Context
+	db  *sql.DB
 }
 
 // NewApp creates a new App application struct
-func NewApp() *App {
-	return &App{}
+func NewApp(db *sql.DB) *App {
+	return &App{
+		db: db,
+	}
 }
 
 // startup is called when the app starts. The context is saved
@@ -23,44 +29,43 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) InitDatabase() {
-	backend.InitDatabase()
 	feeds := []backend.FeedsInfo{
 		{Link: "https://www.kawabangga.com/feed", Category: "RSS/Atom"},
 		{Link: "https://jvns.ca/atom.xml", Category: "RSS/Atom"},
 		{Link: "https://www.ruanyifeng.com/blog/atom.xml", Category: "RSS/Atom"},
 		{Link: "https://www.appinn.com/feed/", Category: "RSS/Atom"},
 	}
-	backend.SetFeedList(feeds)
+	feed.SetFeedList(a.db, feeds)
 }
 
 func (a *App) GetFeedList() []backend.FeedsInfo {
-	return backend.GetFeedList()
+	return feed.GetFeedList(a.db)
 }
 
 func (a *App) SetFeedList(feeds []backend.FeedsInfo) {
-	backend.SetFeedList(feeds)
+	feed.SetFeedList(a.db, feeds)
 }
 
-func (a *App) DeleteFeedList(feed backend.FeedsInfo) {
-	backend.DeleteFeedList(feed)
+func (a *App) DeleteFeedList(feeds backend.FeedsInfo) {
+	feed.DeleteFeedList(a.db, feeds)
 }
 
 func (a *App) GetFeedContent() []backend.FeedContentsInfo {
-	return backend.GetFeedContent()
+	return feed.GetFeedContent(a.db)
 }
 
 func (a *App) GetHistory() []backend.FeedContentsInfo {
-	return backend.GetHistory()
+	return history.GetHistory(a.db)
 }
 
-func (a *App) SetHistory(history []backend.FeedContentsInfo) {
-	backend.SetHistory(history)
+func (a *App) SetHistory(historys []backend.FeedContentsInfo) {
+	history.SetHistory(a.db, historys)
 }
 
 func (a *App) SetHistoryReaded(feed backend.FeedContentsInfo) {
-	backend.SetHistoryReaded(feed)
+	history.SetHistoryReaded(a.db, feed)
 }
 
 func (a *App) ClearHistory() {
-	backend.ClearHistory()
+	history.ClearHistory(a.db)
 }

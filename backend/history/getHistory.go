@@ -1,4 +1,4 @@
-package backend
+package history
 
 import (
 	"database/sql"
@@ -6,20 +6,12 @@ import (
 	"sort"
 
 	_ "github.com/glebarez/go-sqlite"
+
+	"MrRSS/backend"
 )
 
-func GetHistory() []FeedContentsInfo {
-	result := []FeedContentsInfo{}
-
-	if dbFilePath == "" {
-		log.Fatal("Database file path is not set")
-	}
-
-	db, err := sql.Open("sqlite", dbFilePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
+func GetHistory(db *sql.DB) []backend.FeedContentsInfo {
+	result := []backend.FeedContentsInfo{}
 
 	// Get the items in the History table
 	rows, err := db.Query("SELECT [FeedTitle], [FeedImage], [Title], [Link], [TimeSince], [Time], [Image], [Content], [Readed] FROM [History]")
@@ -42,7 +34,7 @@ func GetHistory() []FeedContentsInfo {
 		if err != nil {
 			log.Fatal(err)
 		}
-		result = append(result, FeedContentsInfo{FeedTitle: feedTitle, FeedImage: feedImage, Title: title, Link: link, TimeSince: timeSince, Time: time, Image: image, Content: content, Readed: readed})
+		result = append(result, backend.FeedContentsInfo{FeedTitle: feedTitle, FeedImage: feedImage, Title: title, Link: link, TimeSince: timeSince, Time: time, Image: image, Content: content, Readed: readed})
 	}
 	err = rows.Err()
 	if err != nil {
@@ -57,17 +49,7 @@ func GetHistory() []FeedContentsInfo {
 	return result
 }
 
-func CheckInHistory(feed FeedContentsInfo) bool {
-	if dbFilePath == "" {
-		log.Fatal("Database file path is not set")
-	}
-
-	db, err := sql.Open("sqlite", dbFilePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
+func CheckInHistory(db *sql.DB, feed backend.FeedContentsInfo) bool {
 	// Check if the item is in the History table
 	rows, err := db.Query("SELECT [Link] FROM [History] WHERE [Link] = ?", feed.Link)
 	if err != nil {
@@ -78,17 +60,7 @@ func CheckInHistory(feed FeedContentsInfo) bool {
 	return rows.Next()
 }
 
-func GetHistoryReaded(feed FeedContentsInfo) bool {
-	if dbFilePath == "" {
-		log.Fatal("Database file path is not set")
-	}
-
-	db, err := sql.Open("sqlite", dbFilePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
+func GetHistoryReaded(db *sql.DB, feed backend.FeedContentsInfo) bool {
 	// Get the Readed field in the History table
 	rows, err := db.Query("SELECT [Readed] FROM [History] WHERE [Link] = ?", feed.Link)
 	if err != nil {
