@@ -8,6 +8,10 @@
   [![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)](https://go.dev/)
   [![Wails](https://img.shields.io/badge/Wails-v2-red)](https://wails.io/)
   [![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?logo=vue.js)](https://vuejs.org/)
+
+  <p>
+    <strong>English</strong> | <a href="README_zh.md">简体中文</a>
+  </p>
 </div>
 
 ---
@@ -15,17 +19,11 @@
 ## ✨ Features
 
 - 🖥️ **Cross-Platform**: Native desktop app for Windows, macOS, and Linux
-- 📰 **RSS/Atom Support**: Subscribe to unlimited feeds
 - 🌐 **Auto-Translation**: Translate article titles using Google Translate or DeepL API
 - 📁 **Smart Organization**: Organize feeds into categories that expand by default
 - ⭐ **Favorites & Reading Tracking**: Save articles and track read/unread status
 - 🎨 **Modern UI**: Clean, responsive interface with dark mode support
-- 🌍 **Multi-Language**: Full support for English and Chinese (中文)
 - 📦 **OPML Import/Export**: Easy migration from other RSS readers
-- 🔄 **Auto-Refresh**: Configurable automatic feed updates
-- 🧹 **Smart Cleanup**: Optional auto-cleanup of old articles
-- 🎯 **Progressive Loading**: Articles update progressively as feeds are fetched
-- 🚀 **Viewport Translation**: Auto-translate articles as they enter the viewport
 
 ## 📸 Screenshots
 
@@ -40,17 +38,20 @@
 Download the latest installer for your platform from the [Releases](https://github.com/WCY-dt/MrRSS/releases) page:
 
 **Windows:**
+
 - Download `MrRSS-{version}-windows-amd64-installer.exe`
 - Run the installer and follow the installation wizard
 - Launch MrRSS from Start Menu or Desktop shortcut
 
 **macOS:**
+
 - Download `MrRSS-{version}-darwin-universal.dmg`
 - Open the DMG file
 - Drag MrRSS.app to your Applications folder
 - Launch MrRSS from Applications
 
 **Linux:**
+
 - Download `MrRSS-{version}-linux-amd64.AppImage`
 - Make it executable: `chmod +x MrRSS-*.AppImage`
 - Run: `./MrRSS-*.AppImage`
@@ -138,17 +139,20 @@ wails build -clean -ldflags "-s -w"
 After building the application, you can create installer packages:
 
 **Windows (NSIS Installer):**
+
 ```bash
 # Requires NSIS installed
 makensis build/windows/installer.nsi
 ```
 
 **macOS (DMG):**
+
 ```bash
 ./build/macos/create-dmg.sh
 ```
 
 **Linux (AppImage):**
+
 ```bash
 ./build/linux/create-appimage.sh
 ```

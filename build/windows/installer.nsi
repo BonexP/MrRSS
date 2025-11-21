@@ -1,10 +1,12 @@
 ; MrRSS NSIS Installer Script
 ; This script creates a Windows installer for MrRSS
 ;
-; IMPORTANT: This script must be run from the repository root directory:
+; IMPORTANT: This script creates a Windows installer for MrRSS
+;
+; To build:
 ;   makensis build/windows/installer.nsi
 ; 
-; All paths in this script are relative to the repository root.
+; All paths in this script are relative to the script directory.
 
 !define APP_NAME "MrRSS"
 !define APP_VERSION "1.1.0"
@@ -18,8 +20,8 @@
 
 ; General Settings
 Name "${APP_NAME} ${APP_VERSION}"
-; Note: Output path assumes makensis is run from repository root
-OutFile "build\bin\MrRSS-${APP_VERSION}-windows-amd64-installer.exe"
+; Output path relative to script directory
+OutFile "..\bin\MrRSS-${APP_VERSION}-windows-amd64-installer.exe"
 InstallDir "$PROGRAMFILES64\${APP_NAME}"
 InstallDirRegKey HKLM "Software\${APP_NAME}" "Install_Dir"
 RequestExecutionLevel admin
@@ -37,8 +39,7 @@ RequestExecutionLevel admin
 !insertmacro MUI_PAGE_WELCOME
 
 ; License page
-; Note: LICENSE file must be in repository root when running makensis
-!insertmacro MUI_PAGE_LICENSE "LICENSE"
+!insertmacro MUI_PAGE_LICENSE "..\..\LICENSE"
 
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
@@ -72,8 +73,7 @@ Section "MainSection" SEC01
     SetOutPath "$INSTDIR"
     
     ; Copy the executable
-    ; Note: Assumes makensis is run from repository root
-    File "build\bin\${APP_EXE}"
+    File "..\bin\${APP_EXE}"
     
     ; Create shortcuts
     CreateDirectory "$SMPROGRAMS\${APP_NAME}"
@@ -116,5 +116,5 @@ Section "Uninstall"
     DeleteRegKey HKLM "Software\${APP_NAME}"
     
     ; Note: User data directory is NOT removed to preserve user data
-    ; Data location: %APPDATA%\MrRSS\
+    ; Data location: %APPDATA%\MrRSS
 SectionEnd
