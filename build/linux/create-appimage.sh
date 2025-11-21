@@ -11,7 +11,8 @@
 set -e
 
 APP_NAME="MrRSS"
-VERSION="1.1.0"
+# Get version from wails.json if available, otherwise use default
+VERSION=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' wails.json 2>/dev/null | head -1 | sed 's/.*"\([^"]*\)".*/\1/' || echo "1.1.0")
 APP_PUBLISHER="MrRSS Team"
 APP_URL="https://github.com/WCY-dt/MrRSS"
 APP_DESCRIPTION="A Modern, Cross-Platform Desktop RSS Reader"
@@ -88,6 +89,9 @@ elif [ -f "build/appicon.png" ]; then
     echo "Using existing PNG icon..."
     cp "build/appicon.png" "${APPDIR}/usr/share/icons/hicolor/256x256/apps/${APP_NAME}.png"
     cp "build/appicon.png" "${APPDIR}/${APP_NAME}.png"
+else
+    echo "Warning: Neither inkscape nor ImageMagick found, and no pre-built icon available."
+    echo "To fix: Install imagemagick (sudo apt-get install imagemagick) or place a 256x256 PNG icon at build/appicon.png"
 fi
 
 # Copy desktop file to root

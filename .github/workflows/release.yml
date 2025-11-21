@@ -155,6 +155,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev gcc pkg-config wget file libfuse2 imagemagick
+          # Verify webkit2gtk-4.1 is installed
+          pkg-config --modversion webkit2gtk-4.1 || (echo "webkit2gtk-4.1 not found" && exit 1)
       
       - name: Install Windows dependencies
         if: matrix.platform == 'windows'
@@ -184,6 +186,11 @@ jobs:
       - name: Create installer (Windows)
         if: matrix.platform == 'windows'
         run: |
+          # Ensure build/windows directory exists
+          New-Item -ItemType Directory -Force -Path build/windows
+          # Update version in installer script
+          $version = "${{ needs.create-release.outputs.version }}"
+          (Get-Content build/windows/installer.nsi) -replace '!define APP_VERSION ".*"', "!define APP_VERSION `"$version`"" | Set-Content build/windows/installer.nsi
           # Build NSIS installer
           # Use full path since chocolatey doesn't refresh PATH in current session
           & "C:\Program Files (x86)\NSIS\makensis.exe" build/windows/installer.nsi
@@ -224,6 +231,7 @@ jobs:
           asset_path: ./build/bin/MrRSS-${{ needs.create-release.outputs.version }}-windows-amd64-installer.exe
           asset_name: MrRSS-${{ needs.create-release.outputs.version }}-windows-amd64-installer.exe
           asset_content_type: application/octet-stream
+        continue-on-error: true
       
       - name: Upload Linux AppImage
         if: matrix.platform == 'linux'
@@ -235,6 +243,7 @@ jobs:
           asset_path: ./build/bin/MrRSS-${{ needs.create-release.outputs.version }}-linux-amd64.AppImage
           asset_name: MrRSS-${{ needs.create-release.outputs.version }}-linux-amd64.AppImage
           asset_content_type: application/octet-stream
+        continue-on-error: true
       
       - name: Upload macOS DMG
         if: matrix.platform == 'darwin'
@@ -246,6 +255,7 @@ jobs:
           asset_path: ./build/bin/MrRSS-${{ needs.create-release.outputs.version }}-darwin-universal.dmg
           asset_name: MrRSS-${{ needs.create-release.outputs.version }}-darwin-universal.dmg
           asset_content_type: application/octet-stream
+        continue-on-error: true
       
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
