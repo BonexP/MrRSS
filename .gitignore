@@ -37,6 +37,8 @@ dist/
 
 # database files
 *.db
+*.db-shm
+*.db-wal
 
 # vue & vite
 node_modules/

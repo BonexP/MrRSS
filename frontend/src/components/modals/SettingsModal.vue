@@ -164,7 +164,7 @@ async function cleanupDatabase() {
 
 <template>
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div class="bg-bg-primary w-[800px] h-[600px] flex flex-col rounded-2xl shadow-2xl border border-border overflow-hidden animate-fade-in">
+        <div class="bg-bg-primary w-[800px] h-[800px] flex flex-col rounded-2xl shadow-2xl border border-border overflow-hidden animate-fade-in">
             <div class="p-5 border-b border-border flex justify-between items-center shrink-0">
                 <h3 class="text-lg font-semibold m-0">Settings</h3>
                 <span @click="emit('close')" class="text-2xl cursor-pointer text-text-secondary hover:text-text-primary">&times;</span>
@@ -196,7 +196,7 @@ async function cleanupDatabase() {
                                 <div class="font-medium mb-1">Auto-update Interval</div>
                                 <div class="text-xs text-text-secondary">How often to check for new articles (in minutes)</div>
                             </div>
-                            <input type="number" v-model="settings.update_interval" min="1" class="input-field w-24 text-center">
+                            <input type="number" v-model="settings.update_interval" min="1" class="input-field text-center">
                         </div>
                     </div>
 
@@ -224,18 +224,18 @@ async function cleanupDatabase() {
                         <div v-if="settings.translation_enabled" class="ml-4 space-y-3 border-l-2 border-border pl-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1">Translation Provider</label>
-                                <select v-model="settings.translation_provider" class="input-field">
+                                <select v-model="settings.translation_provider" class="input-field w-full">
                                     <option value="google">Google Translate (Free)</option>
                                     <option value="deepl">DeepL API</option>
                                 </select>
                             </div>
                             <div v-if="settings.translation_provider === 'deepl'">
                                 <label class="block text-sm font-medium mb-1">DeepL API Key</label>
-                                <input type="password" v-model="settings.deepl_api_key" placeholder="Enter your DeepL API key" class="input-field">
+                                <input type="password" v-model="settings.deepl_api_key" placeholder="Enter your DeepL API key" class="input-field w-full">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1">Target Language</label>
-                                <select v-model="settings.target_language" class="input-field">
+                                <select v-model="settings.target_language" class="input-field w-full">
                                     <option value="en">English</option>
                                     <option value="es">Spanish</option>
                                     <option value="fr">French</option>
@@ -266,7 +266,7 @@ async function cleanupDatabase() {
                             </button>
                         </div>
                         <p class="text-xs text-text-secondary mt-2">
-                            Removes all articles except read and favorited ones. Old articles (>1 week) are also automatically cleaned.
+                            Removes all articles except read and favorited ones. Old articles are also automatically cleaned if "Auto Cleanup" is enabled in General settings.
                         </p>
                     </div>
                     
@@ -287,7 +287,7 @@ async function cleanupDatabase() {
                             </label>
                         </div>
 
-                        <div class="border border-border rounded-lg bg-bg-secondary flex-1 overflow-y-auto min-h-[300px]">
+                        <div class="border border-border rounded-lg bg-bg-secondary flex-1 overflow-y-auto min-h-[250px]">
                             <div v-for="feed in store.feeds" :key="feed.id" class="flex items-center p-3 border-b border-border last:border-0 bg-bg-primary hover:bg-bg-secondary">
                                 <input type="checkbox" :value="feed.id" v-model="selectedFeeds" class="mr-3 rounded border-border">
                                 <div class="truncate flex-1 mr-2">
@@ -330,7 +330,7 @@ async function cleanupDatabase() {
     @apply text-accent border-accent;
 }
 .input-field {
-    @apply w-full p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary text-sm focus:border-accent focus:outline-none transition-colors;
+    @apply p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary text-sm focus:border-accent focus:outline-none transition-colors;
 }
 .btn-primary {
     @apply bg-accent text-white border-none px-5 py-2.5 rounded-lg cursor-pointer font-semibold hover:bg-accent-hover transition-colors;
