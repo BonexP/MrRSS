@@ -1,0 +1,135 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.1.0)'
+        required: true
+        type: string
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Get version from input
+        id: get_version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          # Remove 'v' prefix if present
+          VERSION="${VERSION#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Update version in wails.json
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          sed -i 's/"version": ".*"/"version": "'$VERSION'"/' wails.json
+          sed -i 's/"productVersion": ".*"/"productVersion": "'$VERSION'"/' wails.json
+      
+      - name: Create Git tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add wails.json
+          git commit -m "Release ${{ steps.get_version.outputs.tag }}" || echo "No changes to commit"
+          git tag ${{ steps.get_version.outputs.tag }}
+          git push origin ${{ steps.get_version.outputs.tag }} || echo "Tag already exists"
+      
+      - name: Generate changelog
+        id: changelog
+        run: |
+          echo "## What's Changed" > CHANGELOG.md
+          git log $(git describe --tags --abbrev=0 HEAD^)..HEAD --pretty=format:"* %s (%h)" >> CHANGELOG.md || echo "* Initial release" >> CHANGELOG.md
+      
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.tag }}
+          release_name: MrRSS ${{ steps.get_version.outputs.tag }}
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: false
+
+  build-release:
+    name: Build ${{ matrix.platform }}
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: amd64
+            ext: ''
+          - os: windows-latest
+            platform: windows
+            arch: amd64
+            ext: '.exe'
+          - os: macos-latest
+            platform: darwin
+            arch: universal
+            ext: '.app'
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.create-release.outputs.version }}
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+      
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+      
+      - name: Build application
+        run: wails build -clean -ldflags "-s -w"
+      
+      - name: Package application (Linux)
+        if: matrix.platform == 'linux'
+        run: |
+          cd build/bin
+          tar -czf MrRSS-${{ needs.create-release.outputs.version }}-linux-amd64.tar.gz MrRSS
+      
+      - name: Package application (Windows)
+        if: matrix.platform == 'windows'
+        run: |
+          cd build/bin
+          Compress-Archive -Path MrRSS.exe -DestinationPath MrRSS-${{ needs.create-release.outputs.version }}-windows-amd64.zip
+        shell: pwsh
+      
+      - name: Package application (macOS)
+        if: matrix.platform == 'darwin'
+        run: |
+          cd build/bin
+          zip -r MrRSS-${{ needs.create-release.outputs.version }}-darwin-universal.zip MrRSS.app
+      
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./build/bin/MrRSS-${{ needs.create-release.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.platform == 'windows' && '.zip' || matrix.platform == 'darwin' && '.zip' || '.tar.gz' }}
+          asset_name: MrRSS-${{ needs.create-release.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}${{ matrix.platform == 'windows' && '.zip' || matrix.platform == 'darwin' && '.zip' || '.tar.gz' }}
+          asset_content_type: application/octet-stream
