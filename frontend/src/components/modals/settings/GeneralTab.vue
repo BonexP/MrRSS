@@ -292,6 +292,6 @@ function formatLastUpdate(timestamp) {
     @apply flex items-start justify-between gap-4 p-3 rounded-lg bg-bg-secondary border border-border;
 }
 .sub-setting-item {
-    @apply p-2.5 rounded-md bg-bg-tertiary/50;
+    @apply p-2.5 rounded-md bg-bg-tertiary;
 }
 </style>
