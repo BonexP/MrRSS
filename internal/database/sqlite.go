@@ -86,6 +86,7 @@ func (db *DB) Init() error {
 	_, _ = db.Exec(`ALTER TABLE feeds ADD COLUMN link TEXT DEFAULT ''`)
 	
 	// Migration: Add discovery_completed column to feeds table
+	// Error is ignored - if column exists, the operation fails harmlessly.
 	_, _ = db.Exec(`ALTER TABLE feeds ADD COLUMN discovery_completed BOOLEAN DEFAULT 0`)
 	})
 	return err

@@ -1121,11 +1121,12 @@ func (h *Handler) HandleDiscoverAllFeeds(w http.ResponseWriter, r *http.Request)
 
 	log.Printf("Starting batch discovery for %d feeds", len(feedsToDiscover))
 
+discoveryLoop:
 	for _, feed := range feedsToDiscover {
 		select {
 		case <-ctx.Done():
 			log.Println("Batch discovery cancelled: timeout")
-			break
+			break discoveryLoop
 		default:
 		}
 
