@@ -19,9 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed hardcoded dialog messages in feed management (unsubscribe, delete, rename category)
-- Fixed hardcoded toast messages in settings and feed operations
-- Fixed hardcoded loading messages in article content view
 - Replaced native `prompt()` with custom `showInput()` dialog for consistent UI
 
 ## [1.1.7] - 2025-11-24
