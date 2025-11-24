@@ -187,6 +187,8 @@ export const translations = {
         
         // Prompts
         enterCategoryName: 'Enter new category name:',
+        moveFeeds: 'Move Feeds',
+        move: 'Move',
     },
     zh: {
         // App
@@ -376,6 +378,8 @@ export const translations = {
         
         // Prompts
         enterCategoryName: '输入新的分类名称：',
+        moveFeeds: '移动订阅',
+        move: '移动',
     }
 };
 

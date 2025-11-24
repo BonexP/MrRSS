@@ -2,6 +2,10 @@
 import { store } from '../store.js';
 import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import { BrowserOpenURL } from '../wailsjs/wailsjs/runtime/runtime.js';
+import { 
+    PhNewspaper, PhArrowLeft, PhGlobe, PhArticle, PhEnvelopeOpen, 
+    PhEnvelope, PhStar, PhArrowSquareOut 
+} from "@phosphor-icons/vue";
 
 const article = computed(() => store.articles.find(a => a.id === store.currentArticleId));
 const showContent = ref(false); // Toggle between original webpage and RSS content
@@ -154,28 +158,30 @@ onBeforeUnmount(() => {
 
 <template>
     <main :class="['flex-1 bg-bg-primary flex flex-col h-full absolute w-full md:static md:w-auto z-30 transition-transform duration-300', article ? 'translate-x-0' : 'translate-x-full md:translate-x-0']">
-        <div v-if="!article" class="hidden md:flex flex-col items-center justify-center h-full text-text-secondary text-center">
-            <i class="ph ph-newspaper text-5xl mb-5 opacity-50"></i>
-            <p>{{ store.i18n.t('selectArticle') }}</p>
+        <div v-if="!article" class="hidden md:flex flex-col items-center justify-center h-full text-text-secondary text-center px-4">
+            <PhNewspaper :size="48" class="mb-4 sm:mb-5 opacity-50 sm:w-16 sm:h-16" />
+            <p class="text-sm sm:text-base">{{ store.i18n.t('selectArticle') }}</p>
         </div>
 
         <div v-else class="flex flex-col h-full bg-bg-primary">
-            <div class="h-[50px] px-5 border-b border-border flex justify-between items-center bg-bg-primary shrink-0">
-                <button @click="close" class="md:hidden flex items-center gap-2 text-text-secondary hover:text-text-primary">
-                    <i class="ph ph-arrow-left"></i> {{ store.i18n.t('back') }}
+            <div class="h-[44px] sm:h-[50px] px-3 sm:px-5 border-b border-border flex justify-between items-center bg-bg-primary shrink-0">
+                <button @click="close" class="md:hidden flex items-center gap-1.5 sm:gap-2 text-text-secondary hover:text-text-primary text-sm sm:text-base">
+                    <PhArrowLeft :size="18" class="sm:w-5 sm:h-5" /> <span class="hidden xs:inline">{{ store.i18n.t('back') }}</span>
                 </button>
-                <div class="flex gap-2 ml-auto">
+                <div class="flex gap-1 sm:gap-2 ml-auto">
                     <button @click="toggleContentView" class="action-btn" :title="showContent ? store.i18n.t('viewOriginal') : store.i18n.t('viewContent')">
-                        <i :class="['ph', showContent ? 'ph-globe' : 'ph-article']"></i>
+                        <PhGlobe v-if="showContent" :size="18" class="sm:w-5 sm:h-5" />
+                        <PhArticle v-else :size="18" class="sm:w-5 sm:h-5" />
                     </button>
                     <button @click="toggleRead" class="action-btn" :title="article.is_read ? store.i18n.t('markAsUnread') : store.i18n.t('markAsRead')">
-                        <i :class="['ph', article.is_read ? 'ph-envelope-open' : 'ph-envelope']"></i>
+                        <PhEnvelopeOpen v-if="article.is_read" :size="18" class="sm:w-5 sm:h-5" />
+                        <PhEnvelope v-else :size="18" class="sm:w-5 sm:h-5" />
                     </button>
-                    <button @click="toggleFavorite" :class="['action-btn', article.is_favorite ? 'text-yellow-400' : '']" :title="article.is_favorite ? store.i18n.t('removeFromFavorite') : store.i18n.t('addToFavorite')">
-                        <i :class="['ph', 'ph-star']"></i>
+                    <button @click="toggleFavorite" :class="['action-btn', article.is_favorite ? 'text-yellow-500 hover:text-yellow-600' : 'hover:text-yellow-500']" :title="article.is_favorite ? store.i18n.t('removeFromFavorite') : store.i18n.t('addToFavorite')">
+                        <PhStar :size="18" class="sm:w-5 sm:h-5" :weight="article.is_favorite ? 'fill' : 'regular'" />
                     </button>
                     <button @click="openOriginal" class="action-btn" :title="store.i18n.t('openInBrowser')">
-                        <i class="ph ph-arrow-square-out"></i>
+                        <PhArrowSquareOut :size="18" class="sm:w-5 sm:h-5" />
                     </button>
                 </div>
             </div>
@@ -186,42 +192,42 @@ onBeforeUnmount(() => {
             </div>
             
             <!-- RSS content view -->
-            <div v-else class="flex-1 overflow-y-auto bg-bg-primary p-6">
+            <div v-else class="flex-1 overflow-y-auto bg-bg-primary p-3 sm:p-6">
                 <div class="max-w-3xl mx-auto bg-bg-primary">
-                    <h1 class="text-3xl font-bold mb-4 text-text-primary">{{ article.title }}</h1>
-                    <div class="text-sm text-text-secondary mb-6 flex items-center gap-4">
+                    <h1 class="text-xl sm:text-3xl font-bold mb-3 sm:mb-4 text-text-primary leading-tight">{{ article.title }}</h1>
+                    <div class="text-xs sm:text-sm text-text-secondary mb-4 sm:mb-6 flex flex-wrap items-center gap-2 sm:gap-4">
                         <span>{{ article.feed_title }}</span>
-                        <span>•</span>
+                        <span class="hidden sm:inline">•</span>
                         <span>{{ new Date(article.published_at).toLocaleDateString() }}</span>
                     </div>
                     
                     <!-- Loading state with proper background -->
-                    <div v-if="isLoadingContent" class="flex flex-col items-center justify-center py-16 bg-bg-primary">
-                        <div class="relative mb-6">
+                    <div v-if="isLoadingContent" class="flex flex-col items-center justify-center py-12 sm:py-16 bg-bg-primary">
+                        <div class="relative mb-4 sm:mb-6">
                             <!-- Outer pulsing ring -->
-                            <div class="absolute inset-0 rounded-full border-4 border-accent animate-ping opacity-20"></div>
+                            <div class="absolute inset-0 rounded-full border-2 sm:border-4 border-accent animate-ping opacity-20"></div>
                             <!-- Middle spinning ring -->
-                            <div class="absolute inset-0 rounded-full border-4 border-t-accent border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
+                            <div class="absolute inset-0 rounded-full border-2 sm:border-4 border-t-accent border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
                             <!-- Inner icon -->
-                            <div class="relative bg-bg-secondary rounded-full p-6">
-                                <i class="ph ph-article text-5xl text-accent"></i>
+                            <div class="relative bg-bg-secondary rounded-full p-4 sm:p-6">
+                                <PhArticle :size="48" class="text-accent sm:w-16 sm:h-16" />
                             </div>
                         </div>
-                        <p class="text-lg font-medium text-text-primary mb-2">
+                        <p class="text-base sm:text-lg font-medium text-text-primary mb-1 sm:mb-2">
                             {{ store.i18n.locale.value === 'zh' ? '加载内容中' : 'Loading content' }}
                         </p>
-                        <p class="text-sm text-text-secondary">
+                        <p class="text-xs sm:text-sm text-text-secondary px-4 text-center">
                             {{ store.i18n.locale.value === 'zh' ? '正在从 RSS 源获取文章内容...' : 'Fetching article content from RSS feed...' }}
                         </p>
                     </div>
                     
                     <!-- Content display -->
-                    <div v-else-if="articleContent" class="prose prose-lg max-w-none text-text-primary" v-html="articleContent"></div>
+                    <div v-else-if="articleContent" class="prose prose-sm sm:prose-lg max-w-none text-text-primary" v-html="articleContent"></div>
                     
                     <!-- No content available -->
-                    <div v-else class="text-center text-text-secondary py-8">
-                        <i class="ph ph-article text-5xl mb-3 opacity-50"></i>
-                        <p>{{ store.i18n.t('noContent') }}</p>
+                    <div v-else class="text-center text-text-secondary py-6 sm:py-8">
+                        <PhArticle :size="48" class="mb-2 sm:mb-3 opacity-50 mx-auto sm:w-16 sm:h-16" />
+                        <p class="text-sm sm:text-base">{{ store.i18n.t('noContent') }}</p>
                     </div>
                 </div>
             </div>
@@ -231,7 +237,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .action-btn {
-    @apply text-xl cursor-pointer text-text-secondary p-1.5 rounded-md transition-colors hover:bg-bg-tertiary hover:text-text-primary;
+    @apply text-lg sm:text-xl cursor-pointer text-text-secondary p-1 sm:p-1.5 rounded-md transition-colors hover:bg-bg-tertiary hover:text-text-primary;
 }
 
 /* Prose styling for article content */

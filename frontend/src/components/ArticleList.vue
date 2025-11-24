@@ -2,6 +2,10 @@
 import { store } from '../store.js';
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { BrowserOpenURL } from '../wailsjs/wailsjs/runtime/runtime.js';
+import { 
+    PhCheckCircle, PhArrowClockwise, PhList, PhMagnifyingGlass, 
+    PhEyeSlash, PhStar, PhSpinner 
+} from "@phosphor-icons/vue";
 
 const listRef = ref(null);
 const translationSettings = ref({
@@ -199,7 +203,7 @@ function onArticleContextMenu(e, article) {
             y: e.clientY,
             items: [
                 { label: article.is_read ? store.i18n.t('markAsUnread') : store.i18n.t('markAsRead'), action: 'toggleRead', icon: article.is_read ? 'ph-envelope' : 'ph-envelope-open' },
-                { label: article.is_favorite ? store.i18n.t('removeFromFavorites') : store.i18n.t('addToFavorites'), action: 'toggleFavorite', icon: 'ph-star' },
+                { label: article.is_favorite ? store.i18n.t('removeFromFavorites') : store.i18n.t('addToFavorites'), action: 'toggleFavorite', icon: 'ph-star', iconWeight: article.is_favorite ? 'fill' : 'regular', iconColor: article.is_favorite ? 'text-yellow-500' : '' },
                 { separator: true },
                 { label: contentActionLabel, action: 'renderContent', icon: contentActionIcon },
                 { label: article.is_hidden ? store.i18n.t('unhideArticle') : store.i18n.t('hideArticle'), action: 'toggleHide', icon: article.is_hidden ? 'ph-eye' : 'ph-eye-slash', danger: !article.is_hidden },
@@ -296,34 +300,34 @@ async function markAllAsRead() {
 
 <template>
     <section class="article-list flex flex-col w-full border-r border-border bg-bg-primary shrink-0 h-full">
-        <div class="p-4 border-b border-border bg-bg-primary">
-            <div class="flex items-center justify-between mb-3">
-                <h3 class="m-0 text-lg font-semibold">{{ store.i18n.t('articles') }}</h3>
-                <div class="flex items-center gap-2">
-                    <button @click="markAllAsRead" class="text-text-secondary hover:text-text-primary hover:bg-bg-tertiary p-1.5 rounded transition-colors" :title="store.i18n.t('markAllRead')">
-                        <i class="ph ph-check-circle text-xl"></i>
+        <div class="p-2 sm:p-4 border-b border-border bg-bg-primary">
+            <div class="flex items-center justify-between mb-2 sm:mb-3">
+                <h3 class="m-0 text-base sm:text-lg font-semibold">{{ store.i18n.t('articles') }}</h3>
+                <div class="flex items-center gap-1 sm:gap-2">
+                    <button @click="markAllAsRead" class="text-text-secondary hover:text-text-primary hover:bg-bg-tertiary p-1 sm:p-1.5 rounded transition-colors" :title="store.i18n.t('markAllRead')">
+                        <PhCheckCircle :size="20" class="sm:w-6 sm:h-6" />
                     </button>
                     <div class="relative">
-                        <button @click="refreshArticles" class="text-text-secondary hover:text-text-primary hover:bg-bg-tertiary p-1.5 rounded transition-colors" :title="store.i18n.t('refresh')">
-                            <i :class="['ph ph-arrow-clockwise text-xl', store.refreshProgress.isRunning ? 'ph-spin' : '']"></i>
+                        <button @click="refreshArticles" class="text-text-secondary hover:text-text-primary hover:bg-bg-tertiary p-1 sm:p-1.5 rounded transition-colors" :title="store.i18n.t('refresh')">
+                            <PhArrowClockwise :size="20" class="sm:w-6 sm:h-6" :class="store.refreshProgress.isRunning ? 'animate-spin' : ''" />
                         </button>
-                        <div v-if="store.refreshProgress.isRunning && store.refreshProgress.total > store.refreshProgress.current" class="absolute -top-1 -right-1 bg-accent text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center">
+                        <div v-if="store.refreshProgress.isRunning && store.refreshProgress.total > store.refreshProgress.current" class="absolute -top-1 -right-1 bg-accent text-white text-[9px] sm:text-[10px] font-bold rounded-full min-w-[14px] sm:min-w-[16px] h-3.5 sm:h-4 px-0.5 sm:px-1 flex items-center justify-center">
                             {{ store.refreshProgress.total - store.refreshProgress.current }}
                         </div>
                     </div>
-                    <button @click="emit('toggleSidebar')" class="md:hidden text-2xl p-1">
-                        <i class="ph ph-list"></i>
+                    <button @click="emit('toggleSidebar')" class="md:hidden text-xl sm:text-2xl p-1">
+                        <PhList :size="20" class="sm:w-6 sm:h-6" />
                     </button>
                 </div>
             </div>
-            <div class="flex items-center bg-bg-secondary border border-border rounded-lg px-3 py-2 focus-within:border-accent transition-colors">
-                <i class="ph ph-magnifying-glass text-text-secondary"></i>
-                <input type="text" v-model="searchQuery" :placeholder="store.i18n.t('search')" class="bg-transparent border-none outline-none w-full ml-2 text-text-primary text-sm">
+            <div class="flex items-center bg-bg-secondary border border-border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 focus-within:border-accent transition-colors">
+                <PhMagnifyingGlass :size="18" class="text-text-secondary sm:w-5 sm:h-5" />
+                <input type="text" v-model="searchQuery" :placeholder="store.i18n.t('search')" class="bg-transparent border-none outline-none w-full ml-1.5 sm:ml-2 text-text-primary text-xs sm:text-sm">
             </div>
         </div>
         
         <div class="flex-1 overflow-y-auto" @scroll="handleScroll" ref="listRef">
-            <div v-if="filteredArticles.length === 0 && !store.isLoading" class="p-5 text-center text-text-secondary">
+            <div v-if="filteredArticles.length === 0 && !store.isLoading" class="p-4 sm:p-5 text-center text-text-secondary text-sm sm:text-base">
                 {{ store.i18n.t('noArticles') }}
             </div>
             
@@ -334,28 +338,30 @@ async function markAllAsRead() {
                  @contextmenu="onArticleContextMenu($event, article)"
                  :class="['article-card', article.is_read ? 'read' : '', article.is_favorite ? 'favorite' : '', article.is_hidden ? 'hidden' : '', store.currentArticleId === article.id ? 'active' : '']">
                 
-                <img v-if="article.image_url" :src="article.image_url" class="w-20 h-[60px] object-cover rounded bg-bg-tertiary shrink-0 border border-border" @error="$event.target.style.display='none'">
+                <img v-if="article.image_url" :src="article.image_url" class="w-16 h-12 sm:w-20 sm:h-[60px] object-cover rounded bg-bg-tertiary shrink-0 border border-border" @error="$event.target.style.display='none'">
                 
                 <div class="flex-1 min-w-0">
-                    <div class="flex items-start gap-2">
-                        <h4 v-if="!article.translated_title || article.translated_title === article.title" class="flex-1 m-0 mb-1.5 text-base font-semibold leading-snug text-text-primary">{{ article.title }}</h4>
+                    <div class="flex items-start gap-1.5 sm:gap-2">
+                        <h4 v-if="!article.translated_title || article.translated_title === article.title" class="flex-1 m-0 mb-1 sm:mb-1.5 text-sm sm:text-base font-semibold leading-snug text-text-primary">{{ article.title }}</h4>
                         <div v-else class="flex-1">
-                            <h4 class="m-0 mb-1 text-base font-semibold leading-snug text-text-primary">{{ article.translated_title }}</h4>
-                            <div class="text-xs text-text-secondary italic mb-1">{{ article.title }}</div>
+                            <h4 class="m-0 mb-0.5 sm:mb-1 text-sm sm:text-base font-semibold leading-snug text-text-primary">{{ article.translated_title }}</h4>
+                            <div class="text-[10px] sm:text-xs text-text-secondary italic mb-0.5 sm:mb-1">{{ article.title }}</div>
                         </div>
-                        <i v-if="article.is_hidden" class="ph ph-eye-slash text-text-secondary flex-shrink-0" :title="store.i18n.t('hideArticle')"></i>
+                        <PhEyeSlash v-if="article.is_hidden" :size="18" class="text-text-secondary flex-shrink-0 sm:w-5 sm:h-5" :title="store.i18n.t('hideArticle')" />
                     </div>
 
-                    <div class="flex justify-between items-center text-xs text-text-secondary mt-2">
-                        <span class="font-medium text-accent">{{ article.feed_title }}</span>
-                        <span>{{ formatDate(article.published_at) }}</span>
+                    <div class="flex justify-between items-center text-[10px] sm:text-xs text-text-secondary mt-1.5 sm:mt-2">
+                        <span class="font-medium text-accent truncate flex-1 min-w-0 mr-2">{{ article.feed_title }}</span>
+                        <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+                            <PhStar v-if="article.is_favorite" :size="14" class="text-yellow-500 sm:w-[18px] sm:h-[18px]" weight="fill" />
+                            <span class="whitespace-nowrap">{{ formatDate(article.published_at) }}</span>
+                        </div>
                     </div>
-                    <i v-if="article.is_favorite" class="ph ph-star text-yellow-400 mt-1 block"></i>
                 </div>
             </div>
             
-            <div v-if="store.isLoading" class="p-4 text-center text-text-secondary">
-                <i class="ph ph-spinner ph-spin text-xl"></i>
+            <div v-if="store.isLoading" class="p-3 sm:p-4 text-center text-text-secondary">
+                <PhSpinner :size="20" class="animate-spin sm:w-6 sm:h-6" />
             </div>
         </div>
     </section>
@@ -368,10 +374,10 @@ async function markAllAsRead() {
     }
 }
 .article-card {
-    @apply p-3 border-b border-border cursor-pointer transition-colors flex gap-3 relative hover:bg-bg-tertiary;
+    @apply p-2 sm:p-3 border-b border-border cursor-pointer transition-colors flex gap-2 sm:gap-3 relative hover:bg-bg-tertiary;
 }
 .article-card.active {
-    @apply bg-bg-tertiary border-l-[3px] border-l-accent;
+    @apply bg-bg-tertiary border-l-2 sm:border-l-[3px] border-l-accent;
 }
 .article-card.read h4 {
     @apply text-text-secondary font-normal;
@@ -387,5 +393,12 @@ async function markAllAsRead() {
 }
 .article-card.hidden:hover {
     @apply opacity-80;
+}
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 </style>

@@ -2,6 +2,10 @@
 import { store } from '../store.js';
 import { computed, ref, watch } from 'vue';
 import { BrowserOpenURL } from '../wailsjs/wailsjs/runtime/runtime.js';
+import { 
+    PhListDashes, PhCircle, PhStar, PhFolder, PhCaretDown, PhWarningCircle, 
+    PhFolderDashed, PhPlus, PhGear, PhCheckCircle, PhGlobe, PhPencil, PhTrash 
+} from "@phosphor-icons/vue";
 
 const props = defineProps(['isOpen']);
 const emit = defineEmits(['toggle']);
@@ -225,27 +229,27 @@ async function handleCategoryAction(action, categoryName) {
 
 <template>
     <aside :class="['sidebar flex flex-col bg-bg-secondary border-r border-border h-full transition-transform duration-300 absolute z-20 md:relative md:translate-x-0', isOpen ? 'translate-x-0' : '-translate-x-full']">
-        <div class="p-5 border-b border-border flex justify-between items-center">
-            <h2 class="m-0 text-lg font-bold flex items-center gap-2 text-accent">
-                <img src="/assets/logo.svg" alt="Logo" class="h-7 w-auto" /> {{ store.i18n.t('appName') }}
+        <div class="p-3 sm:p-5 border-b border-border flex justify-between items-center">
+            <h2 class="m-0 text-base sm:text-lg font-bold flex items-center gap-1.5 sm:gap-2 text-accent">
+                <img src="/assets/logo.svg" alt="Logo" class="h-6 sm:h-7 w-auto" /> <span class="hidden xs:inline">{{ store.i18n.t('appName') }}</span>
             </h2>
         </div>
 
-        <nav class="p-3 space-y-1">
+        <nav class="p-2 sm:p-3 space-y-1">
             <button @click="store.setFilter('all')" :class="['nav-item', store.currentFilter === 'all' ? 'active' : '']">
-                <i class="ph ph-list-dashes"></i> 
+                <PhListDashes :size="20" /> 
                 <span class="flex-1 text-left">{{ store.i18n.t('allArticles') }}</span>
                 <span v-if="store.unreadCounts.total > 0" class="unread-badge">{{ store.unreadCounts.total }}</span>
             </button>
             <button @click="store.setFilter('unread')" :class="['nav-item', store.currentFilter === 'unread' ? 'active' : '']">
-                <i class="ph ph-circle"></i> {{ store.i18n.t('unread') }}
+                <PhCircle :size="20" /> {{ store.i18n.t('unread') }}
             </button>
             <button @click="store.setFilter('favorites')" :class="['nav-item', store.currentFilter === 'favorites' ? 'active' : '']">
-                <i class="ph ph-star"></i> {{ store.i18n.t('favorites') }}
+                <PhStar :size="20" /> {{ store.i18n.t('favorites') }}
             </button>
         </nav>
 
-        <div class="flex-1 overflow-y-auto p-2 border-t border-border">
+        <div class="flex-1 overflow-y-auto p-1.5 sm:p-2 border-t border-border">
             <!-- Recursive Tree Component would be better, but flattening for simplicity or inline -->
             <div v-for="(data, name) in tree.tree" :key="name" class="mb-1">
                 <div 
@@ -253,12 +257,12 @@ async function handleCategoryAction(action, categoryName) {
                     @contextmenu="onCategoryContextMenu($event, name)"
                 >
                     <span class="flex-1 flex items-center gap-2" @click="store.setCategory(name)">
-                        <i class="ph ph-folder"></i> {{ name }}
+                        <PhFolder :size="20" /> {{ name }}
                     </span>
                     <span v-if="categoryUnreadCounts[name] > 0" class="unread-badge mr-1">{{ categoryUnreadCounts[name] }}</span>
-                    <i class="ph ph-caret-down p-1 cursor-pointer transition-transform" 
+                    <PhCaretDown :size="20" class="p-1 cursor-pointer transition-transform" 
                        :class="{ 'rotate-180': isCategoryOpen(name) }"
-                       @click.stop="toggleCategory(name)"></i>
+                       @click.stop="toggleCategory(name)" />
                 </div>
                 <div v-show="isCategoryOpen(name)" class="pl-2">
                     <div v-for="feed in data._feeds" :key="feed.id" 
@@ -269,7 +273,7 @@ async function handleCategoryAction(action, categoryName) {
                             <img :src="feed.image_url || getFavicon(feed.url)" class="w-full h-full object-contain" @error="$event.target.style.display='none'">
                         </div>
                         <span class="truncate flex-1">{{ feed.title }}</span>
-                        <i v-if="feed.last_error" class="ph ph-warning-circle text-yellow-500 text-xs shrink-0" :title="feed.last_error"></i>
+                        <PhWarningCircle v-if="feed.last_error" :size="16" class="text-yellow-500 shrink-0" :title="feed.last_error" />
                         <span v-if="store.unreadCounts.feedCounts[feed.id] > 0" class="unread-badge">{{ store.unreadCounts.feedCounts[feed.id] }}</span>
                     </div>
                 </div>
@@ -279,11 +283,11 @@ async function handleCategoryAction(action, categoryName) {
              <div v-if="tree.uncategorized.length > 0" class="mb-1">
                 <div class="category-header" @click="toggleCategory('uncategorized')" @contextmenu="onCategoryContextMenu($event, 'uncategorized')">
                      <span class="flex-1 flex items-center gap-2">
-                        <i class="ph ph-folder-dashed"></i> {{ store.i18n.t('uncategorized') }}
+                        <PhFolderDashed :size="20" /> {{ store.i18n.t('uncategorized') }}
                     </span>
                     <span v-if="categoryUnreadCounts['uncategorized'] > 0" class="unread-badge mr-1">{{ categoryUnreadCounts['uncategorized'] }}</span>
-                    <i class="ph ph-caret-down p-1 cursor-pointer transition-transform" 
-                       :class="{ 'rotate-180': isCategoryOpen('uncategorized') }"></i>
+                    <PhCaretDown :size="20" class="p-1 cursor-pointer transition-transform" 
+                       :class="{ 'rotate-180': isCategoryOpen('uncategorized') }" />
                 </div>
                 <div v-show="isCategoryOpen('uncategorized')" class="pl-2">
                     <div v-for="feed in tree.uncategorized" :key="feed.id" 
@@ -294,16 +298,16 @@ async function handleCategoryAction(action, categoryName) {
                             <img :src="feed.image_url || getFavicon(feed.url)" class="w-full h-full object-contain" @error="$event.target.style.display='none'">
                         </div>
                         <span class="truncate flex-1">{{ feed.title }}</span>
-                        <i v-if="feed.last_error" class="ph ph-warning-circle text-yellow-500 text-xs shrink-0" :title="feed.last_error"></i>
+                        <PhWarningCircle v-if="feed.last_error" :size="16" class="text-yellow-500 shrink-0" :title="feed.last_error" />
                         <span v-if="store.unreadCounts.feedCounts[feed.id] > 0" class="unread-badge">{{ store.unreadCounts.feedCounts[feed.id] }}</span>
                     </div>
                 </div>
              </div>
         </div>
 
-        <div class="p-4 border-t border-border flex gap-2">
-            <button @click="emitShowAddFeed" class="footer-btn" :title="store.i18n.t('addFeed')"><i class="ph ph-plus"></i></button>
-            <button @click="emitShowSettings" class="footer-btn" :title="store.i18n.t('settings')"><i class="ph ph-gear"></i></button>
+        <div class="p-2 sm:p-4 border-t border-border flex gap-1.5 sm:gap-2">
+            <button @click="emitShowAddFeed" class="footer-btn" :title="store.i18n.t('addFeed')"><PhPlus :size="18" class="sm:w-5 sm:h-5" /></button>
+            <button @click="emitShowSettings" class="footer-btn" :title="store.i18n.t('settings')"><PhGear :size="18" class="sm:w-5 sm:h-5" /></button>
         </div>
     </aside>
     <!-- Overlay for mobile -->
@@ -320,27 +324,33 @@ async function handleCategoryAction(action, categoryName) {
     }
 }
 .nav-item {
-    @apply flex items-center gap-3 w-full px-3 py-2.5 text-text-secondary rounded-lg font-medium transition-colors hover:bg-bg-tertiary hover:text-text-primary text-left;
+    @apply flex items-center gap-2 sm:gap-3 w-full px-2 sm:px-3 py-2 sm:py-2.5 text-text-secondary rounded-lg font-medium transition-colors hover:bg-bg-tertiary hover:text-text-primary text-left text-sm sm:text-base;
 }
 .nav-item.active {
     @apply bg-bg-tertiary text-accent font-semibold;
 }
 .category-header {
-    @apply px-3 py-2 cursor-pointer font-semibold text-sm text-text-secondary flex items-center justify-between rounded-md hover:bg-bg-tertiary hover:text-text-primary transition-colors;
+    @apply px-2 sm:px-3 py-1.5 sm:py-2 cursor-pointer font-semibold text-xs sm:text-sm text-text-secondary flex items-center justify-between rounded-md hover:bg-bg-tertiary hover:text-text-primary transition-colors;
 }
 .category-header.active {
     @apply bg-bg-tertiary text-accent;
 }
 .feed-item {
-    @apply px-3 py-2 cursor-pointer rounded-md text-sm text-text-primary flex items-center gap-2.5 hover:bg-bg-tertiary transition-colors;
+    @apply px-2 sm:px-3 py-1.5 sm:py-2 cursor-pointer rounded-md text-xs sm:text-sm text-text-primary flex items-center gap-1.5 sm:gap-2.5 hover:bg-bg-tertiary transition-colors;
 }
 .feed-item.active {
     @apply bg-bg-tertiary text-accent font-medium;
 }
 .footer-btn {
-    @apply flex-1 flex items-center justify-center gap-2 p-2.5 text-text-secondary rounded-lg text-xl hover:bg-bg-tertiary hover:text-text-primary transition-colors;
+    @apply flex-1 flex items-center justify-center gap-2 p-2 sm:p-2.5 text-text-secondary rounded-lg text-lg sm:text-xl hover:bg-bg-tertiary hover:text-text-primary transition-colors;
 }
 .unread-badge {
-    @apply bg-text-secondary bg-opacity-20 text-text-secondary text-[10px] font-medium rounded-full min-w-[16px] h-[16px] px-1 flex items-center justify-center;
+    @apply text-[9px] sm:text-[10px] font-semibold rounded-full min-w-[14px] sm:min-w-[16px] h-[14px] sm:h-[16px] px-0.5 sm:px-1 flex items-center justify-center;
+    background-color: rgba(200, 200, 200, 0.3);
+    color: #666666;
+}
+.dark-mode .unread-badge {
+    background-color: rgba(160, 160, 160, 0.25);
+    color: #cccccc;
 }
 </style>

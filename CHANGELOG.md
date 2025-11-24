@@ -9,15 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Unread count badge displayed on each feed in the sidebar
-- Total unread count displayed on "All Articles" button
-- "Mark All as Read" button next to the refresh button in article list
-- "Mark All as Read" option in feed context menu
-- Dynamic unread count updates after refresh, cleanup, or article read operations
+- Unread count badge displayed on each feed in the sidebar and "All Articles" button
+- "Mark All as Read" button next to the refresh button in article list and feed context menu
+- When feeds fail to load, display error message in feed list instead of silently failing
+- Implemented input dialog for moving feeds to a new category
 
 ### Changed
 
-- Unread counts now update in real-time when articles are marked as read/unread
+- Fixed unfavorite icon for better visibility
 
 ## [1.1.6] - 2025-11-23
 

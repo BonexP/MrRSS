@@ -1,14 +1,37 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import * as PhosphorIcons from "@phosphor-icons/vue";
 
 const props = defineProps({
-    items: { type: Array, required: true }, // [{ label: 'Edit', action: 'edit', icon: 'ph-pencil' }, { separator: true }]
+    items: { type: Array, required: true }, // [{ label: 'Edit', action: 'edit', icon: 'PhPencil' }, { separator: true }]
     x: { type: Number, required: true },
     y: { type: Number, required: true }
 });
 
 const emit = defineEmits(['close', 'action']);
 const menuRef = ref(null);
+
+// Map old icon names to new component names
+const iconMap = {
+    'ph-check-circle': 'PhCheckCircle',
+    'ph-globe': 'PhGlobe',
+    'ph-pencil': 'PhPencil',
+    'ph-trash': 'PhTrash',
+    'ph-envelope': 'PhEnvelope',
+    'ph-envelope-open': 'PhEnvelopeOpen',
+    'ph-star': 'PhStar',
+    'ph-article': 'PhArticle',
+    'ph-eye': 'PhEye',
+    'ph-eye-slash': 'PhEyeSlash',
+    'ph-arrow-square-out': 'PhArrowSquareOut'
+};
+
+// Get icon component from icon string
+function getIconComponent(iconName) {
+    if (!iconName) return null;
+    const componentName = iconMap[iconName] || iconName;
+    return PhosphorIcons[componentName] || null;
+}
 
 function handleClickOutside(event) {
     if (menuRef.value && !menuRef.value.contains(event.target)) {
@@ -48,7 +71,11 @@ function handleAction(item) {
                      item.disabled ? 'opacity-50 cursor-not-allowed' : '',
                      item.danger ? 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20' : 'text-text-primary'
                  ]">
-                <i v-if="item.icon" :class="['ph', item.icon, 'text-lg', item.danger ? 'text-red-600 dark:text-red-400' : 'text-text-secondary']"></i>
+                <component v-if="item.icon && getIconComponent(item.icon)" 
+                           :is="getIconComponent(item.icon)" 
+                           :size="20" 
+                           :weight="item.iconWeight || 'regular'"
+                           :class="item.iconColor || (item.danger ? 'text-red-600 dark:text-red-400' : 'text-text-secondary')" />
                 <span>{{ item.label }}</span>
             </div>
         </template>

@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { PhCheckCircle, PhXCircle, PhWarning, PhInfo, PhX } from "@phosphor-icons/vue";
 
 const props = defineProps({
     message: { type: String, required: true },
@@ -29,13 +30,13 @@ function handleClose() {
 <template>
     <div v-if="show" :class="['toast', `toast-${type}`, show ? 'toast-show' : 'toast-hide']">
         <div class="flex items-center gap-3">
-            <i v-if="type === 'success'" class="ph ph-check-circle text-xl"></i>
-            <i v-else-if="type === 'error'" class="ph ph-x-circle text-xl"></i>
-            <i v-else-if="type === 'warning'" class="ph ph-warning text-xl"></i>
-            <i v-else class="ph ph-info text-xl"></i>
+            <PhCheckCircle v-if="type === 'success'" :size="20" />
+            <PhXCircle v-else-if="type === 'error'" :size="20" />
+            <PhWarning v-else-if="type === 'warning'" :size="20" />
+            <PhInfo v-else :size="20" />
             <span class="flex-1">{{ message }}</span>
             <button @click="handleClose" class="text-xl opacity-70 hover:opacity-100 transition-opacity">
-                <i class="ph ph-x"></i>
+                <PhX :size="20" />
             </button>
         </div>
     </div>

@@ -8,6 +8,7 @@ import EditFeedModal from './components/modals/EditFeedModal.vue';
 import SettingsModal from './components/modals/SettingsModal.vue';
 import ContextMenu from './components/ContextMenu.vue';
 import ConfirmDialog from './components/modals/ConfirmDialog.vue';
+import InputDialog from './components/modals/InputDialog.vue';
 import Toast from './components/Toast.vue';
 import { onMounted, ref } from 'vue';
 
@@ -19,6 +20,7 @@ const isSidebarOpen = ref(false);
 
 // Global notification system
 const confirmDialog = ref(null);
+const inputDialog = ref(null);
 const toasts = ref([]);
 
 function showConfirm(options) {
@@ -37,6 +39,22 @@ function showConfirm(options) {
     });
 }
 
+function showInput(options) {
+    return new Promise((resolve) => {
+        inputDialog.value = {
+            ...options,
+            onConfirm: (value) => {
+                inputDialog.value = null;
+                resolve(value);
+            },
+            onCancel: () => {
+                inputDialog.value = null;
+                resolve(null);
+            }
+        };
+    });
+}
+
 function showToast(message, type = 'info', duration = 3000) {
     const id = Date.now();
     toasts.value.push({ id, message, type, duration });
@@ -44,6 +62,7 @@ function showToast(message, type = 'info', duration = 3000) {
 
 // Make these available globally
 window.showConfirm = showConfirm;
+window.showInput = showInput;
 window.showToast = showToast;
 
 // Resizable columns state
@@ -223,6 +242,19 @@ function handleContextMenuAction(action) {
             @close="confirmDialog = null"
         />
         
+        <InputDialog 
+            v-if="inputDialog"
+            :title="inputDialog.title"
+            :message="inputDialog.message"
+            :placeholder="inputDialog.placeholder"
+            :defaultValue="inputDialog.defaultValue"
+            :confirmText="inputDialog.confirmText"
+            :cancelText="inputDialog.cancelText"
+            @confirm="inputDialog.onConfirm"
+            @cancel="inputDialog.onCancel"
+            @close="inputDialog = null"
+        />
+        
         <div class="toast-container">
             <Toast 
                 v-for="toast in toasts"
@@ -239,12 +271,25 @@ function handleContextMenuAction(action) {
 <style>
 .toast-container {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 10px;
+    right: 10px;
+    left: 10px;
     z-index: 60;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
+    pointer-events: none;
+}
+.toast-container > * {
+    pointer-events: auto;
+}
+@media (min-width: 640px) {
+    .toast-container {
+        top: 20px;
+        right: 20px;
+        left: auto;
+        gap: 10px;
+    }
 }
 .resizer {
     width: 4px;

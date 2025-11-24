@@ -4,6 +4,7 @@ import { ref, onMounted } from 'vue';
 import GeneralTab from './settings/GeneralTab.vue';
 import FeedsTab from './settings/FeedsTab.vue';
 import AboutTab from './settings/AboutTab.vue';
+import { PhGear } from "@phosphor-icons/vue";
 
 const emit = defineEmits(['close']);
 const activeTab = ref('general');
@@ -163,8 +164,13 @@ async function handleBatchDelete(selectedIds) {
 async function handleBatchMove(selectedIds) {
     if (!store.feeds) return;
     
-    // TODO: Replace with custom input dialog
-    const newCategory = prompt('Enter new category name:');
+    const newCategory = await window.showInput({
+        title: store.i18n.t('moveFeeds'),
+        message: store.i18n.t('enterCategoryName'),
+        placeholder: store.i18n.t('categoryPlaceholder'),
+        confirmText: store.i18n.t('move'),
+        cancelText: store.i18n.t('cancel')
+    });
     if (newCategory === null) return;
 
     const promises = selectedIds.map(id => {
@@ -312,23 +318,23 @@ async function handleDownloadInstallUpdate() {
 </script>
 
 <template>
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-bg-primary w-full max-w-4xl h-[700px] flex flex-col rounded-2xl shadow-2xl border border-border overflow-hidden animate-fade-in">
-            <div class="p-5 border-b border-border flex justify-between items-center shrink-0">
-                <h3 class="text-lg font-semibold m-0 flex items-center gap-2">
-                    <i class="ph ph-gear text-xl"></i>
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 sm:p-4">
+        <div class="bg-bg-primary w-full max-w-4xl h-full sm:h-[700px] sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl shadow-2xl border border-border overflow-hidden animate-fade-in">
+            <div class="p-3 sm:p-5 border-b border-border flex justify-between items-center shrink-0">
+                <h3 class="text-base sm:text-lg font-semibold m-0 flex items-center gap-2">
+                    <PhGear :size="20" class="sm:w-6 sm:h-6" />
                     {{ store.i18n.t('settingsTitle') }}
                 </h3>
                 <span @click="emit('close')" class="text-2xl cursor-pointer text-text-secondary hover:text-text-primary">&times;</span>
             </div>
             
-            <div class="flex border-b border-border bg-bg-secondary shrink-0 overflow-x-auto">
+            <div class="flex border-b border-border bg-bg-secondary shrink-0 overflow-x-auto scrollbar-hide">
                 <button @click="activeTab = 'general'" :class="['tab-btn', activeTab === 'general' ? 'active' : '']">{{ store.i18n.t('general') }}</button>
                 <button @click="activeTab = 'feeds'" :class="['tab-btn', activeTab === 'feeds' ? 'active' : '']">{{ store.i18n.t('feeds') }}</button>
                 <button @click="activeTab = 'about'" :class="['tab-btn', activeTab === 'about' ? 'active' : '']">{{ store.i18n.t('about') }}</button>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-6">
+            <div class="flex-1 overflow-y-auto p-3 sm:p-6 min-h-0">
                 <GeneralTab v-if="activeTab === 'general'" :settings="settings" />
                 
                 <FeedsTab 
@@ -360,7 +366,7 @@ async function handleDownloadInstallUpdate() {
 
 <style scoped>
 .tab-btn {
-    @apply px-5 py-3 bg-transparent border-b-2 border-transparent text-text-secondary font-semibold cursor-pointer hover:text-text-primary transition-all relative;
+    @apply px-3 sm:px-5 py-2 sm:py-3 bg-transparent border-b-2 border-transparent text-text-secondary font-semibold cursor-pointer hover:text-text-primary transition-all relative whitespace-nowrap text-sm sm:text-base;
 }
 .tab-btn:hover {
     background-color: rgba(128, 128, 128, 0.1);
@@ -392,5 +398,12 @@ async function handleDownloadInstallUpdate() {
 @keyframes modalFadeIn {
     from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
 }
 </style>

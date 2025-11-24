@@ -1,6 +1,11 @@
 <script setup>
 import { store } from '../../../store.js';
 import { watch, onUnmounted, onMounted, ref } from 'vue';
+import { 
+    PhPalette, PhMoon, PhTranslate, PhArticle, PhArrowClockwise, PhClock, 
+    PhCalendarCheck, PhPower, PhDatabase, PhBroom, PhHardDrive, PhCalendarX, 
+    PhEyeSlash, PhGlobe, PhPackage, PhKey 
+} from "@phosphor-icons/vue";
 
 const props = defineProps({
     settings: { type: Object, required: true }
@@ -144,48 +149,48 @@ function formatLastUpdate(timestamp) {
 </script>
 
 <template>
-    <div class="space-y-6">
+    <div class="space-y-4 sm:space-y-6">
         <div class="setting-group">
-            <label class="font-semibold mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2">
-                <i class="ph ph-palette text-base"></i>
+            <label class="font-semibold mb-2 sm:mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2">
+                <PhPalette :size="14" class="sm:w-4 sm:h-4" />
                 {{ store.i18n.t('appearance') }}
             </label>
             <div class="setting-item">
-                <div class="flex-1 flex items-start gap-3">
-                    <i class="ph ph-moon text-xl text-text-secondary mt-0.5"></i>
-                    <div class="flex-1">
-                        <div class="font-medium mb-1">{{ store.i18n.t('theme') }}</div>
-                        <div class="text-xs text-text-secondary">{{ store.i18n.t('themeDesc') }}</div>
+                <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                    <PhMoon :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium mb-1 text-sm sm:text-base">{{ store.i18n.t('theme') }}</div>
+                        <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('themeDesc') }}</div>
                     </div>
                 </div>
-                <select v-model="settings.theme" class="input-field w-48">
+                <select v-model="settings.theme" class="input-field w-24 sm:w-48 text-xs sm:text-sm">
                     <option value="light">{{ store.i18n.t('light') }}</option>
                     <option value="dark">{{ store.i18n.t('dark') }}</option>
                     <option value="auto">{{ store.i18n.t('auto') }}</option>
                 </select>
             </div>
-            <div class="setting-item mt-3">
-                <div class="flex-1 flex items-start gap-3">
-                    <i class="ph ph-translate text-xl text-text-secondary mt-0.5"></i>
-                    <div class="flex-1">
-                        <div class="font-medium mb-1">{{ store.i18n.t('language') }}</div>
-                        <div class="text-xs text-text-secondary">{{ store.i18n.t('languageDesc') }}</div>
+            <div class="setting-item mt-2 sm:mt-3">
+                <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                    <PhTranslate :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium mb-1 text-sm sm:text-base">{{ store.i18n.t('language') }}</div>
+                        <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('languageDesc') }}</div>
                     </div>
                 </div>
-                <select v-model="settings.language" class="input-field w-48">
+                <select v-model="settings.language" class="input-field w-24 sm:w-48 text-xs sm:text-sm">
                     <option value="en">{{ store.i18n.t('english') }}</option>
                     <option value="zh">{{ store.i18n.t('chinese') }}</option>
                 </select>
             </div>
-            <div class="setting-item mt-3">
-                <div class="flex-1 flex items-start gap-3">
-                    <i class="ph ph-article text-xl text-text-secondary mt-0.5"></i>
-                    <div class="flex-1">
-                        <div class="font-medium mb-1">{{ store.i18n.t('defaultViewMode') }}</div>
-                        <div class="text-xs text-text-secondary">{{ store.i18n.t('defaultViewModeDesc') }}</div>
+            <div class="setting-item mt-2 sm:mt-3">
+                <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                    <PhArticle :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium mb-1 text-sm sm:text-base">{{ store.i18n.t('defaultViewMode') }}</div>
+                        <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('defaultViewModeDesc') }}</div>
                     </div>
                 </div>
-                <select v-model="settings.default_view_mode" class="input-field w-48">
+                <select v-model="settings.default_view_mode" class="input-field w-24 sm:w-48 text-xs sm:text-sm">
                     <option value="original">{{ store.i18n.t('viewModeOriginal') }}</option>
                     <option value="rendered">{{ store.i18n.t('viewModeRendered') }}</option>
                 </select>
@@ -193,38 +198,38 @@ function formatLastUpdate(timestamp) {
         </div>
 
         <div class="setting-group">
-            <label class="font-semibold mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2">
-                <i class="ph ph-arrow-clockwise text-base"></i>
+            <label class="font-semibold mb-2 sm:mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2">
+                <PhArrowClockwise :size="14" class="sm:w-4 sm:h-4" />
                 {{ store.i18n.t('updates') }}
             </label>
             <div class="setting-item">
-                <div class="flex-1 flex items-start gap-3">
-                    <i class="ph ph-clock text-xl text-text-secondary mt-0.5"></i>
-                    <div class="flex-1">
-                        <div class="font-medium mb-1">{{ store.i18n.t('autoUpdateInterval') }}</div>
-                        <div class="text-xs text-text-secondary">{{ store.i18n.t('autoUpdateIntervalDesc') }}</div>
+                <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                    <PhClock :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium mb-1 text-sm sm:text-base">{{ store.i18n.t('autoUpdateInterval') }}</div>
+                        <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('autoUpdateIntervalDesc') }}</div>
                     </div>
                 </div>
-                <input type="number" v-model="settings.update_interval" min="1" class="input-field w-20 text-center">
+                <input type="number" v-model="settings.update_interval" min="1" class="input-field w-16 sm:w-20 text-center text-xs sm:text-sm">
             </div>
             
             <!-- Last update time - read-only info display -->
-            <div class="info-display mt-3">
+            <div class="info-display mt-2 sm:mt-3">
                 <div class="flex items-center gap-2">
-                    <i class="ph ph-calendar-check text-lg text-text-secondary"></i>
-                    <div class="flex-1">
-                        <div class="text-sm text-text-secondary">{{ store.i18n.t('lastArticleUpdate') }}</div>
+                    <PhCalendarCheck :size="18" class="text-text-secondary shrink-0 sm:w-5 sm:h-5" />
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs sm:text-sm text-text-secondary truncate">{{ store.i18n.t('lastArticleUpdate') }}</div>
                     </div>
-                    <div class="text-sm font-medium text-accent">{{ formatLastUpdate(settings.last_article_update) }}</div>
+                    <div class="text-xs sm:text-sm font-medium text-accent shrink-0">{{ formatLastUpdate(settings.last_article_update) }}</div>
                 </div>
             </div>
             
-            <div class="setting-item mt-3">
-                <div class="flex-1 flex items-start gap-3">
-                    <i class="ph ph-power text-xl text-text-secondary mt-0.5"></i>
-                    <div class="flex-1">
-                        <div class="font-medium mb-1">{{ store.i18n.t('startupOnBoot') }}</div>
-                        <div class="text-xs text-text-secondary">{{ store.i18n.t('startupOnBootDesc') }}</div>
+            <div class="setting-item mt-2 sm:mt-3">
+                <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                    <PhPower :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium mb-1 text-sm sm:text-base">{{ store.i18n.t('startupOnBoot') }}</div>
+                        <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('startupOnBootDesc') }}</div>
                     </div>
                 </div>
                 <input type="checkbox" v-model="settings.startup_on_boot" class="toggle">
@@ -232,57 +237,57 @@ function formatLastUpdate(timestamp) {
         </div>
 
         <div class="setting-group">
-            <label class="font-semibold mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2">
-                <i class="ph ph-database text-base"></i>
+            <label class="font-semibold mb-2 sm:mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2">
+                <PhDatabase :size="14" class="sm:w-4 sm:h-4" />
                 {{ store.i18n.t('database') }}
             </label>
             <div class="setting-item">
-                <div class="flex-1 flex items-start gap-3">
-                    <i class="ph ph-broom text-xl text-text-secondary mt-0.5"></i>
-                    <div class="flex-1">
-                        <div class="font-medium mb-1">{{ store.i18n.t('autoCleanup') }}</div>
-                        <div class="text-xs text-text-secondary">{{ store.i18n.t('autoCleanupDesc') }}</div>
+                <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                    <PhBroom :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium mb-1 text-sm sm:text-base">{{ store.i18n.t('autoCleanup') }}</div>
+                        <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('autoCleanupDesc') }}</div>
                     </div>
                 </div>
                 <input type="checkbox" v-model="settings.auto_cleanup_enabled" class="toggle">
             </div>
             
-            <div v-if="settings.auto_cleanup_enabled" class="ml-4 mt-3 space-y-3 border-l-2 border-border pl-4">
+            <div v-if="settings.auto_cleanup_enabled" class="ml-2 sm:ml-4 mt-2 sm:mt-3 space-y-2 sm:space-y-3 border-l-2 border-border pl-2 sm:pl-4">
                 <div class="sub-setting-item">
-                    <div class="flex-1 flex items-start gap-3">
-                        <i class="ph ph-hard-drive text-xl text-text-secondary mt-0.5"></i>
-                        <div class="flex-1">
-                            <div class="font-medium mb-1">{{ store.i18n.t('maxCacheSize') }}</div>
-                            <div class="text-xs text-text-secondary">{{ store.i18n.t('maxCacheSizeDesc') }}</div>
+                    <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                        <PhHardDrive :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium mb-1 text-sm">{{ store.i18n.t('maxCacheSize') }}</div>
+                            <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('maxCacheSizeDesc') }}</div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <input type="number" v-model="settings.max_cache_size_mb" min="1" max="1000" class="input-field w-20 text-center">
-                        <span class="text-sm text-text-secondary">MB</span>
+                    <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+                        <input type="number" v-model="settings.max_cache_size_mb" min="1" max="1000" class="input-field w-14 sm:w-20 text-center text-xs sm:text-sm">
+                        <span class="text-xs sm:text-sm text-text-secondary">MB</span>
                     </div>
                 </div>
                 
                 <div class="sub-setting-item">
-                    <div class="flex-1 flex items-start gap-3">
-                        <i class="ph ph-calendar-x text-xl text-text-secondary mt-0.5"></i>
-                        <div class="flex-1">
-                            <div class="font-medium mb-1">{{ store.i18n.t('maxArticleAge') }}</div>
-                            <div class="text-xs text-text-secondary">{{ store.i18n.t('maxArticleAgeDesc') }}</div>
+                    <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                        <PhCalendarX :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium mb-1 text-sm">{{ store.i18n.t('maxArticleAge') }}</div>
+                            <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('maxArticleAgeDesc') }}</div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <input type="number" v-model="settings.max_article_age_days" min="1" max="365" class="input-field w-20 text-center">
-                        <span class="text-sm text-text-secondary">{{ store.i18n.t('days') }}</span>
+                    <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+                        <input type="number" v-model="settings.max_article_age_days" min="1" max="365" class="input-field w-14 sm:w-20 text-center text-xs sm:text-sm">
+                        <span class="text-xs sm:text-sm text-text-secondary">{{ store.i18n.t('days') }}</span>
                     </div>
                 </div>
             </div>
             
-            <div class="setting-item mt-3">
-                <div class="flex-1 flex items-start gap-3">
-                    <i class="ph ph-eye-slash text-xl text-text-secondary mt-0.5"></i>
-                    <div class="flex-1">
-                        <div class="font-medium mb-1">{{ store.i18n.t('showHiddenArticles') }}</div>
-                        <div class="text-xs text-text-secondary">{{ store.i18n.t('showHiddenArticlesDesc') }}</div>
+            <div class="setting-item mt-2 sm:mt-3">
+                <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                    <PhEyeSlash :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium mb-1 text-sm sm:text-base">{{ store.i18n.t('showHiddenArticles') }}</div>
+                        <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('showHiddenArticlesDesc') }}</div>
                     </div>
                 </div>
                 <input type="checkbox" v-model="settings.show_hidden_articles" class="toggle">
@@ -290,56 +295,56 @@ function formatLastUpdate(timestamp) {
         </div>
 
         <div class="setting-group">
-            <label class="font-semibold mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2">
-                <i class="ph ph-globe text-base"></i>
+            <label class="font-semibold mb-2 sm:mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2">
+                <PhGlobe :size="14" class="sm:w-4 sm:h-4" />
                 {{ store.i18n.t('translation') }}
             </label>
-            <div class="setting-item mb-4">
-                <div class="flex-1 flex items-start gap-3">
-                    <i class="ph ph-article text-xl text-text-secondary mt-0.5"></i>
-                    <div class="flex-1">
-                        <div class="font-medium mb-1">{{ store.i18n.t('enableTranslation') }}</div>
-                        <div class="text-xs text-text-secondary">{{ store.i18n.t('enableTranslationDesc') }}</div>
+            <div class="setting-item mb-2 sm:mb-4">
+                <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                    <PhArticle :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                    <div class="flex-1 min-w-0">
+                        <div class="font-medium mb-1 text-sm sm:text-base">{{ store.i18n.t('enableTranslation') }}</div>
+                        <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('enableTranslationDesc') }}</div>
                     </div>
                 </div>
                 <input type="checkbox" v-model="settings.translation_enabled" class="toggle">
             </div>
             
-            <div v-if="settings.translation_enabled" class="ml-4 space-y-3 border-l-2 border-border pl-4">
+            <div v-if="settings.translation_enabled" class="ml-2 sm:ml-4 space-y-2 sm:space-y-3 border-l-2 border-border pl-2 sm:pl-4">
                 <div class="sub-setting-item">
-                    <div class="flex-1 flex items-start gap-3">
-                        <i class="ph ph-package text-xl text-text-secondary mt-0.5"></i>
-                        <div class="flex-1">
-                            <div class="font-medium mb-1">{{ store.i18n.t('translationProvider') }}</div>
-                            <div class="text-xs text-text-secondary">{{ store.i18n.t('translationProviderDesc') || 'Choose the translation service to use' }}</div>
+                    <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                        <PhPackage :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium mb-1 text-sm">{{ store.i18n.t('translationProvider') }}</div>
+                            <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('translationProviderDesc') || 'Choose the translation service to use' }}</div>
                         </div>
                     </div>
-                    <select v-model="settings.translation_provider" class="input-field w-48">
+                    <select v-model="settings.translation_provider" class="input-field w-32 sm:w-48 text-xs sm:text-sm">
                         <option value="google">Google Translate (Free)</option>
                         <option value="deepl">DeepL API</option>
                     </select>
                 </div>
                 
                 <div v-if="settings.translation_provider === 'deepl'" class="sub-setting-item">
-                    <div class="flex-1 flex items-start gap-3">
-                        <i class="ph ph-key text-xl text-text-secondary mt-0.5"></i>
-                        <div class="flex-1">
-                            <div class="font-medium mb-1">{{ store.i18n.t('deeplApiKey') }}</div>
-                            <div class="text-xs text-text-secondary">{{ store.i18n.t('deeplApiKeyDesc') || 'Enter your DeepL API key' }}</div>
+                    <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                        <PhKey :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium mb-1 text-sm">{{ store.i18n.t('deeplApiKey') }}</div>
+                            <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('deeplApiKeyDesc') || 'Enter your DeepL API key' }}</div>
                         </div>
                     </div>
-                    <input type="password" v-model="settings.deepl_api_key" :placeholder="store.i18n.t('deeplApiKeyPlaceholder')" class="input-field w-48">
+                    <input type="password" v-model="settings.deepl_api_key" :placeholder="store.i18n.t('deeplApiKeyPlaceholder')" class="input-field w-32 sm:w-48 text-xs sm:text-sm">
                 </div>
                 
                 <div class="sub-setting-item">
-                    <div class="flex-1 flex items-start gap-3">
-                        <i class="ph ph-globe text-xl text-text-secondary mt-0.5"></i>
-                        <div class="flex-1">
-                            <div class="font-medium mb-1">{{ store.i18n.t('targetLanguage') }}</div>
-                            <div class="text-xs text-text-secondary">{{ store.i18n.t('targetLanguageDesc') || 'Language to translate article titles to' }}</div>
+                    <div class="flex-1 flex items-start gap-2 sm:gap-3 min-w-0">
+                        <PhGlobe :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+                        <div class="flex-1 min-w-0">
+                            <div class="font-medium mb-1 text-sm">{{ store.i18n.t('targetLanguage') }}</div>
+                            <div class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('targetLanguageDesc') || 'Language to translate article titles to' }}</div>
                         </div>
                     </div>
-                    <select v-model="settings.target_language" class="input-field w-48">
+                    <select v-model="settings.target_language" class="input-field w-24 sm:w-48 text-xs sm:text-sm">
                         <option value="en">{{ store.i18n.t('english') }}</option>
                         <option value="es">{{ store.i18n.t('spanish') }}</option>
                         <option value="fr">{{ store.i18n.t('french') }}</option>
@@ -355,10 +360,10 @@ function formatLastUpdate(timestamp) {
 
 <style scoped>
 .input-field {
-    @apply p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary text-sm focus:border-accent focus:outline-none transition-colors;
+    @apply p-1.5 sm:p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary focus:border-accent focus:outline-none transition-colors;
 }
 .toggle {
-    @apply w-10 h-5 appearance-none bg-bg-tertiary rounded-full relative cursor-pointer border border-border transition-colors checked:bg-accent checked:border-accent;
+    @apply w-10 h-5 appearance-none bg-bg-tertiary rounded-full relative cursor-pointer border border-border transition-colors checked:bg-accent checked:border-accent shrink-0;
 }
 .toggle::after {
     content: '';
@@ -368,13 +373,13 @@ function formatLastUpdate(timestamp) {
     transform: translateX(20px);
 }
 .setting-item {
-    @apply flex items-start justify-between gap-4 p-3 rounded-lg bg-bg-secondary border border-border;
+    @apply flex items-start justify-between gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-bg-secondary border border-border;
 }
 .sub-setting-item {
-    @apply flex items-start justify-between gap-4 p-2.5 rounded-md bg-bg-tertiary;
+    @apply flex items-start justify-between gap-2 sm:gap-4 p-2 sm:p-2.5 rounded-md bg-bg-tertiary;
 }
 .info-display {
-    @apply px-3 py-2 rounded-lg border border-border;
+    @apply px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-border;
     background-color: rgba(233, 236, 239, 0.3);
 }
 .dark-mode .info-display {
