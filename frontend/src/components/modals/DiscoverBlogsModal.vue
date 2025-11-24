@@ -139,7 +139,7 @@ if (props.show) {
                         <p class="text-sm text-text-secondary">
                             {{ store.i18n.t('foundBlogs', { count: discoveredBlogs.length }) }}
                         </p>
-                        <button @click="selectAll" class="text-sm text-accent hover:text-accent-dark font-medium">
+                        <button @click="selectAll" class="text-sm text-accent hover:text-accent-hover font-medium">
                             {{ allSelected ? store.i18n.t('deselectAll') : store.i18n.t('selectAll') }}
                         </button>
                     </div>
@@ -175,7 +175,7 @@ if (props.show) {
                                             <a :href="blog.homepage" 
                                                target="_blank" 
                                                @click.stop
-                                               class="text-xs text-accent hover:text-accent-dark flex items-center gap-1 mt-1 truncate">
+                                               class="text-xs text-accent hover:text-accent-hover flex items-center gap-1 mt-1 truncate">
                                                 <PhGlobe :size="14" />
                                                 <span class="truncate">{{ blog.homepage }}</span>
                                             </a>
@@ -226,10 +226,10 @@ if (props.show) {
 
 <style scoped>
 .btn-primary {
-    @apply px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-dark transition-colors font-medium;
+    @apply px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors font-medium;
 }
 
 .btn-secondary {
-    @apply px-4 py-2 bg-bg-tertiary text-text-primary rounded-lg hover:bg-bg-quaternary transition-colors;
+    @apply px-4 py-2 bg-bg-tertiary text-text-primary rounded-lg hover:opacity-80 transition-colors;
 }
 </style>
