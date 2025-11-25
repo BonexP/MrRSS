@@ -18,7 +18,7 @@ const progressMessage = ref('');
 const progressDetail = ref('');
 const progressCounts = ref({ current: 0, total: 0, found: 0 });
 const isSubscribing = ref(false);
-let eventSource = null;
+let pollInterval = null;
 
 function getHostname(url) {
     try {
@@ -29,7 +29,7 @@ function getHostname(url) {
 }
 
 async function startDiscovery() {
-    console.log('startDiscovery: Beginning SSE discovery process');
+    console.log('startDiscovery: Beginning discovery process with polling');
     isDiscovering.value = true;
     errorMessage.value = '';
     discoveredFeeds.value = [];
@@ -38,98 +38,104 @@ async function startDiscovery() {
     progressDetail.value = '';
     progressCounts.value = { current: 0, total: 0, found: 0 };
 
-    // Close any existing event source
-    if (eventSource) {
-        eventSource.close();
-        eventSource = null;
+    // Clear any existing poll interval
+    if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
     }
 
     try {
-        // Check if EventSource is supported
-        if (typeof EventSource === 'undefined') {
-            throw new Error('EventSource not supported by this browser');
-        }
-
-        // Validate feed ID before creating EventSource
+        // Validate feed ID
         if (!props.feed?.id) {
             throw new Error('Invalid feed ID');
         }
 
-        // Use SSE endpoint for real-time progress
-        eventSource = new EventSource(`/api/feeds/discover-sse?feed_id=${props.feed.id}`);
+        // Clear any previous discovery state
+        await fetch('/api/feeds/discover/clear', { method: 'POST' });
 
-        eventSource.addEventListener('progress', (event) => {
-            const progress = JSON.parse(event.data);
-            console.log('Progress:', progress);
-            
-            // Update progress message based on stage
-            switch (progress.stage) {
-                case 'fetching_homepage':
-                    progressMessage.value = store.i18n.t('fetchingHomepage');
-                    progressDetail.value = getHostname(progress.detail);
-                    break;
-                case 'finding_friend_links':
-                    progressMessage.value = store.i18n.t('searchingFriendLinks');
-                    progressDetail.value = getHostname(progress.detail);
-                    break;
-                case 'fetching_friend_page':
-                    progressMessage.value = store.i18n.t('fetchingFriendPage');
-                    progressDetail.value = getHostname(progress.detail);
-                    break;
-                case 'found_links':
-                    progressMessage.value = store.i18n.t('foundPotentialLinks', { count: progress.total });
-                    progressDetail.value = '';
-                    progressCounts.value.total = progress.total;
-                    break;
-                case 'checking_rss':
-                    progressMessage.value = store.i18n.t('checkingRssFeed');
-                    progressDetail.value = getHostname(progress.detail);
-                    progressCounts.value.current = progress.current || 0;
-                    progressCounts.value.total = progress.total || 0;
-                    progressCounts.value.found = progress.found_count || 0;
-                    break;
-                default:
-                    progressMessage.value = progress.message || store.i18n.t('discovering');
-                    progressDetail.value = progress.detail ? getHostname(progress.detail) : '';
-            }
+        // Start discovery in background
+        const startResponse = await fetch('/api/feeds/discover/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ feed_id: props.feed.id })
         });
 
-        eventSource.addEventListener('complete', (event) => {
-            const result = JSON.parse(event.data);
-            console.log('Discovery complete:', result);
-            
-            discoveredFeeds.value = result.feeds || [];
-            
-            if (discoveredFeeds.value.length === 0) {
-                errorMessage.value = store.i18n.t('noFriendLinksFound');
-            }
-            
-            isDiscovering.value = false;
-            progressMessage.value = '';
-            progressDetail.value = '';
-            eventSource.close();
-            eventSource = null;
-        });
+        if (!startResponse.ok) {
+            const errorText = await startResponse.text();
+            throw new Error(errorText || 'Failed to start discovery');
+        }
 
-        eventSource.addEventListener('error', (event) => {
-            // Check if it's a connection error or an error event from server
-            if (event.data) {
-                const error = JSON.parse(event.data);
-                console.error('Discovery error:', error);
-                errorMessage.value = store.i18n.t('discoveryFailed') + ': ' + (error.message || 'Unknown error');
-            } else {
-                console.error('EventSource error:', event);
-                // Only show error if we're still discovering (not if SSE just closed)
-                if (isDiscovering.value) {
-                    errorMessage.value = store.i18n.t('discoveryFailed');
+        // Start polling for progress
+        pollInterval = setInterval(async () => {
+            try {
+                const progressResponse = await fetch('/api/feeds/discover/progress');
+                if (!progressResponse.ok) {
+                    throw new Error('Failed to get progress');
                 }
+
+                const state = await progressResponse.json();
+                console.log('Progress state:', state);
+
+                // Update progress display
+                if (state.progress) {
+                    const progress = state.progress;
+                    switch (progress.stage) {
+                        case 'fetching_homepage':
+                            progressMessage.value = store.i18n.t('fetchingHomepage');
+                            progressDetail.value = progress.detail ? getHostname(progress.detail) : '';
+                            break;
+                        case 'finding_friend_links':
+                            progressMessage.value = store.i18n.t('searchingFriendLinks');
+                            progressDetail.value = progress.detail ? getHostname(progress.detail) : '';
+                            break;
+                        case 'fetching_friend_page':
+                            progressMessage.value = store.i18n.t('fetchingFriendPage');
+                            progressDetail.value = progress.detail ? getHostname(progress.detail) : '';
+                            break;
+                        case 'found_links':
+                            progressMessage.value = store.i18n.t('foundPotentialLinks', { count: progress.total });
+                            progressDetail.value = '';
+                            progressCounts.value.total = progress.total;
+                            break;
+                        case 'checking_rss':
+                            progressMessage.value = store.i18n.t('checkingRssFeed');
+                            progressDetail.value = progress.detail ? getHostname(progress.detail) : '';
+                            progressCounts.value.current = progress.current || 0;
+                            progressCounts.value.total = progress.total || 0;
+                            progressCounts.value.found = progress.found_count || 0;
+                            break;
+                        default:
+                            progressMessage.value = progress.message || store.i18n.t('discovering');
+                            progressDetail.value = progress.detail ? getHostname(progress.detail) : '';
+                    }
+                }
+
+                // Check if complete
+                if (state.is_complete) {
+                    clearInterval(pollInterval);
+                    pollInterval = null;
+
+                    if (state.error) {
+                        errorMessage.value = store.i18n.t('discoveryFailed') + ': ' + state.error;
+                    } else {
+                        discoveredFeeds.value = state.feeds || [];
+                        if (discoveredFeeds.value.length === 0) {
+                            errorMessage.value = store.i18n.t('noFriendLinksFound');
+                        }
+                    }
+
+                    isDiscovering.value = false;
+                    progressMessage.value = '';
+                    progressDetail.value = '';
+
+                    // Clear the discovery state
+                    await fetch('/api/feeds/discover/clear', { method: 'POST' });
+                }
+            } catch (pollError) {
+                console.error('Polling error:', pollError);
+                // Don't stop polling on transient errors
             }
-            isDiscovering.value = false;
-            progressMessage.value = '';
-            progressDetail.value = '';
-            eventSource.close();
-            eventSource = null;
-        });
+        }, 500); // Poll every 500ms
 
     } catch (error) {
         console.error('Discovery error:', error);
@@ -137,6 +143,10 @@ async function startDiscovery() {
         isDiscovering.value = false;
         progressMessage.value = '';
         progressDetail.value = '';
+        if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+        }
     }
 }
 
@@ -201,11 +211,13 @@ async function subscribeSelected() {
 }
 
 function close() {
-    // Close SSE connection if active
-    if (eventSource) {
-        eventSource.close();
-        eventSource = null;
+    // Clear polling interval if active
+    if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
     }
+    // Clear discovery state on server
+    fetch('/api/feeds/discover/clear', { method: 'POST' }).catch(() => {});
     emit('close');
 }
 
@@ -229,10 +241,12 @@ watch(() => props.show, (newShow, oldShow) => {
 
 // Cleanup on unmount
 onUnmounted(() => {
-    if (eventSource) {
-        eventSource.close();
-        eventSource = null;
+    if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
     }
+    // Clear discovery state on server
+    fetch('/api/feeds/discover/clear', { method: 'POST' }).catch(() => {});
 });
 </script>
 

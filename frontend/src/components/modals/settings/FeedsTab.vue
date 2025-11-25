@@ -11,7 +11,7 @@ const emit = defineEmits(['import-opml', 'export-opml', 'cleanup-database', 'add
 const selectedFeeds = ref([]);
 const isDiscoveringAll = ref(false);
 const discoveryProgress = ref({ message: '', detail: '', current: 0, total: 0, feedName: '', foundCount: 0 });
-let eventSource = null;
+let pollInterval = null;
 
 const isAllSelected = computed(() => {
     return store.feeds && store.feeds.length > 0 && selectedFeeds.value.length === store.feeds.length;
@@ -50,114 +50,92 @@ async function handleDiscoverAll() {
     isDiscoveringAll.value = true;
     discoveryProgress.value = { message: store.i18n.t('preparingDiscovery'), detail: '', current: 0, total: 0, feedName: '', foundCount: 0 };
     
-    // Close any existing event source
-    if (eventSource) {
-        eventSource.close();
-        eventSource = null;
+    // Clear any existing poll interval
+    if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
     }
 
     try {
-        // Check if EventSource is supported
-        if (typeof EventSource === 'undefined') {
-            throw new Error('EventSource not supported by this browser');
+        // Clear any previous discovery state
+        await fetch('/api/feeds/discover-all/clear', { method: 'POST' });
+
+        // Start batch discovery in background
+        const startResponse = await fetch('/api/feeds/discover-all/start', {
+            method: 'POST'
+        });
+
+        if (!startResponse.ok) {
+            const errorText = await startResponse.text();
+            throw new Error(errorText || 'Failed to start batch discovery');
         }
 
-        // Use SSE endpoint for real-time progress
-        eventSource = new EventSource('/api/feeds/discover-all-sse');
-
-        eventSource.addEventListener('progress', (event) => {
-            const progress = JSON.parse(event.data);
-            console.log('Batch progress:', progress);
-            
-            // Update progress based on stage
-            switch (progress.stage) {
-                case 'starting':
-                    discoveryProgress.value = {
-                        message: store.i18n.t('preparingDiscovery'),
-                        detail: '',
-                        current: 0,
-                        total: progress.total,
-                        feedName: '',
-                        foundCount: 0
-                    };
-                    break;
-                case 'processing_feed':
-                    discoveryProgress.value = {
-                        message: store.i18n.t('processingFeed', { current: progress.current, total: progress.total }),
-                        detail: progress.feed_name || progress.detail,
-                        current: progress.current,
-                        total: progress.total,
-                        feedName: progress.feed_name,
-                        foundCount: progress.found_count || 0
-                    };
-                    break;
-                case 'fetching_homepage':
-                case 'finding_friend_links':
-                case 'fetching_friend_page':
-                case 'checking_rss':
-                    discoveryProgress.value = {
-                        message: store.i18n.t('processingFeed', { current: progress.current, total: progress.total }),
-                        detail: progress.feed_name + (progress.detail ? ' - ' + getHostname(progress.detail) : ''),
-                        current: progress.current,
-                        total: progress.total,
-                        feedName: progress.feed_name,
-                        foundCount: progress.found_count || 0
-                    };
-                    break;
-                default:
-                    discoveryProgress.value = {
-                        message: progress.message || store.i18n.t('discovering'),
-                        detail: progress.detail || progress.feed_name || '',
-                        current: progress.current || discoveryProgress.value.current,
-                        total: progress.total || discoveryProgress.value.total,
-                        feedName: progress.feed_name || discoveryProgress.value.feedName,
-                        foundCount: progress.found_count || discoveryProgress.value.foundCount
-                    };
-            }
-        });
-
-        eventSource.addEventListener('complete', async (event) => {
-            const result = JSON.parse(event.data);
-            console.log('Batch discovery complete:', result);
-            
-            // Refresh feeds to show updated discovery status
-            await store.fetchFeeds();
-            
-            if (result.feeds_found > 0) {
-                window.showToast(
-                    store.i18n.t('discoveryComplete') + ': ' + 
-                    store.i18n.t('foundFeeds', { count: result.feeds_found }),
-                    'success'
-                );
-            } else {
-                window.showToast(store.i18n.t('noFriendLinksFound'), 'info');
-            }
-            
+        const startResult = await startResponse.json();
+        
+        // Check if already complete (all feeds discovered)
+        if (startResult.status === 'complete') {
+            window.showToast(startResult.message || store.i18n.t('noFriendLinksFound'), 'info');
             isDiscoveringAll.value = false;
-            discoveryProgress.value = { message: '', detail: '', current: 0, total: 0, feedName: '', foundCount: 0 };
-            eventSource.close();
-            eventSource = null;
-        });
+            return;
+        }
 
-        eventSource.addEventListener('error', async (event) => {
-            if (event.data) {
-                const error = JSON.parse(event.data);
-                console.error('Batch discovery error:', error);
-                window.showToast(store.i18n.t('discoveryFailed') + ': ' + (error.message || 'Unknown error'), 'error');
-            } else {
-                console.error('EventSource error:', event);
-                if (isDiscoveringAll.value) {
-                    window.showToast(store.i18n.t('discoveryFailed'), 'error');
+        discoveryProgress.value.total = startResult.total || 0;
+
+        // Start polling for progress
+        pollInterval = setInterval(async () => {
+            try {
+                const progressResponse = await fetch('/api/feeds/discover-all/progress');
+                if (!progressResponse.ok) {
+                    throw new Error('Failed to get progress');
                 }
+
+                const state = await progressResponse.json();
+                console.log('Batch progress state:', state);
+
+                // Update progress display
+                if (state.progress) {
+                    const progress = state.progress;
+                    discoveryProgress.value = {
+                        message: progress.message || store.i18n.t('processingFeed', { current: progress.current || 0, total: progress.total || 0 }),
+                        detail: progress.feed_name || (progress.detail ? getHostname(progress.detail) : ''),
+                        current: progress.current || 0,
+                        total: progress.total || 0,
+                        feedName: progress.feed_name || '',
+                        foundCount: progress.found_count || 0
+                    };
+                }
+
+                // Check if complete
+                if (state.is_complete) {
+                    clearInterval(pollInterval);
+                    pollInterval = null;
+
+                    // Refresh feeds to show updated discovery status
+                    await store.fetchFeeds();
+
+                    if (state.error) {
+                        window.showToast(store.i18n.t('discoveryFailed') + ': ' + state.error, 'error');
+                    } else if (state.feeds && state.feeds.length > 0) {
+                        window.showToast(
+                            store.i18n.t('discoveryComplete') + ': ' + 
+                            store.i18n.t('foundFeeds', { count: state.feeds.length }),
+                            'success'
+                        );
+                    } else {
+                        window.showToast(store.i18n.t('noFriendLinksFound'), 'info');
+                    }
+
+                    isDiscoveringAll.value = false;
+                    discoveryProgress.value = { message: '', detail: '', current: 0, total: 0, feedName: '', foundCount: 0 };
+
+                    // Clear the discovery state
+                    await fetch('/api/feeds/discover-all/clear', { method: 'POST' });
+                }
+            } catch (pollError) {
+                console.error('Polling error:', pollError);
+                // Don't stop polling on transient errors
             }
-            isDiscoveringAll.value = false;
-            discoveryProgress.value = { message: '', detail: '', current: 0, total: 0, feedName: '', foundCount: 0 };
-            eventSource.close();
-            eventSource = null;
-            
-            // Refresh feeds anyway
-            await store.fetchFeeds();
-        });
+        }, 500); // Poll every 500ms
 
     } catch (error) {
         console.error('Discovery error:', error);
@@ -201,10 +179,12 @@ function getFavicon(url) {
 
 // Cleanup on unmount
 onUnmounted(() => {
-    if (eventSource) {
-        eventSource.close();
-        eventSource = null;
+    if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
     }
+    // Clear discovery state on server
+    fetch('/api/feeds/discover-all/clear', { method: 'POST' }).catch(() => {});
 });
 </script>
 
