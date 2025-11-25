@@ -247,10 +247,18 @@ function evaluateCondition(article, condition) {
         case 'published_after':
             const afterDate = new Date(value);
             const articleDateAfter = new Date(article.published_at);
+            // Validate dates before comparison
+            if (isNaN(afterDate.getTime()) || isNaN(articleDateAfter.getTime())) {
+                return true; // Skip invalid dates
+            }
             return articleDateAfter >= afterDate;
         case 'published_before':
             const beforeDate = new Date(value);
             const articleDateBefore = new Date(article.published_at);
+            // Validate dates before comparison
+            if (isNaN(beforeDate.getTime()) || isNaN(articleDateBefore.getTime())) {
+                return true; // Skip invalid dates
+            }
             return articleDateBefore <= beforeDate;
         default:
             return true;

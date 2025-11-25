@@ -95,11 +95,8 @@ function clearFilters() {
 }
 
 function applyFilters() {
-    // Validate conditions
-    const validConditions = conditions.value.filter(c => {
-        if (!c.value) return false;
-        return true;
-    });
+    // Validate conditions - only include conditions with a value
+    const validConditions = conditions.value.filter(c => c.value);
     
     emit('apply', validConditions);
     emit('close');
