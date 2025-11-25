@@ -1,6 +1,6 @@
 <script setup>
 import { store } from '../store.js';
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { BrowserOpenURL } from '../wailsjs/wailsjs/runtime/runtime.js';
 import { 
     PhCheckCircle, PhArrowClockwise, PhList, PhMagnifyingGlass, 
@@ -19,6 +19,8 @@ const defaultViewMode = ref('original'); // Track default view mode for context 
 // Filter state
 const showFilterModal = ref(false);
 const activeFilters = ref([]);
+const filteredArticlesFromServer = ref([]);
+const isFilterLoading = ref(false);
 
 const props = defineProps(['isSidebarOpen']);
 const emit = defineEmits(['toggleSidebar']);
@@ -182,9 +184,10 @@ function formatDate(dateStr) {
 // Search filtering
 const searchQuery = ref('');
 const filteredArticles = computed(() => {
-    let articles = store.articles;
+    // If filters are active, use server-filtered articles
+    let articles = activeFilters.value.length > 0 ? filteredArticlesFromServer.value : store.articles;
     
-    // Apply search query filter
+    // Apply search query filter (client-side, on top of server filter)
     if (searchQuery.value) {
         const lower = searchQuery.value.toLowerCase();
         articles = articles.filter(a => 
@@ -193,96 +196,48 @@ const filteredArticles = computed(() => {
         );
     }
     
-    // Apply advanced filters
-    if (activeFilters.value.length > 0) {
-        articles = applyAdvancedFilters(articles, activeFilters.value);
-    }
-    
     return articles;
 });
 
-// Apply advanced filter conditions
-function applyAdvancedFilters(articles, filters) {
-    if (filters.length === 0) return articles;
-    
-    return articles.filter(article => {
-        let result = evaluateCondition(article, filters[0]);
-        
-        for (let i = 1; i < filters.length; i++) {
-            const condition = filters[i];
-            const conditionResult = evaluateCondition(article, condition);
-            
-            if (condition.logic === 'and') {
-                result = result && conditionResult;
-            } else if (condition.logic === 'or') {
-                result = result || conditionResult;
-            } else if (condition.logic === 'not') {
-                result = result && !conditionResult;
-            }
-        }
-        
-        return result;
-    });
-}
-
-function evaluateCondition(article, condition) {
-    const { field, operator, value } = condition;
-    
-    if (!value) return true;
-    
-    let fieldValue = '';
-    
-    switch (field) {
-        case 'feed_name':
-            fieldValue = article.feed_title || '';
-            break;
-        case 'feed_category':
-            // Get category from feed
-            const feed = store.feeds.find(f => f.id === article.feed_id);
-            fieldValue = feed?.category || '';
-            break;
-        case 'article_title':
-            fieldValue = article.title || '';
-            break;
-        case 'published_after':
-            const afterDate = new Date(value);
-            const articleDateAfter = new Date(article.published_at);
-            // Validate dates before comparison
-            if (isNaN(afterDate.getTime()) || isNaN(articleDateAfter.getTime())) {
-                return true; // Skip invalid dates
-            }
-            return articleDateAfter >= afterDate;
-        case 'published_before':
-            const beforeDate = new Date(value);
-            const articleDateBefore = new Date(article.published_at);
-            // Validate dates before comparison
-            if (isNaN(beforeDate.getTime()) || isNaN(articleDateBefore.getTime())) {
-                return true; // Skip invalid dates
-            }
-            return articleDateBefore <= beforeDate;
-        default:
-            return true;
+// Fetch filtered articles from server
+async function fetchFilteredArticles(filters) {
+    if (filters.length === 0) {
+        filteredArticlesFromServer.value = [];
+        return;
     }
     
-    // Text comparison
-    const lowerValue = value.toLowerCase();
-    const lowerFieldValue = fieldValue.toLowerCase();
-    
-    if (operator === 'exact') {
-        return lowerFieldValue === lowerValue;
-    } else {
-        // contains
-        return lowerFieldValue.includes(lowerValue);
+    isFilterLoading.value = true;
+    try {
+        const res = await fetch('/api/articles/filter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ conditions: filters })
+        });
+        
+        if (res.ok) {
+            const data = await res.json();
+            filteredArticlesFromServer.value = data || [];
+        } else {
+            console.error('Error fetching filtered articles');
+            filteredArticlesFromServer.value = [];
+        }
+    } catch (e) {
+        console.error('Error fetching filtered articles:', e);
+        filteredArticlesFromServer.value = [];
+    } finally {
+        isFilterLoading.value = false;
     }
 }
 
 // Filter handlers
-function handleApplyFilters(filters) {
+async function handleApplyFilters(filters) {
     activeFilters.value = filters;
+    await fetchFilteredArticles(filters);
 }
 
 function clearAllFilters() {
     activeFilters.value = [];
+    filteredArticlesFromServer.value = [];
 }
 
 function onArticleContextMenu(e, article) {
@@ -437,7 +392,7 @@ async function markAllAsRead() {
         </div>
         
         <div class="flex-1 overflow-y-auto" @scroll="handleScroll" ref="listRef">
-            <div v-if="filteredArticles.length === 0 && !store.isLoading" class="p-4 sm:p-5 text-center text-text-secondary text-sm sm:text-base">
+            <div v-if="filteredArticles.length === 0 && !store.isLoading && !isFilterLoading" class="p-4 sm:p-5 text-center text-text-secondary text-sm sm:text-base">
                 {{ store.i18n.t('noArticles') }}
             </div>
             
@@ -470,7 +425,7 @@ async function markAllAsRead() {
                 </div>
             </div>
             
-            <div v-if="store.isLoading" class="p-3 sm:p-4 text-center text-text-secondary">
+            <div v-if="store.isLoading || isFilterLoading" class="p-3 sm:p-4 text-center text-text-secondary">
                 <PhSpinner :size="20" class="animate-spin sm:w-6 sm:h-6" />
             </div>
         </div>

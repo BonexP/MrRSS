@@ -139,7 +139,7 @@ function close() {
                             </select>
                         </div>
                         
-                        <div class="flex flex-wrap gap-2 items-start">
+                        <div class="flex flex-wrap gap-2 items-end">
                             <!-- Field selector -->
                             <div class="flex-1 min-w-[140px]">
                                 <label class="block text-xs text-text-secondary mb-1">{{ store.i18n.t('filterField') }}</label>
@@ -168,31 +168,23 @@ function close() {
                                 <input v-if="isDateField(condition.field)" 
                                        type="date" 
                                        v-model="condition.value" 
-                                       class="input-field w-full">
+                                       class="date-field w-full">
                                 
-                                <!-- Text input with datalist for feed name -->
-                                <template v-else-if="condition.field === 'feed_name'">
-                                    <input type="text" 
-                                           v-model="condition.value" 
-                                           list="feed-names-list"
-                                           class="input-field w-full"
-                                           :placeholder="store.i18n.t('feedName')">
-                                    <datalist id="feed-names-list">
-                                        <option v-for="name in feedNames" :key="name" :value="name" />
-                                    </datalist>
-                                </template>
+                                <!-- Dropdown select for feed name -->
+                                <select v-else-if="condition.field === 'feed_name'" 
+                                        v-model="condition.value" 
+                                        class="select-field w-full">
+                                    <option value="">{{ store.i18n.t('feedName') }}</option>
+                                    <option v-for="name in feedNames" :key="name" :value="name">{{ name }}</option>
+                                </select>
                                 
-                                <!-- Text input with datalist for category -->
-                                <template v-else-if="condition.field === 'feed_category'">
-                                    <input type="text" 
-                                           v-model="condition.value" 
-                                           list="feed-categories-list"
-                                           class="input-field w-full"
-                                           :placeholder="store.i18n.t('feedCategory')">
-                                    <datalist id="feed-categories-list">
-                                        <option v-for="cat in feedCategories" :key="cat" :value="cat" />
-                                    </datalist>
-                                </template>
+                                <!-- Dropdown select for category -->
+                                <select v-else-if="condition.field === 'feed_category'" 
+                                        v-model="condition.value" 
+                                        class="select-field w-full">
+                                    <option value="">{{ store.i18n.t('feedCategory') }}</option>
+                                    <option v-for="cat in feedCategories" :key="cat" :value="cat">{{ cat }}</option>
+                                </select>
                                 
                                 <!-- Regular text input -->
                                 <input v-else 
@@ -203,7 +195,7 @@ function close() {
                             </div>
                             
                             <!-- Remove button -->
-                            <div class="flex items-end">
+                            <div class="flex-shrink-0">
                                 <button @click="removeCondition(index)" class="btn-danger-icon" :title="store.i18n.t('removeCondition')">
                                     <PhTrash :size="18" />
                                 </button>
@@ -238,6 +230,10 @@ function close() {
 }
 .select-field {
     @apply p-2 border border-border rounded-md bg-bg-primary text-text-primary text-sm focus:border-accent focus:outline-none transition-colors cursor-pointer;
+}
+.date-field {
+    @apply p-2 border border-border rounded-md bg-bg-primary text-text-primary text-sm focus:border-accent focus:outline-none transition-colors cursor-pointer;
+    color-scheme: light dark;
 }
 .btn-primary {
     @apply bg-accent text-white border-none px-5 py-2.5 rounded-lg cursor-pointer font-semibold hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed;

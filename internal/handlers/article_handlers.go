@@ -6,10 +6,25 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"MrRSS/internal/models"
 )
+
+// FilterCondition represents a single filter condition from the frontend
+type FilterCondition struct {
+	ID       int64  `json:"id"`
+	Logic    string `json:"logic"`    // "and", "or", "not" (null for first condition)
+	Field    string `json:"field"`    // "feed_name", "feed_category", "article_title", "published_after", "published_before"
+	Operator string `json:"operator"` // "contains", "exact" (null for date fields)
+	Value    string `json:"value"`
+}
+
+// FilterRequest represents the request body for filtered articles
+type FilterRequest struct {
+	Conditions []FilterCondition `json:"conditions"`
+}
 
 // HandleArticles returns articles with filtering and pagination.
 func (h *Handler) HandleArticles(w http.ResponseWriter, r *http.Request) {
@@ -261,4 +276,128 @@ func (h *Handler) HandleGetArticleContent(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(map[string]string{
 		"content": content,
 	})
+}
+
+// HandleFilteredArticles returns articles filtered by advanced conditions from the database.
+func (h *Handler) HandleFilteredArticles(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req FilterRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// Get show_hidden_articles setting
+	showHiddenStr, _ := h.DB.GetSetting("show_hidden_articles")
+	showHidden := showHiddenStr == "true"
+
+	// Get all articles from database
+	// Note: Using a high limit to fetch all articles for filtering
+	// For very large datasets, consider implementing database-level filtering
+	articles, err := h.DB.GetArticles("", 0, "", showHidden, 50000, 0)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Get feeds for category lookup
+	feeds, err := h.DB.GetFeeds()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Create a map of feed ID to category
+	feedCategories := make(map[int64]string)
+	for _, feed := range feeds {
+		feedCategories[feed.ID] = feed.Category
+	}
+
+	// Apply filter conditions
+	if len(req.Conditions) > 0 {
+		var filteredArticles []models.Article
+		for _, article := range articles {
+			if evaluateArticleConditions(article, req.Conditions, feedCategories) {
+				filteredArticles = append(filteredArticles, article)
+			}
+		}
+		articles = filteredArticles
+	}
+
+	json.NewEncoder(w).Encode(articles)
+}
+
+// evaluateArticleConditions evaluates all filter conditions for an article
+func evaluateArticleConditions(article models.Article, conditions []FilterCondition, feedCategories map[int64]string) bool {
+	if len(conditions) == 0 {
+		return true
+	}
+
+	result := evaluateSingleCondition(article, conditions[0], feedCategories)
+
+	for i := 1; i < len(conditions); i++ {
+		condition := conditions[i]
+		conditionResult := evaluateSingleCondition(article, condition, feedCategories)
+
+		switch condition.Logic {
+		case "and":
+			result = result && conditionResult
+		case "or":
+			result = result || conditionResult
+		case "not":
+			result = result && !conditionResult
+		}
+	}
+
+	return result
+}
+
+// evaluateSingleCondition evaluates a single filter condition for an article
+func evaluateSingleCondition(article models.Article, condition FilterCondition, feedCategories map[int64]string) bool {
+	if condition.Value == "" {
+		return true
+	}
+
+	var fieldValue string
+
+	switch condition.Field {
+	case "feed_name":
+		fieldValue = article.FeedTitle
+	case "feed_category":
+		fieldValue = feedCategories[article.FeedID]
+	case "article_title":
+		fieldValue = article.Title
+	case "published_after":
+		afterDate, err := time.Parse("2006-01-02", condition.Value)
+		if err != nil {
+			log.Printf("Invalid date format for published_after filter: %s", condition.Value)
+			return true // Skip invalid dates
+		}
+		return article.PublishedAt.After(afterDate) || article.PublishedAt.Equal(afterDate)
+	case "published_before":
+		beforeDate, err := time.Parse("2006-01-02", condition.Value)
+		if err != nil {
+			log.Printf("Invalid date format for published_before filter: %s", condition.Value)
+			return true // Skip invalid dates
+		}
+		// Add one day to include the selected date
+		beforeDate = beforeDate.Add(24 * time.Hour)
+		return article.PublishedAt.Before(beforeDate)
+	default:
+		return true
+	}
+
+	// Text comparison
+	lowerValue := strings.ToLower(condition.Value)
+	lowerFieldValue := strings.ToLower(fieldValue)
+
+	if condition.Operator == "exact" {
+		return lowerFieldValue == lowerValue
+	}
+	// contains
+	return strings.Contains(lowerFieldValue, lowerValue)
 }
