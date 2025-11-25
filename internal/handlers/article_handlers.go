@@ -14,11 +14,13 @@ import (
 
 // FilterCondition represents a single filter condition from the frontend
 type FilterCondition struct {
-	ID       int64  `json:"id"`
-	Logic    string `json:"logic"`    // "and", "or", "not" (null for first condition)
-	Field    string `json:"field"`    // "feed_name", "feed_category", "article_title", "published_after", "published_before"
-	Operator string `json:"operator"` // "contains", "exact" (null for date fields)
-	Value    string `json:"value"`
+	ID       int64    `json:"id"`
+	Logic    string   `json:"logic"`    // "and", "or" (null for first condition)
+	Negate   bool     `json:"negate"`   // NOT modifier for this condition
+	Field    string   `json:"field"`    // "feed_name", "feed_category", "article_title", "published_after", "published_before"
+	Operator string   `json:"operator"` // "contains", "exact" (null for date fields and multi-select)
+	Value    string   `json:"value"`    // Single value for text/date fields
+	Values   []string `json:"values"`   // Multiple values for feed_name and feed_category
 }
 
 // FilterRequest represents the request body for filtered articles
@@ -348,56 +350,88 @@ func evaluateArticleConditions(article models.Article, conditions []FilterCondit
 			result = result && conditionResult
 		case "or":
 			result = result || conditionResult
-		case "not":
-			result = result && !conditionResult
 		}
 	}
 
 	return result
 }
 
+// matchMultiSelectContains checks if fieldValue matches any of the selected values using contains logic
+func matchMultiSelectContains(fieldValue string, values []string, singleValue string) bool {
+	if len(values) > 0 {
+		lowerField := strings.ToLower(fieldValue)
+		for _, val := range values {
+			if strings.Contains(lowerField, strings.ToLower(val)) {
+				return true
+			}
+		}
+		return false
+	} else if singleValue != "" {
+		return strings.Contains(strings.ToLower(fieldValue), strings.ToLower(singleValue))
+	}
+	return true
+}
+
 // evaluateSingleCondition evaluates a single filter condition for an article
 func evaluateSingleCondition(article models.Article, condition FilterCondition, feedCategories map[int64]string) bool {
-	if condition.Value == "" {
-		return true
-	}
-
-	var fieldValue string
+	var result bool
 
 	switch condition.Field {
 	case "feed_name":
-		fieldValue = article.FeedTitle
+		result = matchMultiSelectContains(article.FeedTitle, condition.Values, condition.Value)
+
 	case "feed_category":
-		fieldValue = feedCategories[article.FeedID]
+		feedCategory := feedCategories[article.FeedID]
+		result = matchMultiSelectContains(feedCategory, condition.Values, condition.Value)
+
 	case "article_title":
-		fieldValue = article.Title
+		if condition.Value == "" {
+			result = true
+		} else {
+			lowerValue := strings.ToLower(condition.Value)
+			lowerTitle := strings.ToLower(article.Title)
+			if condition.Operator == "exact" {
+				result = lowerTitle == lowerValue
+			} else {
+				result = strings.Contains(lowerTitle, lowerValue)
+			}
+		}
+
 	case "published_after":
-		afterDate, err := time.Parse("2006-01-02", condition.Value)
-		if err != nil {
-			log.Printf("Invalid date format for published_after filter: %s", condition.Value)
-			return true // Skip invalid dates
+		if condition.Value == "" {
+			result = true
+		} else {
+			afterDate, err := time.Parse("2006-01-02", condition.Value)
+			if err != nil {
+				log.Printf("Invalid date format for published_after filter: %s", condition.Value)
+				result = true
+			} else {
+				result = article.PublishedAt.After(afterDate) || article.PublishedAt.Equal(afterDate)
+			}
 		}
-		return article.PublishedAt.After(afterDate) || article.PublishedAt.Equal(afterDate)
+
 	case "published_before":
-		beforeDate, err := time.Parse("2006-01-02", condition.Value)
-		if err != nil {
-			log.Printf("Invalid date format for published_before filter: %s", condition.Value)
-			return true // Skip invalid dates
+		if condition.Value == "" {
+			result = true
+		} else {
+			beforeDate, err := time.Parse("2006-01-02", condition.Value)
+			if err != nil {
+				log.Printf("Invalid date format for published_before filter: %s", condition.Value)
+				result = true
+			} else {
+				// Add one day to include the selected date
+				beforeDate = beforeDate.Add(24 * time.Hour)
+				result = article.PublishedAt.Before(beforeDate)
+			}
 		}
-		// Add one day to include the selected date
-		beforeDate = beforeDate.Add(24 * time.Hour)
-		return article.PublishedAt.Before(beforeDate)
+
 	default:
-		return true
+		result = true
 	}
 
-	// Text comparison
-	lowerValue := strings.ToLower(condition.Value)
-	lowerFieldValue := strings.ToLower(fieldValue)
-
-	if condition.Operator == "exact" {
-		return lowerFieldValue == lowerValue
+	// Apply NOT modifier
+	if condition.Negate {
+		return !result
 	}
-	// contains
-	return strings.Contains(lowerFieldValue, lowerValue)
+	return result
 }
