@@ -1,22 +1,43 @@
-<script setup>
-import { store } from '../../../store.js';
-import { ref, onMounted } from 'vue';
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+import { ref, onMounted, type Ref } from 'vue';
 import { 
     PhArrowsClockwise, PhArrowCircleUp, PhCheckCircle, PhCircleNotch, 
-    PhGear, PhDownloadSimple, PhGithubLogo 
+    PhGear, PhGithubLogo 
 } from "@phosphor-icons/vue";
 
-const emit = defineEmits(['check-updates', 'download-install-update']);
+const { t } = useI18n();
 
-const props = defineProps({
-    updateInfo: { type: Object, default: null },
-    checkingUpdates: { type: Boolean, default: false },
-    downloadingUpdate: { type: Boolean, default: false },
-    installingUpdate: { type: Boolean, default: false },
-    downloadProgress: { type: Number, default: 0 }
+interface UpdateInfo {
+    has_update: boolean;
+    current_version: string;
+    latest_version: string;
+    download_url?: string;
+    error?: string;
+}
+
+interface Props {
+    updateInfo: UpdateInfo | null;
+    checkingUpdates: boolean;
+    downloadingUpdate: boolean;
+    installingUpdate: boolean;
+    downloadProgress: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    updateInfo: null,
+    checkingUpdates: false,
+    downloadingUpdate: false,
+    installingUpdate: false,
+    downloadProgress: 0
 });
 
-const appVersion = ref('1.2.2');
+const emit = defineEmits<{
+    'check-updates': [];
+    'download-install-update': [];
+}>();
+
+const appVersion: Ref<string> = ref('1.2.2');
 
 onMounted(async () => {
     // Fetch current version from API
@@ -43,14 +64,14 @@ function handleDownloadInstall() {
 <template>
     <div class="text-center py-6 sm:py-10 px-2">
         <img src="/assets/logo.svg" alt="Logo" class="h-12 sm:h-16 w-auto mb-3 sm:mb-4 mx-auto">
-        <h3 class="text-lg sm:text-xl font-bold mb-2">{{ store.i18n.t('appName') }}</h3>
-        <p class="text-text-secondary text-sm sm:text-base">{{ store.i18n.t('aboutApp') }}</p>
-        <p class="text-text-secondary text-xs sm:text-sm mt-2">{{ store.i18n.t('version') }} {{ appVersion }}</p>
+        <h3 class="text-lg sm:text-xl font-bold mb-2">{{ t('appName') }}</h3>
+        <p class="text-text-secondary text-sm sm:text-base">{{ t('aboutApp') }}</p>
+        <p class="text-text-secondary text-xs sm:text-sm mt-2">{{ t('version') }} {{ appVersion }}</p>
         
         <div class="mt-4 sm:mt-6 mb-4 sm:mb-6 flex justify-center">
             <button @click="handleCheckUpdates" :disabled="checkingUpdates" class="btn-secondary justify-center text-sm sm:text-base">
                 <PhArrowsClockwise :size="18" class="sm:w-5 sm:h-5" :class="{'animate-spin': checkingUpdates}" />
-                {{ checkingUpdates ? store.i18n.t('checking') : store.i18n.t('checkForUpdates') }}
+                {{ checkingUpdates ? t('checking') : t('checkForUpdates') }}
             </button>
         </div>
 
@@ -60,11 +81,11 @@ function handleDownloadInstall() {
                 <PhCheckCircle v-else :size="28" class="text-accent mt-0.5 shrink-0 sm:w-8 sm:h-8" />
                 <div class="flex-1 min-w-0">
                     <h4 class="font-semibold mb-1 text-sm sm:text-base">
-                        {{ updateInfo.has_update ? store.i18n.t('updateAvailable') : store.i18n.t('upToDate') }}
+                        {{ updateInfo.has_update ? t('updateAvailable') : t('upToDate') }}
                     </h4>
                     <div class="text-xs sm:text-sm text-text-secondary space-y-1">
-                        <div class="truncate">{{ store.i18n.t('currentVersion') }}: {{ updateInfo.current_version }}</div>
-                        <div v-if="updateInfo.has_update" class="truncate">{{ store.i18n.t('latestVersion') }}: {{ updateInfo.latest_version }}</div>
+                        <div class="truncate">{{ t('currentVersion') }}: {{ updateInfo.current_version }}</div>
+                        <div v-if="updateInfo.has_update" class="truncate">{{ t('latestVersion') }}: {{ updateInfo.latest_version }}</div>
                     </div>
                     
                     <!-- Download and Install Button -->
@@ -76,9 +97,9 @@ function handleDownloadInstall() {
                             <PhCircleNotch v-if="downloadingUpdate" :size="18" class="animate-spin sm:w-5 sm:h-5" />
                             <PhGear v-else-if="installingUpdate" :size="18" class="animate-spin sm:w-5 sm:h-5" />
                             <PhDownloadSimple v-else :size="18" class="sm:w-5 sm:h-5" />
-                            <span v-if="downloadingUpdate">{{ store.i18n.t('downloading') }} {{ downloadProgress }}%</span>
-                            <span v-else-if="installingUpdate">{{ store.i18n.t('installingUpdate') }}</span>
-                            <span v-else>{{ store.i18n.t('downloadUpdate') }}</span>
+                            <span v-if="downloadingUpdate">{{ t('downloading') }} {{ downloadProgress }}%</span>
+                            <span v-else-if="installingUpdate">{{ t('installingUpdate') }}</span>
+                            <span v-else>{{ t('downloadUpdate') }}</span>
                         </button>
                         
                         <!-- Progress bar -->
@@ -101,7 +122,7 @@ function handleDownloadInstall() {
         <div class="mt-4 sm:mt-6">
             <a href="https://github.com/WCY-dt/MrRSS" target="_blank" class="inline-flex items-center gap-1.5 sm:gap-2 text-accent hover:text-accent-hover transition-colors text-xs sm:text-sm font-medium">
                 <PhGithubLogo :size="20" class="sm:w-6 sm:h-6" />
-                {{ store.i18n.t('viewOnGitHub') }}
+                {{ t('viewOnGitHub') }}
             </a>
         </div>
     </div>

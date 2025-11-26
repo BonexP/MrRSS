@@ -1,19 +1,54 @@
-<script setup>
-import { store } from '../../../store.js';
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+import { ref, onMounted, onUnmounted, computed, watch, type Ref, type Component } from 'vue';
 import { 
     PhKeyboard, PhArrowDown, PhArrowUp, PhArrowRight, PhX, PhBookOpen,
     PhStar, PhArrowSquareOut, PhArticle, PhArrowClockwise, PhCheckCircle, 
     PhGear, PhPlus, PhMagnifyingGlass, PhListDashes, PhCircle, PhHeart,
     PhArrowCounterClockwise, PhInfo
 } from "@phosphor-icons/vue";
+import ShortcutItem from './ShortcutItem.vue';
 
-const props = defineProps({
-    settings: { type: Object, required: true }
-});
+const { t } = useI18n();
+
+interface SettingsData {
+    shortcuts: string;
+    [key: string]: any;
+}
+
+interface Props {
+    settings: SettingsData;
+}
+
+const props = defineProps<Props>();
+
+interface Shortcuts {
+    nextArticle: string;
+    previousArticle: string;
+    openArticle: string;
+    closeArticle: string;
+    toggleReadStatus: string;
+    toggleFavoriteStatus: string;
+    openInBrowser: string;
+    toggleContentView: string;
+    refreshFeeds: string;
+    markAllRead: string;
+    openSettings: string;
+    addFeed: string;
+    focusSearch: string;
+    goToAllArticles: string;
+    goToUnread: string;
+    goToFavorites: string;
+}
+
+interface ShortcutItem {
+    key: keyof Shortcuts;
+    label: string;
+    icon: Component;
+}
 
 // Default shortcuts configuration
-const defaultShortcuts = {
+const defaultShortcuts: Shortcuts = {
     nextArticle: 'j',
     previousArticle: 'k',
     openArticle: 'Enter',
@@ -33,43 +68,43 @@ const defaultShortcuts = {
 };
 
 // Current shortcuts (loaded from settings or use defaults)
-const shortcuts = ref({ ...defaultShortcuts });
+const shortcuts: Ref<Shortcuts> = ref({ ...defaultShortcuts });
 
 // Track which shortcut is being edited
-const editingShortcut = ref(null);
+const editingShortcut: Ref<keyof Shortcuts | null> = ref(null);
 const recordedKey = ref('');
 
 // Shortcut groups for display
-const shortcutGroups = computed(() => [
+const shortcutGroups = computed<Array<{label: string; items: ShortcutItem[]}>>(() => [
     {
-        label: store.i18n.t('shortcutNavigation'),
+        label: t('shortcutNavigation'),
         items: [
-            { key: 'nextArticle', label: store.i18n.t('nextArticle'), icon: PhArrowDown },
-            { key: 'previousArticle', label: store.i18n.t('previousArticle'), icon: PhArrowUp },
-            { key: 'openArticle', label: store.i18n.t('openArticle'), icon: PhArrowRight },
-            { key: 'closeArticle', label: store.i18n.t('closeArticle'), icon: PhX },
-            { key: 'goToAllArticles', label: store.i18n.t('goToAllArticles'), icon: PhListDashes },
-            { key: 'goToUnread', label: store.i18n.t('goToUnread'), icon: PhCircle },
-            { key: 'goToFavorites', label: store.i18n.t('goToFavorites'), icon: PhHeart }
+            { key: 'nextArticle', label: t('nextArticle'), icon: PhArrowDown },
+            { key: 'previousArticle', label: t('previousArticle'), icon: PhArrowUp },
+            { key: 'openArticle', label: t('openArticle'), icon: PhArrowRight },
+            { key: 'closeArticle', label: t('closeArticle'), icon: PhX },
+            { key: 'goToAllArticles', label: t('goToAllArticles'), icon: PhListDashes },
+            { key: 'goToUnread', label: t('goToUnread'), icon: PhCircle },
+            { key: 'goToFavorites', label: t('goToFavorites'), icon: PhHeart }
         ]
     },
     {
-        label: store.i18n.t('shortcutArticles'),
+        label: t('shortcutArticles'),
         items: [
-            { key: 'toggleReadStatus', label: store.i18n.t('toggleReadStatus'), icon: PhBookOpen },
-            { key: 'toggleFavoriteStatus', label: store.i18n.t('toggleFavoriteStatus'), icon: PhStar },
-            { key: 'openInBrowser', label: store.i18n.t('openInBrowserShortcut'), icon: PhArrowSquareOut },
-            { key: 'toggleContentView', label: store.i18n.t('toggleContentView'), icon: PhArticle }
+            { key: 'toggleReadStatus', label: t('toggleReadStatus'), icon: PhBookOpen },
+            { key: 'toggleFavoriteStatus', label: t('toggleFavoriteStatus'), icon: PhStar },
+            { key: 'openInBrowser', label: t('openInBrowserShortcut'), icon: PhArrowSquareOut },
+            { key: 'toggleContentView', label: t('toggleContentView'), icon: PhArticle }
         ]
     },
     {
-        label: store.i18n.t('shortcutOther'),
+        label: t('shortcutOther'),
         items: [
-            { key: 'refreshFeeds', label: store.i18n.t('refreshFeedsShortcut'), icon: PhArrowClockwise },
-            { key: 'markAllRead', label: store.i18n.t('markAllReadShortcut'), icon: PhCheckCircle },
-            { key: 'openSettings', label: store.i18n.t('openSettingsShortcut'), icon: PhGear },
-            { key: 'addFeed', label: store.i18n.t('addFeedShortcut'), icon: PhPlus },
-            { key: 'focusSearch', label: store.i18n.t('focusSearch'), icon: PhMagnifyingGlass }
+            { key: 'refreshFeeds', label: t('refreshFeedsShortcut'), icon: PhArrowClockwise },
+            { key: 'markAllRead', label: t('markAllReadShortcut'), icon: PhCheckCircle },
+            { key: 'openSettings', label: t('openSettingsShortcut'), icon: PhGear },
+            { key: 'addFeed', label: t('addFeedShortcut'), icon: PhPlus },
+            { key: 'focusSearch', label: t('focusSearch'), icon: PhMagnifyingGlass }
         ]
     }
 ]);
@@ -96,34 +131,8 @@ onUnmounted(() => {
     window.removeEventListener('keydown', handleKeyRecord, true);
 });
 
-// Format key for display
-function formatKey(key) {
-    if (!key) return '—';
-    
-    // Convert key combinations to display format
-    const parts = key.split('+');
-    return parts.map(part => {
-        // Capitalize first letter and handle special keys
-        if (part === 'Shift') return '⇧';
-        if (part === 'Control' || part === 'Ctrl') return '⌃';
-        if (part === 'Alt') return '⌥';
-        if (part === 'Meta' || part === 'Cmd') return '⌘';
-        if (part === 'Enter') return '↵';
-        if (part === 'Escape') return 'Esc';
-        if (part === 'ArrowUp') return '↑';
-        if (part === 'ArrowDown') return '↓';
-        if (part === 'ArrowLeft') return '←';
-        if (part === 'ArrowRight') return '→';
-        if (part === 'Space') return '␣';
-        if (part === 'Backspace') return '⌫';
-        if (part === 'Delete') return 'Del';
-        if (part === 'Tab') return '⇥';
-        return part.toUpperCase();
-    }).join(' + ');
-}
-
 // Start editing a shortcut
-function startEditing(shortcutKey) {
+function startEditing(shortcutKey: keyof Shortcuts) {
     editingShortcut.value = shortcutKey;
     recordedKey.value = '';
 }
@@ -135,7 +144,7 @@ function stopEditing() {
 }
 
 // Handle key recording
-function handleKeyRecord(e) {
+function handleKeyRecord(e: KeyboardEvent) {
     if (!editingShortcut.value) return;
     
     e.preventDefault();
@@ -146,7 +155,7 @@ function handleKeyRecord(e) {
         // Clear the shortcut
         shortcuts.value[editingShortcut.value] = '';
         saveShortcuts();
-        window.showToast(store.i18n.t('shortcutCleared'), 'info');
+        window.showToast(t('shortcutCleared'), 'info');
         stopEditing();
         return;
     }
@@ -178,7 +187,7 @@ function handleKeyRecord(e) {
     );
     
     if (conflictKey) {
-        window.showToast(store.i18n.t('shortcutConflict'), 'warning');
+        window.showToast(t('shortcutConflict'), 'warning');
         stopEditing();
         return;
     }
@@ -186,7 +195,7 @@ function handleKeyRecord(e) {
     // Update the shortcut
     shortcuts.value[editingShortcut.value] = key;
     saveShortcuts();
-    window.showToast(store.i18n.t('shortcutUpdated'), 'success');
+    window.showToast(t('shortcutUpdated'), 'success');
     stopEditing();
 }
 
@@ -210,7 +219,7 @@ async function saveShortcuts() {
 function resetToDefaults() {
     shortcuts.value = { ...defaultShortcuts };
     saveShortcuts();
-    window.showToast(store.i18n.t('shortcutUpdated'), 'success');
+    window.showToast(t('shortcutUpdated'), 'success');
 }
 
 // Watch for settings changes from parent
@@ -232,20 +241,20 @@ watch(() => props.settings.shortcuts, (newVal) => {
             <div class="flex items-center gap-2 sm:gap-3">
                 <PhKeyboard :size="20" class="text-text-secondary sm:w-6 sm:h-6" />
                 <div>
-                    <h3 class="font-semibold text-sm sm:text-base">{{ store.i18n.t('shortcuts') }}</h3>
-                    <p class="text-xs text-text-secondary hidden sm:block">{{ store.i18n.t('shortcutsDesc') }}</p>
+                    <h3 class="font-semibold text-sm sm:text-base">{{ t('shortcuts') }}</h3>
+                    <p class="text-xs text-text-secondary hidden sm:block">{{ t('shortcutsDesc') }}</p>
                 </div>
             </div>
             <button @click="resetToDefaults" class="btn-secondary text-xs sm:text-sm py-1.5 px-2.5 sm:px-3">
                 <PhArrowCounterClockwise :size="16" class="sm:w-5 sm:h-5" />
-                {{ store.i18n.t('resetToDefault') }}
+                {{ t('resetToDefault') }}
             </button>
         </div>
         
         <!-- Tip moved to top with improved styling -->
         <div class="tip-box">
             <PhInfo :size="16" class="text-accent shrink-0 sm:w-5 sm:h-5" />
-            <span class="text-xs sm:text-sm">{{ store.i18n.t('escToClear') }}</span>
+            <span class="text-xs sm:text-sm">{{ t('escToClear') }}</span>
         </div>
 
         <div v-for="group in shortcutGroups" :key="group.label" class="setting-group">
@@ -254,45 +263,20 @@ watch(() => props.settings.shortcuts, (newVal) => {
             </label>
             
             <div class="space-y-2">
-                <div v-for="item in group.items" :key="item.key" class="shortcut-item">
-                    <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                        <component :is="item.icon" :size="18" class="text-text-secondary shrink-0 sm:w-5 sm:h-5" />
-                        <span class="text-sm truncate">{{ item.label }}</span>
-                    </div>
-                    
-                    <button 
-                        @click="startEditing(item.key)"
-                        :class="['shortcut-key-btn', editingShortcut === item.key ? 'recording' : '']"
-                    >
-                        <span v-if="editingShortcut === item.key" class="text-accent animate-pulse text-xs sm:text-sm">
-                            {{ store.i18n.t('pressKey') }}
-                        </span>
-                        <span v-else class="text-xs sm:text-sm">{{ formatKey(shortcuts[item.key]) }}</span>
-                    </button>
-                </div>
+                <ShortcutItem
+                    v-for="item in group.items" 
+                    :key="item.key"
+                    :item="item"
+                    :shortcut-value="shortcuts[item.key as keyof Shortcuts]"
+                    :is-editing="editingShortcut === item.key"
+                    @edit="startEditing(item.key as keyof Shortcuts)"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <style scoped>
-.shortcut-item {
-    @apply flex items-center justify-between gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-bg-secondary border border-border;
-}
-
-.shortcut-key-btn {
-    @apply px-2.5 sm:px-3 py-1.5 sm:py-2 rounded font-mono cursor-pointer transition-all min-w-[80px] sm:min-w-[100px] text-center bg-bg-tertiary border border-border;
-}
-
-.shortcut-key-btn:hover {
-    @apply border-accent bg-bg-primary;
-}
-
-.shortcut-key-btn.recording {
-    @apply border-accent;
-    background-color: rgba(59, 130, 246, 0.1);
-}
-
 .btn-secondary {
     @apply bg-transparent border border-border text-text-primary rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-tertiary transition-colors;
 }
@@ -301,14 +285,5 @@ watch(() => props.settings.shortcuts, (newVal) => {
     @apply flex items-center gap-2 sm:gap-3 py-2 sm:py-2.5 px-2.5 sm:px-3 rounded-lg;
     background-color: rgba(59, 130, 246, 0.05);
     border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-.animate-pulse {
-    animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
 }
 </style>

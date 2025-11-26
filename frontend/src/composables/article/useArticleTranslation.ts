@@ -1,0 +1,131 @@
+import { ref, type Ref } from 'vue';
+import type { Article } from '@/types/models';
+
+interface TranslationSettings {
+  enabled: boolean;
+  targetLang: string;
+}
+
+export function useArticleTranslation() {
+  const translationSettings = ref<TranslationSettings>({
+    enabled: false,
+    targetLang: 'en'
+  });
+  const translatingArticles: Ref<Set<number>> = ref(new Set());
+  let observer: IntersectionObserver | null = null;
+
+  // Load translation settings
+  async function loadTranslationSettings(): Promise<void> {
+    try {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      translationSettings.value = {
+        enabled: data.translation_enabled === 'true',
+        targetLang: data.target_language || 'en'
+      };
+    } catch (e) {
+      console.error('Error loading translation settings:', e);
+    }
+  }
+
+  // Setup intersection observer for auto-translation
+  function setupIntersectionObserver(
+    listRef: HTMLElement | null,
+    articles: Article[]
+  ): void {
+    if (observer) {
+      observer.disconnect();
+    }
+
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const articleId = parseInt((entry.target as HTMLElement).dataset.articleId || '0');
+          const article = articles.find(a => a.id === articleId);
+          
+          // Only translate if article exists, has no translation, and is not already being translated
+          if (article && !article.translated_title && !translatingArticles.value.has(articleId)) {
+            translateArticle(article);
+          }
+        }
+      });
+    }, {
+      root: listRef,
+      rootMargin: '100px',
+      threshold: 0.1
+    });
+  }
+
+  // Translate an article
+  async function translateArticle(article: Article): Promise<void> {
+    if (translatingArticles.value.has(article.id)) return;
+    
+    translatingArticles.value.add(article.id);
+    
+    try {
+      const res = await fetch('/api/articles/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          article_id: article.id,
+          title: article.title,
+          target_language: translationSettings.value.targetLang
+        })
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        // Update the article in the store
+        article.translated_title = data.translated_title;
+      }
+    } catch (e) {
+      console.error('Error translating article:', e);
+    } finally {
+      translatingArticles.value.delete(article.id);
+    }
+  }
+
+  // Observe an article element
+  function observeArticle(el: Element | null): void {
+    if (el && observer && translationSettings.value.enabled) {
+      observer.observe(el);
+    }
+  }
+
+  // Update translation settings from event
+  function handleTranslationSettingsChange(enabled: boolean, targetLang: string, articles: Article[]): void {
+    translationSettings.value = { enabled, targetLang };
+    
+    // Disconnect observer if translation is disabled
+    if (!enabled && observer) {
+      observer.disconnect();
+      observer = null;
+    }
+    // Re-observe if translation is enabled
+    else if (enabled && observer) {
+      setTimeout(() => {
+        const cards = document.querySelectorAll('[data-article-id]');
+        cards.forEach(card => observer?.observe(card));
+      }, 100);
+    }
+  }
+
+  // Cleanup
+  function cleanup(): void {
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
+  }
+
+  return {
+    translationSettings,
+    translatingArticles,
+    loadTranslationSettings,
+    setupIntersectionObserver,
+    translateArticle,
+    observeArticle,
+    handleTranslationSettingsChange,
+    cleanup
+  };
+}
