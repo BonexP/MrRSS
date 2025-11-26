@@ -2,10 +2,10 @@
   <img src="imgs/logo.svg" alt="MrRSS Logo" width="120" height="120">
   <h1>MrRSS</h1>
   <p><strong>一个现代化的跨平台桌面 RSS 阅读器</strong></p>
-  
-   [![Version](https://img.shields.io/badge/version-1.2.2-blue.svg)](https://github.com/WCY-dt/MrRSS/releases)
+
+   [![Version](https://img.shields.io/badge/version-1.2.3-blue.svg)](https://github.com/WCY-dt/MrRSS/releases)
   [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-  [![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)](https://go.dev/)
+   [![Go](https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go)](https://go.dev/)
   [![Wails](https://img.shields.io/badge/Wails-v2-red)](https://wails.io/)
   [![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?logo=vue.js)](https://vuejs.org/)
 
@@ -24,6 +24,8 @@
 - ⭐ **收藏与阅读追踪**: 保存文章并追踪已读/未读状态
 - 🎨 **现代 UI**: 简洁、响应式的界面，支持深色模式
 - 📦 **OPML 导入/导出**: 轻松从其他 RSS 阅读器迁移
+- ⌨️ **快捷键**: 通过可自定义的键盘快捷键提升效率，快速导航和操作
+- 📋 **智能过滤规则**: 使用强大的自定义规则自动组织订阅源
 
 ## 📸 截图
 
@@ -47,7 +49,7 @@
 
 在开始之前，请确保已安装以下环境：
 
-- [Go](https://go.dev/) (1.21 或更高版本)
+- [Go](https://go.dev/) (1.24 或更高版本)
 - [Node.js](https://nodejs.org/) (LTS 版本，带 npm)
 - [Wails](https://wails.io/docs/gettingstarted/installation) CLI
 
@@ -110,6 +112,68 @@ MrRSS 将所有用户数据（数据库、设置）存储在特定平台的目�
 
 ```bash
 wails dev
+```
+
+### 代码质量工具
+
+#### 使用 Make
+
+我们提供了 `Makefile` 来处理常见的开发任务（在 Linux/macOS/Windows 上都可用）：
+
+```bash
+# 显示所有可用命令
+make help
+
+# 运行完整检查（lint + 测试 + 构建）
+make check
+
+# 清理构建产物
+make clean
+
+# 设置开发环境
+make setup
+```
+
+#### 使用脚本
+
+`scripts/` 目录中提供了跨平台的自动化脚本：
+
+**Linux/macOS:**
+
+```bash
+# 运行所有质量检查
+./scripts/check.sh
+
+# 发布前检查
+./scripts/pre-release.sh
+
+# 更新版本
+./scripts/bump-version.sh x.y.z
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# 运行所有质量检查
+.\scripts\check.ps1
+
+# 发布前检查
+.\scripts\pre-release.ps1
+
+# 更新版本
+.\scripts\bump-version.ps1 -NewVersion x.y.z
+```
+
+### Pre-commit Hooks
+
+本项目使用 pre-commit hooks 来确保代码质量：
+
+```bash
+# 安装 hooks
+pre-commit install
+
+# 在所有文件上运行
+pre-commit run --all-files
 ```
 
 ### 运行测试

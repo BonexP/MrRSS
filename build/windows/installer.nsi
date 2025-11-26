@@ -5,7 +5,7 @@
 ;
 ; To build:
 ;   makensis build/windows/installer.nsi
-; 
+;
 ; All paths in this script are relative to the script directory.
 
 !define APP_NAME "MrRSS"
@@ -71,16 +71,16 @@ VIAddVersionKey "LegalCopyright" "Copyright (C) ${APP_PUBLISHER}"
 ; Installer Sections
 Section "MainSection" SEC01
     SetOutPath "$INSTDIR"
-    
+
     ; Copy the executable
     File "..\bin\${APP_EXE}"
-    
+
     ; Create shortcuts
     CreateDirectory "$SMPROGRAMS\${APP_NAME}"
     CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\${APP_EXE}"
     CreateShortcut "$SMPROGRAMS\${APP_NAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
     CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${APP_EXE}"
-    
+
     ; Write registry keys
     WriteRegStr HKLM "Software\${APP_NAME}" "Install_Dir" "$INSTDIR"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayName" "${APP_NAME}"
@@ -91,7 +91,7 @@ Section "MainSection" SEC01
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "UninstallString" "$INSTDIR\Uninstall.exe"
     WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "NoModify" 1
     WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "NoRepair" 1
-    
+
     ; Create uninstaller
     WriteUninstaller "$INSTDIR\Uninstall.exe"
 SectionEnd
@@ -101,20 +101,20 @@ Section "Uninstall"
     ; Remove files
     Delete "$INSTDIR\${APP_EXE}"
     Delete "$INSTDIR\Uninstall.exe"
-    
+
     ; Remove shortcuts
     Delete "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk"
     Delete "$SMPROGRAMS\${APP_NAME}\Uninstall.lnk"
     Delete "$DESKTOP\${APP_NAME}.lnk"
     RMDir "$SMPROGRAMS\${APP_NAME}"
-    
+
     ; Remove installation directory
     RMDir "$INSTDIR"
-    
+
     ; Remove registry keys
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
     DeleteRegKey HKLM "Software\${APP_NAME}"
-    
+
     ; Note: User data directory is NOT removed to preserve user data
     ; Data location: %APPDATA%\MrRSS
 SectionEnd

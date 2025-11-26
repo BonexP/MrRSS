@@ -1,28 +1,44 @@
 # AI Agent Guidelines for MrRSS
 
-This document provides comprehensive guidance for AI agents (like GitHub Copilot, ChatGPT, Claude, etc.) working on the MrRSS project.
-
 ## Project Overview
 
 **MrRSS** is a modern, privacy-focused, cross-platform desktop RSS reader built with:
 
-- **Backend**: Go 1.21+ with Wails v2 framework
-- **Frontend**: Vue.js 3 (Composition API) with Tailwind CSS
-- **Database**: SQLite with `modernc.org/sqlite` driver
+- **Backend**: Go 1.24+ with Wails v2.11+ framework
+- **Frontend**: Vue 3.5+ (Composition API) with Pinia state management, Tailwind CSS 3.3+, Vite 5+
+- **Database**: SQLite with `modernc.org/sqlite` driver (pure Go implementation)
 - **Build Tool**: Wails CLI v2.11+
+- **Additional**: Phosphor Icons, vue-i18n for internationalization
 
 ### Core Functionality
 
-- **Feed Management**: RSS/Atom feed subscription, parsing with `gofeed`, and real-time updates
-- **Article Management**: Read/unread tracking, favorites, pagination, and filtering
-- **Organization**: Category-based feed organization with expandable categories
-- **Translation**: Auto-translation using Google Translate (free) or DeepL API
-- **Data Portability**: OPML import/export for easy migration
-- **Internationalization**: Full UI support for English and Chinese
+- **Feed Management**: RSS/Atom feed subscription, parsing with `gofeed`, concurrent fetching, and real-time updates
+- **Article Management**: Read/unread tracking, favorites, pagination, filtering, and search
+- **Organization**: Category-based feed organization with expandable categories and smart filtering rules
+- **Translation**: Auto-translation using Google Translate (free, no API key) or DeepL API
+- **Data Portability**: OPML import/export for easy migration between RSS readers
+- **Internationalization**: Full UI support for English and Chinese with extensible i18n system
 - **Auto-Refresh**: Configurable interval for automatic feed updates (default 10 minutes)
-- **Auto-Cleanup**: Configurable article retention (by age and cache size)
-- **Update System**: In-app update checking and installation with progress tracking
-- **Theming**: Light/Dark/Auto modes with system preference detection
+- **Auto-Cleanup**: Configurable article retention by age (preserves favorites) and cache size management
+- **Update System**: In-app update checking and installation with progress tracking and safe file handling
+- **Theming**: Light/Dark/Auto modes with system preference detection and CSS variables
+- **Keyboard Shortcuts**: Customizable shortcuts for power users with keyboard navigation
+- **Smart Discovery**: HTML parsing to find RSS feeds from websites and related sources
+- **Performance**: Virtual scrolling, background processing, optimized database queries with WAL mode
+
+### Advanced Features
+
+- **Security**: Input validation, safe file operations, no shell command injection vulnerabilities
+- **Accessibility**: Keyboard navigation, ARIA labels, screen reader support
+- **Error Handling**: Graceful degradation, user-friendly error messages, comprehensive logging
+- **Concurrent Processing**: Goroutines for parallel feed fetching and background tasks
+- **Database Optimization**: WAL mode, prepared statements, indexed queries, VACUUM operations
+- **Progress Tracking**: Real-time progress updates for long-running operations
+- **Settings Auto-Save**: Debounced settings persistence (500ms) without save buttons
+- **Context Menus**: Right-click context menus with customizable actions
+- **Toast Notifications**: Non-intrusive notifications with different types (success/error/info)
+- **Modal System**: Reusable modal dialogs with proper focus management
+- **Responsive Design**: Mobile-friendly interface with resizable panels
 
 ## Project Structure
 
@@ -30,548 +46,534 @@ This document provides comprehensive guidance for AI agents (like GitHub Copilot
 MrRSS/
 ├── main.go                      # Application entry point, Wails app initialization
 ├── wails.json                   # Wails configuration, version info (2 version fields)
-├── go.mod / go.sum              # Go dependencies
-├── internal/                    # Backend Go code (not exposed directly)
+├── go.mod / go.sum              # Go dependencies (Go 1.24+)
+├── internal/                    # Backend Go code (private, not exposed)
 │   ├── database/
-│   │   ├── sqlite.go           # SQLite operations, schema, settings management
-│   │   └── sqlite_test.go      # Database tests
+│   │   ├── article_db.go        # Article CRUD operations
+│   │   ├── cleanup_db.go        # Auto-cleanup logic (preserves favorites)
+│   │   ├── db.go                # Database initialization and core operations
+│   │   ├── feed_db.go           # Feed CRUD operations
+│   │   ├── settings_db.go       # Settings key-value store operations
+│   │   ├── sqlite.go            # SQLite connection and utilities
+│   │   ├── sqlite_test.go       # Database unit tests
+│   │   └── unread_test.go       # Unread count tests
+│   ├── discovery/
+│   │   ├── discovery_test.go    # Discovery unit tests
+│   │   ├── errors.go            # Discovery error types
+│   │   ├── feed_discovery.go    # Feed discovery from URLs
+│   │   ├── html_parser.go       # HTML parsing for RSS links
+│   │   ├── rss_detector.go      # RSS feed detection logic
+│   │   └── service.go           # Discovery service orchestration
 │   ├── feed/
-│   │   ├── fetcher.go          # RSS/Atom parsing with gofeed, concurrent fetching
-│   │   └── fetcher_test.go     # Feed parsing tests
+│   │   ├── fetcher.go           # RSS/Atom parsing with gofeed, concurrent fetching
+│   │   ├── fetcher_test.go      # Feed parsing and fetching tests
+│   │   └── models.go            # Feed-specific data models
 │   ├── handlers/
-│   │   └── handlers.go         # HTTP handlers, app logic, update system
+│   │   ├── article_handlers.go  # Article-related HTTP endpoints
+│   │   ├── discovery_handlers.go # Feed discovery endpoints
+│   │   ├── feed_handlers.go     # Feed management endpoints
+│   │   ├── handler.go           # Handler initialization and common utilities
+│   │   ├── opml_handlers.go     # OPML import/export endpoints
+│   │   ├── rules_handlers.go    # Filtering rules endpoints
+│   │   ├── scheduler.go         # Background task scheduling
+│   │   ├── settings_handlers.go # Settings management endpoints
+│   │   ├── translation_handlers.go # Translation endpoints
+│   │   └── update_handlers.go   # Update system endpoints
 │   ├── models/
-│   │   └── models.go           # Data structures (Feed, Article, etc.)
+│   │   └── models.go           # Core data structures (Feed, Article, etc.)
 │   ├── opml/
-│   │   ├── handler.go          # OPML import/export logic
-│   │   └── handler_test.go     # OPML tests
+│   │   ├── handler.go          # OPML parsing and generation
+│   │   └── handler_test.go     # OPML unit tests
+│   ├── rules/
+│   │   └── engine.go           # Filtering rules engine
 │   ├── translation/
-│   │   ├── translator.go       # Translation interface
-│   │   ├── google_free.go      # Google Translate (free, no API key)
 │   │   ├── deepl.go            # DeepL API integration
-│   │   └── translator_test.go  # Translation tests
+│   │   ├── google_free.go      # Google Translate (free, no API key)
+│   │   ├── translator.go       # Translation interface and factory
+│   │   └── translator_test.go  # Translation unit tests
 │   ├── utils/
-│   │   └── paths.go            # Platform-specific paths for data storage
+│   │   ├── paths.go            # Platform-specific data paths
+│   │   └── startup.go          # Application startup utilities
 │   └── version/
-│       └── version.go          # Version constant (update this!)
+│       └── version.go          # Version constant (CRITICAL: update all 7 files)
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── ArticleList.vue     # Article list with virtual scrolling
-│   │   │   ├── ArticleDetail.vue   # Article reader view
-│   │   │   ├── Sidebar.vue         # Feed/category navigation
-│   │   │   ├── ContextMenu.vue     # Right-click context menu
-│   │   │   ├── Toast.vue           # Toast notifications
-│   │   │   └── modals/             # Modal dialogs
-│   │   │       ├── SettingsModal.vue       # Main settings container
-│   │   │       ├── settings/
-│   │   │       │   ├── GeneralTab.vue     # General settings with auto-save
-│   │   │       │   ├── FeedsTab.vue       # Feed management
-│   │   │       │   └── AboutTab.vue       # About, version, updates
-│   │   │       ├── AddFeedModal.vue       # Add new feed
-│   │   │       ├── EditFeedModal.vue      # Edit feed
-│   │   │       └── ConfirmDialog.vue      # Confirmation dialogs
-│   │   ├── store.js            # Global state management (reactive)
-│   │   ├── i18n.js             # Internationalization (en/zh)
-│   │   ├── App.vue             # Root component
-│   │   ├── main.js             # Vue app initialization
-│   │   └── style.css           # Global styles, theme variables
-│   ├── package.json            # Frontend dependencies, version
-│   ├── vite.config.js          # Vite build configuration
-│   ├── tailwind.config.js      # Tailwind CSS configuration
-│   └── wailsjs/                # Auto-generated Go→JS bindings (don't edit)
+│   ├── index.html               # HTML template
+│   ├── package.json             # Frontend dependencies and scripts (version field)
+│   ├── package.json.md5         # Dependency hash for caching
+│   ├── postcss.config.js        # PostCSS configuration
+│   ├── tailwind.config.js       # Tailwind CSS configuration
+│   ├── tsconfig.json            # TypeScript configuration
+│   ├── tsconfig.node.json       # Node.js TypeScript configuration
+│   ├── vite.config.js           # Vite build configuration
+│   ├── assets/                  # Static assets
+│   └── src/
+│       ├── App.vue              # Root Vue component
+│       ├── main.ts              # Vue application initialization
+│       ├── style.css            # Global styles and theme variables
+│       ├── vite-env.d.ts        # Vite environment types
+│       ├── components/
+│       │   ├── article/
+│       │   │   ├── ArticleContent.vue      # Article content renderer
+│       │   │   ├── ArticleDetail.vue       # Article detail view
+│       │   │   ├── ArticleDetailToolbar.vue # Article toolbar
+│       │   │   ├── ArticleItem.vue         # Individual article item
+│       │   │   ├── ArticleList.vue         # Article list with virtual scrolling
+│       │   │   └── ArticleToolbar.vue      # Article list toolbar
+│       │   ├── common/
+│       │   │   ├── ContextMenu.vue         # Right-click context menu
+│       │   │   ├── ImageViewer.vue         # Image viewer modal
+│       │   │   └── Toast.vue               # Toast notification component
+│       │   └── modals/
+│       │       ├── SettingsModal.vue       # Main settings modal
+│       │       ├── common/
+│       │       │   ├── ConfirmDialog.vue   # Confirmation dialog
+│       │       │   └── InputDialog.vue     # Input dialog
+│       │       ├── discovery/
+│       │       │   └── DiscoverFeedsModal.vue # Feed discovery modal
+│       │       ├── feed/
+│       │       │   ├── AddFeedModal.vue    # Add feed modal
+│       │       │   └── EditFeedModal.vue   # Edit feed modal
+│       │       ├── filter/
+│       │       │   └── FilterRulesModal.vue # Filtering rules modal
+│       │       └── settings/
+│       │           ├── AboutTab.vue         # About tab (version field)
+│       │           ├── FeedsTab.vue         # Feed settings tab
+│       │           └── GeneralTab.vue       # General settings tab
+│       ├── composables/
+│       │   ├── article/            # Article-related composables
+│       │   ├── core/               # Core utilities
+│       │   ├── discovery/          # Discovery composables
+│       │   ├── feed/               # Feed management composables
+│       │   ├── filter/             # Filtering composables
+│       │   ├── rules/              # Rules composables
+│       │   └── ui/                 # UI composables (notifications, keyboard, etc.)
+│       ├── i18n/
+│       │   ├── index.ts            # i18n configuration and messages
+│       │   └── types.ts            # i18n type definitions
+│       │   └── locales/            # Locale files (en, zh)
+│       ├── stores/
+│       │   └── app.ts              # Pinia store for global state
+│       ├── types/
+│       │   ├── discovery.ts        # Discovery-related types
+│       │   ├── filter.ts           # Filter-related types
+│       │   ├── global.d.ts         # Global type definitions
+│       │   ├── models.ts           # Core data model types
+│       │   └── settings.ts         # Settings-related types
+│       └── utils/
+│           └── date.ts             # Date formatting utilities
+│       └── wailsjs/                # Auto-generated Go→JS bindings (don't edit)
 ├── test/
-│   └── testdata/               # Test files (OPML samples, etc.)
+│   └── testdata/               # Test data files (OPML samples, etc.)
 ├── build/                       # Build scripts and installers
-│   ├── windows/                # Windows-specific build files
-│   ├── linux/                  # Linux AppImage scripts
-│   └── macos/                  # macOS DMG creation scripts
-├── website/                     # GitHub Pages website source
+│   ├── windows/
+│   │   ├── info.json            # Windows build metadata
+│   │   └── installer.nsi        # NSIS installer script
+│   ├── linux/
+│   │   └── create-appimage.sh   # AppImage creation script
+│   └── macos/
+│       └── create-dmg.sh        # DMG creation script
+├── website/                     # GitHub Pages website
+├── imgs/                        # Screenshots and assets
 ├── CHANGELOG.md                 # Version history (update this!)
 ├── README.md                    # English documentation (version badge)
 ├── README_zh.md                 # Chinese documentation (version badge)
+├── SECURITY.md                  # Security policy
+├── CONTRIBUTING.md              # Contribution guidelines
+├── LICENSE                      # MIT License
 └── AGENTS.md                    # This file
 ```
 
 ## Key Technologies & Patterns
 
-### Backend (Go)
+### Backend Architecture (Go 1.24+)
 
-**Wails Framework**:
+**Framework**: Wails v2.11+ with HTTP API endpoints (not Wails bindings for better control)
+**Database**: SQLite with `modernc.org/sqlite` (pure Go implementation), WAL mode enabled
+**RSS Parsing**: `gofeed` library for RSS/Atom feed parsing with concurrent fetching
+**Translation**: Google Translate (free, no API key) and DeepL API integration
+**Concurrency**: Goroutines for parallel feed fetching and background tasks
+**Security**: Input validation, safe file operations, no shell command injection
+
+### Frontend Architecture (Vue 3.5+)
+
+**Framework**: Vue 3.5+ Composition API with TypeScript
+**State Management**: Pinia store for global state (articles, feeds, filters, themes, refresh progress)
+**Styling**: Tailwind CSS 3.3+ with semantic class system and CSS variables for theming
+**Build Tool**: Vite 5+ for fast development and optimized production builds
+**Internationalization**: vue-i18n with English/Chinese support
+**Icons**: Phosphor Icons (Vue/Web) for consistent iconography
+
+### Core Patterns
+
+#### Database Operations
+
+```go
+// Always use prepared statements
+stmt, err := db.conn.Prepare(`
+    SELECT id, title, url, content, published_at
+    FROM articles
+    WHERE feed_id = ? AND is_read = ?
+    ORDER BY published_at DESC
+`)
+if err != nil {
+    return nil, fmt.Errorf("prepare statement: %w", err)
+}
+defer stmt.Close()
+
+rows, err := stmt.Query(feedID, false)
+if err != nil {
+    return nil, fmt.Errorf("execute query: %w", err)
+}
+defer rows.Close()
+```
+
+#### Vue Composition API
+
+```vue
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useAppStore } from '@/stores/app';
+import { useI18n } from 'vue-i18n';
+
+// Props with proper typing
+interface Props {
+  item: Article;
+  isActive?: boolean;
+}
+const props = withDefaults(defineProps<Props>(), {
+  isActive: false
+});
+
+// Reactive state and computed properties
+const store = useAppStore();
+const { t } = useI18n();
+const isLoading = ref(false);
+
+// Async operations with error handling
+async function loadData() {
+  isLoading.value = true;
+  try {
+    const data = await fetch('/api/articles').then(r => r.json());
+    // Update store or local state
+  } catch (error) {
+    console.error('Failed to load data:', error);
+    window.showToast(t('errorLoadingData'), 'error');
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// Lifecycle and cleanup
+onMounted(() => loadData());
+onUnmounted(() => {
+  // Cleanup timers, listeners, etc.
+});
+</script>
+```
+
+#### Auto-Save Pattern (500ms debounce)
+
+```vue
+<script setup>
+import { watch } from 'vue';
+
+let saveTimeout: NodeJS.Timeout | null = null;
+
+async function autoSave() {
+  try {
+    await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings)
+    });
+    store.applySettings(settings);
+  } catch (error) {
+    console.error('Failed to save settings:', error);
+  }
+}
+
+function debouncedAutoSave() {
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(autoSave, 500);
+}
+
+// Watch entire settings object deeply
+watch(() => props.settings, debouncedAutoSave, { deep: true });
+</script>
+```
+
+## Development Workflow
+
+### Getting Started
+
+1. **Prerequisites**: Go 1.24+, Node.js 18+, Wails CLI v2.11+
+2. **Clone & Setup**:
+
+   ```bash
+   git clone https://github.com/username/MrRSS.git
+   cd MrRSS
+   go mod download
+   cd frontend && npm install
+   ```
+
+3. **Development**:
+
+   ```bash
+   wails dev  # Starts development server with hot reload
+   ```
+
+4. **Building**:
+
+   ```bash
+   wails build  # Production build for current platform
+   ```
+
+### Cross-Platform Development Scripts
+
+The project includes automated scripts for development tasks:
+
+**Linux/macOS:**
+```bash
+# Run all quality checks (lint, test, build)
+./scripts/check.sh
+
+# Pre-release checks
+./scripts/pre-release.sh
+
+# Bump version
+./scripts/bump-version.sh 1.2.4
+```
+
+**Windows (PowerShell):**
+```powershell
+# Run all quality checks (lint, test, build)
+.\scripts\check.ps1
+
+# Pre-release checks
+.\scripts\pre-release.ps1
+
+# Bump version
+.\scripts\bump-version.ps1 -NewVersion 1.2.4
+```
+
+### Using Make
+
+A cross-platform Makefile is available with common tasks:
+
+```bash
+# Show all available commands
+make help
+
+# Run full check (lint + test + build)
+make check
+
+# Clean build artifacts
+make clean
+
+# Setup development environment
+make setup
+```
+
+### Code Organization
+
+- **Backend**: `internal/` contains all private Go code
+- **Frontend**: `frontend/src/` follows Vue.js project structure
+- **Tests**: Backend tests in `*_test.go`, frontend tests in `frontend/src/**/*.test.js`
+- **Build Scripts**: Platform-specific build scripts in `build/` directory
+
+### Version Management (CRITICAL)
+
+When updating version, modify ALL of these files:
+
+1. `internal/version/version.go` - Version constant
+2. `wails.json` - "version" and "info.productVersion" fields
+3. `frontend/package.json` - "version" field
+4. `frontend/src/components/modals/settings/AboutTab.vue` - appVersion ref default
+5. `README.md` - Version badge
+6. `README_zh.md` - Version badge
+7. `CHANGELOG.md` - Add new version entry
+
+## Coding Standards
+
+### Go Standards
 
 - Use `context.Context` for all exported methods
-- Methods are automatically exposed to frontend
-- Use struct methods for organization
+- Error wrapping with `fmt.Errorf("operation failed: %w", err)`
+- Prepared statements for all database queries
+- Proper resource cleanup with `defer`
+- Comprehensive input validation
+- No shell command concatenation (security risk)
 
-**Database**:
+### Vue/TypeScript Standards
 
-- SQLite with `modernc.org/sqlite` driver (pure Go implementation)
-- WAL mode enabled for better concurrency
-- Optimized with indexes on common query patterns
-- Use prepared statements for all queries
-- Settings stored in `settings` table with key-value pairs
-- No migrations (development phase) - users backup data before updates
+- Composition API with `<script setup>`
+- Proper TypeScript typing for all props and data
+- vue-i18n for all user-facing strings (`t()` function)
+- Tailwind semantic classes (no inline styles)
+- Debounced operations for performance
+- Proper component lifecycle management
 
-**Settings System**:
+### Security Practices
 
-```go
-// Settings are stored as strings in database
-db.GetSetting("key")           // Returns string value
-db.SetSetting("key", "value")  // Stores string value
+- Input validation for URLs and file paths
+- Safe file operations (`os.Remove()` not shell commands)
+- No XSS vulnerabilities (`v-html` avoided)
+- Prepared SQL statements prevent injection
+- Proper error handling without information leakage
 
-// Common settings:
-// - update_interval: minutes between auto-refresh (default: "10")
-// - auto_cleanup_enabled: "true" or "false" (default: "false")
-// - max_cache_size_mb: max DB size in MB (default: "20")
-// - max_article_age_days: days to keep articles (default: "30")
-// - translation_enabled: "true" or "false"
-// - target_language: language code (e.g., "zh", "en")
-// - translation_provider: "google" or "deepl"
-// - language: UI language "en" or "zh"
-// - theme: "light", "dark", or "auto"
-```
+## Testing Patterns
 
-**RSS Parsing**:
-
-- Use `github.com/mmcdole/gofeed` for parsing
-- Support both RSS and Atom formats
-- Handle malformed feeds gracefully
-
-**Translation**:
-
-- Google Translate: Free, no API key
-- DeepL: Requires API key
-- Store translations in database
-
-### Frontend (Vue.js)
-
-**Vue 3 Composition API**:
-
-```vue
-<script setup>
-import { ref, computed, onMounted } from 'vue';
-import { store } from '../store.js';
-
-const items = ref([]);
-const filteredItems = computed(() => /* ... */);
-
-onMounted(async () => {
-  // Initialize
-});
-</script>
-```
-
-**State Management**:
-
-- Use `store.js` for global state
-- Reactive with Vue's `reactive()`
-- Key state properties:
-  - `feeds`: Array of feed objects
-  - `articles`: Array of article objects
-  - `selectedFeed`: Currently selected feed ID
-  - `selectedArticle`: Currently selected article
-  - `theme`: Current theme ("light", "dark", "auto")
-  - `i18n`: Internationalization object with `t()` method
-
-**Auto-Save Pattern** (Settings):
-
-```vue
-<script setup>
-import { watch, onUnmounted } from 'vue';
-
-let saveTimeout = null;
-
-// Debounced save function (500ms delay)
-function debouncedAutoSave() {
-    if (saveTimeout) clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(autoSave, 500);
-}
-
-// Watch entire settings object
-watch(() => props.settings, debouncedAutoSave, { deep: true });
-
-// Cleanup on unmount
-onUnmounted(() => {
-    if (saveTimeout) clearTimeout(saveTimeout);
-});
-</script>
-```
-
-**Styling**:
-
-- Tailwind CSS utility classes
-- Theme variables in CSS
-- Dark mode support via `data-theme`
-
-**Internationalization**:
-
-- `i18n.js` provides translation function
-- Use `store.i18n.t('key')` in templates
-- Support English (`en`) and Chinese (`zh`)
-
-## Development Guidelines
-
-### Code Style
-
-**Go**:
-
-- Follow `gofmt` formatting
-- Use meaningful variable names
-- Handle errors explicitly
-- Add comments for exported functions
-- Keep functions focused and small
-
-**Vue.js**:
-
-- Use `<script setup>` syntax
-- Props validation with `defineProps`
-- Emit declarations with `defineEmits`
-- Composition API over Options API
-- Keep components under 300 lines
-
-**Commit Messages**:
-
-Follow Conventional Commits:
-
-```plaintext
-<type>(<scope>): <description>
-
-[optional body]
-```
-
-Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
-
-### Testing
-
-**Backend**:
-
-```bash
-go test ./...
-go test -cover ./internal/database
-```
-
-**Frontend**:
-
-```bash
-cd frontend
-npm test
-npm run lint
-```
-
-**Manual Testing**:
-
-```bash
-wails dev  # Development mode with hot reload
-wails build  # Production build
-```
-
-### Building
-
-**Development**:
-
-```bash
-wails dev
-```
-
-**Production**:
-
-```bash
-wails build -clean -ldflags "-s -w"
-```
-
-**Platform-Specific**:
-
-- Windows: Built for amd64 and arm64
-- macOS: Universal binary (Intel + Apple Silicon)
-- Linux: Built for amd64
-
-## Common Tasks
-
-### Adding a New Feature
-
-1. **Plan**: Define the feature scope and requirements
-2. **Backend** (if needed):
-   - Add methods to handlers
-   - Update database schema if needed
-   - Add tests
-3. **Frontend**:
-   - Create/update components
-   - Add i18n strings
-   - Update store if needed
-4. **Test**: Manual + automated testing
-5. **Document**: Update README if user-facing
-
-### Adding Translations
-
-1. Edit `frontend/src/i18n.js`
-2. Add keys to both `en` and `zh` sections:
-
-   ```javascript
-   export const translations = {
-       en: {
-           newKey: 'English text',
-           // ...
-       },
-       zh: {
-           newKey: '中文文本',
-           // ...
-       }
-   };
-   ```
-
-3. Use `store.i18n.t('newKey')` in templates
-4. Test language switching in UI
-
-### Auto-Cleanup Feature
-
-The auto-cleanup system has configurable settings:
-
-1. **Enable/Disable**: `auto_cleanup_enabled` setting
-2. **Max Article Age**: `max_article_age_days` (default: 30 days)
-   - Deletes articles older than this threshold
-   - **Exception**: Favorited articles are never deleted
-3. **Max Cache Size**: `max_cache_size_mb` (default: 20 MB)
-   - Reserved for future size-based cleanup
-   - Currently tracks DB size but doesn't enforce limit
-
-**Cleanup Logic** (`internal/database/sqlite.go`):
+### Backend Tests (Go)
 
 ```go
-// Articles older than max_article_age_days are deleted
-// EXCEPT favorited articles which are kept forever
-cutoffDate := time.Now().AddDate(0, 0, -maxAgeDays)
-DELETE FROM articles WHERE published_at < ? AND is_favorite = 0
-```
+func TestDatabaseOperations(t *testing.T) {
+    // Setup test database
+    db, cleanup := setupTestDB(t)
+    defer cleanup()
 
-**Cleanup Triggers**:
+    // Test data
+    feed := models.Feed{
+        Title: "Test Feed",
+        URL:   "https://example.com/feed.xml",
+    }
 
-- Manual: User clicks "Clean Database" in Settings → Feeds tab
-- Automatic: After each auto-refresh (if enabled in settings)
-- On startup: If auto-cleanup enabled
+    // Execute
+    id, err := db.AddFeed(feed)
 
-### Update System
+    // Assert
+    if err != nil {
+        t.Fatalf("AddFeed failed: %v", err)
+    }
+    if id == 0 {
+        t.Error("Expected non-zero ID")
+    }
 
-The in-app update system checks GitHub releases:
-
-1. **Check Updates**: Queries GitHub API for latest release
-2. **Platform Detection**: Identifies OS and architecture
-3. **Asset Matching**: Finds appropriate installer:
-   - Windows: `MrRSS-{version}-windows-{arch}-installer.exe`
-   - Linux: `MrRSS-{version}-linux-{arch}.AppImage`
-   - macOS: `MrRSS-{version}-darwin-universal.dmg`
-4. **Download**: Shows progress bar, simulated progress updates
-5. **Install**: Launches installer, schedules cleanup, exits app
-6. **Cleanup**: Installer file deleted 3-5 seconds after launch
-
-**Security Measures**:
-
-- URL validation (must be from official GitHub repo)
-- File path validation (prevents traversal attacks)
-- Extension validation (platform-specific)
-- Safe file cleanup using `os.Remove()` instead of shell commands
-
-### Database Changes
-
-1. Edit `internal/database/sqlite.go`
-2. Update `Init()` function with new schema
-3. No migrations (development phase)
-4. Users should back up data before updates
-
-### UI Changes
-
-1. Use existing Tailwind classes
-2. Follow dark mode pattern: `class="bg-bg-primary text-text-primary"`
-3. Ensure responsive design
-4. Test in both themes
-5. Add icons from Phosphor Icons (`ph ph-*`)
-
-## Important Conventions
-
-### Naming
-
-**Go**:
-
-- Exported: `PascalCase` (e.g., `FetchFeed`)
-- Unexported: `camelCase` (e.g., `parseXML`)
-- Interfaces: Usually noun (e.g., `Reader`, `Handler`)
-
-**Vue**:
-
-- Components: `PascalCase` files (e.g., `ArticleList.vue`)
-- Props/emits: `camelCase` (e.g., `feedId`, `onUpdate`)
-- CSS classes: `kebab-case` (e.g., `article-card`)
-
-### File Organization
-
-- One component per file
-- Co-locate tests with code
-- Group related functionality
-- Keep files under 500 lines
-
-### Error Handling
-
-**Go**:
-
-```go
-if err != nil {
-    return fmt.Errorf("context: %w", err)
+    // Verify
+    retrieved, err := db.GetFeed(id)
+    if err != nil {
+        t.Fatalf("GetFeed failed: %v", err)
+    }
+    if retrieved.Title != feed.Title {
+        t.Errorf("Expected title %q, got %q", feed.Title, retrieved.Title)
+    }
 }
 ```
 
-**Vue**:
+### Frontend Tests (Vitest)
 
 ```javascript
-try {
-    // operation
-} catch (e) {
-    console.error(e);
-    window.showToast(store.i18n.t('error'), 'error');
-}
+import { describe, it, expect } from 'vitest';
+import { mount } from '@vue/test-utils';
+import ArticleItem from './ArticleItem.vue';
+
+describe('ArticleItem', () => {
+  it('renders article title', () => {
+    const article = { id: 1, title: 'Test Article', isRead: false };
+    const wrapper = mount(ArticleItem, {
+      props: { article }
+    });
+
+    expect(wrapper.text()).toContain('Test Article');
+  });
+
+  it('emits mark-read event when clicked', async () => {
+    const article = { id: 1, title: 'Test Article', isRead: false };
+    const wrapper = mount(ArticleItem, {
+      props: { article }
+    });
+
+    await wrapper.trigger('click');
+    expect(wrapper.emitted('mark-read')).toBeTruthy();
+  });
+});
 ```
 
-## Security Considerations
+## Deployment Process
 
-1. **Input Validation**: Validate all user inputs
-2. **SQL Injection**: Use parameterized queries
-3. **XSS**: Vue escapes by default, don't use `v-html`
-4. **API Keys**: Store locally, never commit
-5. **Feed Content**: Displayed in iframe with sandbox
+### Build Commands
 
-## Performance Tips
+```bash
+# Development
+wails dev
 
-1. **Backend**:
-   - Use goroutines for concurrent feed fetching
-   - Cache feed data when appropriate
-   - Optimize database queries
+# Production build for current platform
+wails build
 
-2. **Frontend**:
-   - Virtual scrolling for large lists
-   - Lazy load images
-   - Debounce search inputs
-   - Use `v-show` vs `v-if` appropriately
+# Cross-platform builds
+wails build -platform windows/amd64
+wails build -platform linux/amd64
+wails build -platform darwin/amd64
+```
 
-## Debugging
+### Platform-Specific Packaging
 
-**Backend**:
+- **Windows**: NSIS installer (`build/windows/installer.nsi`)
+- **Linux**: AppImage (`build/linux/create-appimage.sh`)
+- **macOS**: DMG (`build/macos/create-dmg.sh`)
 
-- Use `fmt.Println` or `log.Printf`
-- Check Wails console output
-- Use Go debugger (Delve)
+### Release Checklist
 
-**Frontend**:
+1. Update version in all 7 files
+2. Update CHANGELOG.md
+3. Run full test suite
+4. Build for all platforms
+5. Test installers on clean systems
+6. Create GitHub release with binaries
+7. Update website if needed
 
-- Browser DevTools console
-- Vue DevTools extension
-- Check Network tab for API calls
+## Troubleshooting
 
-**Common Issues**:
+### Common Issues
 
-1. **CORS**: Not applicable (native app)
-2. **Feed parsing**: Check feed URL format
-3. **Translation**: Verify API key for DeepL
-4. **Build errors**: Check Go/Node versions
+**Database Issues**:
 
-## Version Management
+- Check SQLite file permissions
+- Verify WAL mode is enabled
+- Run `VACUUM` to reclaim space
 
-**IMPORTANT**: When upgrading the software version, you MUST update ALL of the following files:
+**Build Issues**:
 
-### Required Version Updates
+- Ensure Go 1.24+ and Wails CLI v2.11+
+- Clear `frontend/node_modules` and reinstall
+- Check for conflicting dependencies
 
-1. **`internal/version/version.go`**
+**Runtime Issues**:
 
-   ```go
-   const Version = "X.Y.Z"  // Update this constant
-   ```
+- Check logs in application data directory
+- Verify network connectivity for feed fetching
+- Ensure proper file permissions for updates
 
-2. **`wails.json`** (2 locations in same file)
+### Debug Commands
 
-   ```json
-   {
-     "version": "X.Y.Z",
-     "info": {
-       "productVersion": "X.Y.Z",
-       ...
-     }
-   }
-   ```
+```bash
+# Check Go version and modules
+go version
+go mod verify
 
-3. **`frontend/package.json`**
+# Check Node.js and dependencies
+cd frontend
+npm --version
+npm ls --depth=0
 
-   ```json
-   {
-     "version": "X.Y.Z",
-     ...
-   }
-   ```
+# Check Wails installation
+wails version
 
-4. **`frontend/src/components/modals/settings/AboutTab.vue`**
+# Run backend tests
+go test ./internal/...
 
-   ```vue
-   const appVersion = ref('X.Y.Z');  // Update default version
-   ```
+# Run frontend tests
+cd frontend
+npm test
+```
 
-5. **`README.md`** (version badge)
+### Performance Optimization
 
-   ```markdown
-   [![Version](https://img.shields.io/badge/version-X.Y.Z-blue.svg)](...)
-   ```
-
-6. **`README_zh.md`** (version badge)
-
-   ```markdown
-   [![Version](https://img.shields.io/badge/version-X.Y.Z-blue.svg)](...)
-   ```
-
-7. **`CHANGELOG.md`** (add new version entry at top)
-
-   ```markdown
-   ## [X.Y.Z] - YYYY-MM-DD
-   
-   ### Added
-   - New feature descriptions
-   
-   ### Changed
-   - Changes to existing functionality
-   
-   ### Fixed
-   - Bug fixes
-   ```
-
-### Version Numbering
-
-Follow **Semantic Versioning** (MAJOR.MINOR.PATCH):
-
-- **MAJOR** (X.0.0): Incompatible API changes, breaking changes
-- **MINOR** (1.X.0): Backwards-compatible new features
-- **PATCH** (1.1.X): Backwards-compatible bug fixes
-
-### Version Update Checklist
-
-- [ ] Update `internal/version/version.go`
-- [ ] Update `wails.json` (both fields)
-- [ ] Update `frontend/package.json`
-- [ ] Update `AboutTab.vue` default version
-- [ ] Update `README.md` badge
-- [ ] Update `README_zh.md` badge  
-- [ ] Update `CHANGELOG.md` with changes
-- [ ] Test that version displays correctly in About tab
-- [ ] Run all tests to ensure nothing broke
-
-## Resources
-
-- **Wails Docs**: [https://wails.io/docs/](https://wails.io/docs/)
-- **Vue.js Docs**: [https://vuejs.org/](https://vuejs.org/)
-- **Tailwind CSS**: [https://tailwindcss.com/](https://tailwindcss.com/)
-- **Go Docs**: [https://golang.org/doc/](https://golang.org/doc/)
-- **gofeed**: [https://github.com/mmcdole/gofeed](https://github.com/mmcdole/gofeed)
-
-## Getting Help
-
-1. Check existing issues on GitHub
-2. Read documentation (README, CONTRIBUTING)
-3. Search discussions
-4. Create new issue with template
+- Use database indexes for frequent queries
+- Implement virtual scrolling for large lists
+- Debounce frequent operations (search, auto-save)
+- Use goroutines for concurrent operations
+- Enable SQLite WAL mode for better concurrency
 
 ---
 
-**Remember**: When in doubt, follow existing patterns in the codebase. Consistency is key!
+This document provides comprehensive guidance for AI agents working on the MrRSS project. Always refer to the current codebase for the latest patterns and ensure all changes follow the established conventions.

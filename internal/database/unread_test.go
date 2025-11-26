@@ -186,7 +186,7 @@ func TestMarkAllAsReadExcludesHidden(t *testing.T) {
 	// Create test feed
 	feed := &models.Feed{Title: "Test Feed", URL: "https://example.com/feed", Category: "Test"}
 	db.AddFeed(feed)
-	
+
 	feeds, _ := db.GetFeeds()
 	feedID := feeds[0].ID
 
@@ -240,7 +240,7 @@ func TestUnreadCountsWithHiddenArticles(t *testing.T) {
 	// Create test feed
 	feed := &models.Feed{Title: "Test Feed", URL: "https://example.com/feed", Category: "Test"}
 	db.AddFeed(feed)
-	
+
 	feeds, _ := db.GetFeeds()
 	feedID := feeds[0].ID
 

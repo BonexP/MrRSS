@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script to create a macOS DMG installer for MrRSS
-# 
+#
 # Application Information:
 # Name: MrRSS
 # Description: A Modern, Cross-Platform Desktop RSS Reader

@@ -1,0 +1,162 @@
+/**
+ * Composable for filter field utilities
+ */
+import { computed, type ComputedRef } from 'vue';
+import { useAppStore } from '@/stores/app';
+import { useI18n } from 'vue-i18n';
+import type { FieldOption, OperatorOption, LogicOption, FilterCondition } from '@/types/filter';
+
+export function useFilterFields() {
+  const store = useAppStore();
+  const { t, locale } = useI18n();
+
+  /**
+   * Available field options for filtering
+   */
+  const fieldOptions: FieldOption[] = [
+    { value: 'feed_name', labelKey: 'feedName', multiSelect: true },
+    { value: 'feed_category', labelKey: 'feedCategory', multiSelect: true },
+    { value: 'article_title', labelKey: 'articleTitle', multiSelect: false },
+    { value: 'published_after', labelKey: 'publishedAfter', multiSelect: false },
+    { value: 'published_before', labelKey: 'publishedBefore', multiSelect: false },
+    { value: 'is_read', labelKey: 'readStatus', multiSelect: false, booleanField: true },
+    { value: 'is_favorite', labelKey: 'favoriteStatus', multiSelect: false, booleanField: true },
+  ];
+
+  /**
+   * Operator options for text fields
+   */
+  const textOperatorOptions: OperatorOption[] = [
+    { value: 'contains', labelKey: 'contains' },
+    { value: 'exact', labelKey: 'exactMatch' },
+  ];
+
+  /**
+   * Boolean value options
+   */
+  const booleanOptions: OperatorOption[] = [
+    { value: 'true', labelKey: 'yes' },
+    { value: 'false', labelKey: 'no' },
+  ];
+
+  /**
+   * Logic connector options
+   */
+  const logicOptions: LogicOption[] = [
+    { value: 'and', labelKey: 'and' },
+    { value: 'or', labelKey: 'or' },
+  ];
+
+  /**
+   * Get available feed names
+   */
+  const feedNames: ComputedRef<string[]> = computed(() => {
+    return store.feeds.map((f) => f.title);
+  });
+
+  /**
+   * Get available feed categories
+   */
+  const feedCategories: ComputedRef<string[]> = computed(() => {
+    const categories = new Set<string>();
+    store.feeds.forEach((f) => {
+      if (f.category) {
+        categories.add(f.category);
+      }
+    });
+    return Array.from(categories);
+  });
+
+  /**
+   * Check if field is a date field
+   */
+  function isDateField(field: string): boolean {
+    return field === 'published_after' || field === 'published_before';
+  }
+
+  /**
+   * Check if field supports multiple values
+   */
+  function isMultiSelectField(field: string): boolean {
+    return field === 'feed_name' || field === 'feed_category';
+  }
+
+  /**
+   * Check if field is a boolean field
+   */
+  function isBooleanField(field: string): boolean {
+    return field === 'is_read' || field === 'is_favorite';
+  }
+
+  /**
+   * Check if field needs an operator selector
+   */
+  function needsOperator(field: string): boolean {
+    // Only article_title needs the contains/exact operator
+    return field === 'article_title';
+  }
+
+  /**
+   * Handle field change - reset appropriate values
+   */
+  function onFieldChange(condition: FilterCondition): void {
+    if (isDateField(condition.field)) {
+      condition.operator = null;
+      condition.value = '';
+      condition.values = [];
+    } else if (isMultiSelectField(condition.field)) {
+      condition.operator = 'contains'; // Always contains for multi-select
+      condition.value = '';
+      condition.values = [];
+    } else if (isBooleanField(condition.field)) {
+      condition.operator = null;
+      condition.value = 'true'; // Default to true (read/favorited)
+      condition.values = [];
+    } else {
+      condition.operator = 'contains';
+      condition.value = '';
+      condition.values = [];
+    }
+  }
+
+  /**
+   * Get display text for multi-select dropdown
+   */
+  function getMultiSelectDisplayText(condition: FilterCondition, labelKey: string): string {
+    if (!condition.values || condition.values.length === 0) {
+      return t(labelKey);
+    }
+
+    if (condition.values.length === 1) {
+      return condition.values[0];
+    }
+
+    // Show first item and total count
+    // For Chinese: "xxx等N个" means "xxx and N items in total"
+    // For English: "xxx and N more" means N additional items
+    const firstItem = condition.values[0];
+    const totalCount = condition.values.length;
+    const remaining = totalCount - 1;
+
+    // Use different count based on locale
+    if (locale.value === 'zh') {
+      return `${firstItem} ${t('andNMore', { count: totalCount })}`;
+    }
+    return `${firstItem} ${t('andNMore', { count: remaining })}`;
+  }
+
+  return {
+    fieldOptions,
+    textOperatorOptions,
+    booleanOptions,
+    logicOptions,
+    feedNames,
+    feedCategories,
+    isDateField,
+    isMultiSelectField,
+    isBooleanField,
+    needsOperator,
+    onFieldChange,
+    getMultiSelectDisplayText,
+  };
+}

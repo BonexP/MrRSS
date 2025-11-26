@@ -122,6 +122,23 @@
       <outline text="宝玉的博客" title="宝玉的博客" type="rss" xmlUrl="https://rsshub.app/baoyu/blog" htmlUrl=""></outline>
       <outline text="paper - Last paper" title="paper - Last paper" type="rss" xmlUrl="https://paper.seebug.org/rss/" htmlUrl=""></outline>
       <outline text="Engineering Blogs" title="Engineering Blogs" type="rss" xmlUrl="https://rsshub.app/imhcg" htmlUrl=""></outline>
+      <outline text="王嘉祥" title="王嘉祥" type="rss" xmlUrl="https://blog.jiaxiang.wang/rss.xml" htmlUrl=""></outline>
+      <outline text="Kiro" title="Kiro" type="rss" xmlUrl="https://kiro.cc/atom.xml" htmlUrl=""></outline>
+      <outline text="Airing 的博客" title="Airing 的博客" type="rss" xmlUrl="https://blog.ursb.me/feed.xml" htmlUrl=""></outline>
+      <outline text="Rene Wang 的个人网站" title="Rene Wang 的个人网站" type="rss" xmlUrl="https://rene.wang/rss" htmlUrl=""></outline>
+      <outline text="Shilin&#39;s Blog" title="Shilin&#39;s Blog" type="rss" xmlUrl="https://edward40.com/index.xml" htmlUrl=""></outline>
+      <outline text="Kowyo" title="Kowyo" type="rss" xmlUrl="https://kowyo.com/index.xml" htmlUrl=""></outline>
+      <outline text="炸毛的秘密基地" title="炸毛的秘密基地" type="rss" xmlUrl="https://lzzmm.github.io/feed.xml" htmlUrl=""></outline>
+      <outline text="Hi! 上天不?" title="Hi! 上天不?" type="rss" xmlUrl="https://a-wing.top/feed.xml" htmlUrl=""></outline>
+      <outline text="Zhiqiang&#39;s backyard" title="Zhiqiang&#39;s backyard" type="rss" xmlUrl="https://strrl.dev/index.xml" htmlUrl=""></outline>
+      <outline text="Homura&#39;s Blog" title="Homura&#39;s Blog" type="rss" xmlUrl="https://homura.live/atom.xml" htmlUrl=""></outline>
+      <outline text="Eric&#39;s Blog" title="Eric&#39;s Blog" type="rss" xmlUrl="https://wsdjeg.net/feed.xml" htmlUrl=""></outline>
+      <outline text="Nemo" title="Nemo" type="rss" xmlUrl="https://nemo.cool/feed" htmlUrl=""></outline>
+      <outline text="Tony Ding&#39;s Blog" title="Tony Ding&#39;s Blog" type="rss" xmlUrl="https://blog.tonyding.net/feed" htmlUrl=""></outline>
+      <outline text="Bensz" title="Bensz" type="rss" xmlUrl="https://blognas.hwb0307.com/feed" htmlUrl=""></outline>
+      <outline text="余弦の博客" title="余弦の博客" type="rss" xmlUrl="https://ysx.cosine.ren/rss.xml" htmlUrl=""></outline>
+      <outline text="Usubeni Fantasy" title="Usubeni Fantasy" type="rss" xmlUrl="https://ssshooter.com/rss.xml" htmlUrl=""></outline>
+      <outline text="炸毛的秘密基地" title="炸毛的秘密基地" type="rss" xmlUrl="https://lzzmm.github.io/feed" htmlUrl=""></outline>
     </outline>
     <outline text="技术网站" title="技术网站" type="" xmlUrl="" htmlUrl="">
       <outline text="小米技术" title="小米技术" type="rss" xmlUrl="https://wechat2rss.xlab.app/feed/20bc9c3251b3c4f73d3b53aa1f1ab853d05d4cbc.xml" htmlUrl=""></outline>
@@ -157,7 +174,6 @@
       <outline text="晚点 - 长报道" title="晚点 - 长报道" type="rss" xmlUrl="https://rsshub.app/latepost/4" htmlUrl=""></outline>
       <outline text="36氪 - 24小时热榜" title="36氪 - 24小时热榜" type="rss" xmlUrl="https://rsshub.app/36kr/hot-list/24" htmlUrl=""></outline>
       <outline text="Less Amateur" title="Less Amateur" type="rss" xmlUrl="https://lessamateur.art/atom.xml" htmlUrl=""></outline>
-      <outline text=" Airing 的博客 " title=" Airing 的博客 " type="rss" xmlUrl="https://me.ursb.me/feed" htmlUrl=""></outline>
     </outline>
     <outline text="生活博客" title="生活博客" type="" xmlUrl="" htmlUrl="">
       <outline text="旅行漫记" title="旅行漫记" type="rss" xmlUrl="https://synyan.cn/feed" htmlUrl=""></outline>

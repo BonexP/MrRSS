@@ -24,8 +24,8 @@ func (db *DB) CleanupOldArticles() (int64, error) {
 
 	// Delete articles older than configured age that are not favorited
 	result, err := db.Exec(`
-		DELETE FROM articles 
-		WHERE published_at < ? 
+		DELETE FROM articles
+		WHERE published_at < ?
 		AND is_favorite = 0
 	`, cutoffDate)
 	if err != nil {
@@ -45,8 +45,8 @@ func (db *DB) CleanupUnimportantArticles() (int64, error) {
 	db.WaitForReady()
 
 	result, err := db.Exec(`
-		DELETE FROM articles 
-		WHERE is_read = 0 
+		DELETE FROM articles
+		WHERE is_read = 0
 		AND is_favorite = 0
 	`)
 	if err != nil {

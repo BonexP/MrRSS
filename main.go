@@ -45,7 +45,7 @@ func main() {
 		log.Printf("Warning: Could not get log path: %v. Using current directory.", err)
 		logPath = "debug.log"
 	}
-	
+
 	f, _ := os.OpenFile(logPath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	defer f.Close()
 	log.SetOutput(f)
@@ -68,7 +68,7 @@ func main() {
 		log.Printf("Error initializing database: %v", err)
 		log.Fatal(err)
 	}
-	
+
 	// Run database schema initialization synchronously to ensure it's ready
 	log.Println("Running DB migrations...")
 	if err := db.Init(); err != nil {
@@ -90,7 +90,6 @@ func main() {
 	apiMux.HandleFunc("/api/feeds/update", h.HandleUpdateFeed)
 	apiMux.HandleFunc("/api/feeds/discover", h.HandleDiscoverBlogs)
 	apiMux.HandleFunc("/api/feeds/discover-all", h.HandleDiscoverAllFeeds)
-	// Polling-based discovery endpoints (Wails-compatible)
 	apiMux.HandleFunc("/api/feeds/discover/start", h.HandleStartSingleDiscovery)
 	apiMux.HandleFunc("/api/feeds/discover/progress", h.HandleGetSingleDiscoveryProgress)
 	apiMux.HandleFunc("/api/feeds/discover/clear", h.HandleClearSingleDiscovery)

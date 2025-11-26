@@ -14,25 +14,25 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
-      
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
-      
+          go-version: '1.24'
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
-      
+
       - name: Build frontend (required for embed)
         working-directory: ./frontend
         run: |
           npm ci
           npm run build
-      
+
       - name: Cache Go modules
         uses: actions/cache@v4
         with:
@@ -40,22 +40,22 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      
+
       - name: Download dependencies
         run: go mod download
-      
+
       - name: Run go vet
         run: go vet ./...
-      
+
       - name: Run tests
         run: go test -v -timeout=5m -coverprofile=coverage.out -covermode=atomic ./...
-      
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage.out
           flags: backend
-          
+
   test-frontend:
     name: Test Frontend
     runs-on: ubuntu-latest
@@ -63,30 +63,30 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
-      
+
       - name: Install dependencies
         working-directory: ./frontend
         run: npm ci
-      
+
       - name: Run linter
         working-directory: ./frontend
-        run: npm run lint --if-present || echo "No lint script found"
-      
+        run: npm run lint
+
       - name: Run tests
         working-directory: ./frontend
-        run: npm test --if-present || echo "No test script found"
-      
+        run: npm test
+
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
-  
+
   build-check:
     name: Build Check
     runs-on: ubuntu-latest
@@ -94,26 +94,26 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
-      
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
-      
+          go-version: '1.24'
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
-      
+
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm ci
-      
+
       - name: Build frontend (required for embed)
         working-directory: ./frontend
         run: npm run build
-      
+
       - name: Verify Go code compiles
         run: go build -v ./...

@@ -2,10 +2,10 @@
   <img src="imgs/logo.svg" alt="MrRSS Logo" width="120" height="120">
   <h1>MrRSS</h1>
   <p><strong>A Modern, Cross-Platform Desktop RSS Reader</strong></p>
-  
-   [![Version](https://img.shields.io/badge/version-1.2.2-blue.svg)](https://github.com/WCY-dt/MrRSS/releases)
+
+   [![Version](https://img.shields.io/badge/version-1.2.3-blue.svg)](https://github.com/WCY-dt/MrRSS/releases)
   [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-  [![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)](https://go.dev/)
+   [![Go](https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go)](https://go.dev/)
   [![Wails](https://img.shields.io/badge/Wails-v2-red)](https://wails.io/)
   [![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4FC08D?logo=vue.js)](https://vuejs.org/)
 
@@ -24,6 +24,8 @@
 - ⭐ **Favorites & Reading Tracking**: Save articles and track read/unread status
 - 🎨 **Modern UI**: Clean, responsive interface with dark mode support
 - 📦 **OPML Import/Export**: Easy migration from other RSS readers
+- ⌨️ **Keyboard Shortcuts**: Boost productivity with customizable keyboard shortcuts for quick navigation and actions
+- 📋 **Smart Filtering Rules**: Automate feed organization with powerful custom rules
 
 ## 📸 Screenshots
 
@@ -47,7 +49,7 @@ Download the latest installer for your platform from the [Releases](https://gith
 
 Before you begin, ensure you have the following installed:
 
-- [Go](https://go.dev/) (1.21 or higher)
+- [Go](https://go.dev/) (1.24 or higher)
 - [Node.js](https://nodejs.org/) (LTS version with npm)
 - [Wails](https://wails.io/docs/gettingstarted/installation) CLI
 
@@ -110,6 +112,68 @@ Start the application with hot reloading:
 
 ```bash
 wails dev
+```
+
+### Code Quality Tools
+
+#### Using Make
+
+We provide a `Makefile` with common development tasks (works on Linux/macOS/Windows with Make installed):
+
+```bash
+# Show all available commands
+make help
+
+# Run full check (lint + test + build)
+make check
+
+# Clean build artifacts
+make clean
+
+# Setup development environment
+make setup
+```
+
+#### Using Scripts
+
+Cross-platform scripts are available in the `scripts/` directory:
+
+**Linux/macOS:**
+
+```bash
+# Run all checks
+./scripts/check.sh
+
+# Pre-release checks
+./scripts/pre-release.sh
+
+# Bump version
+./scripts/bump-version.sh x.y.z
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Run all checks
+.\scripts\check.ps1
+
+# Pre-release checks
+.\scripts\pre-release.ps1
+
+# Bump version
+.\scripts\bump-version.ps1 -NewVersion x.y.z
+```
+
+### Pre-commit Hooks
+
+This project uses pre-commit hooks to ensure code quality:
+
+```bash
+# Install hooks
+pre-commit install
+
+# Run on all files
+pre-commit run --all-files
 ```
 
 ### Running Tests

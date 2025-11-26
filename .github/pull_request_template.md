@@ -44,10 +44,10 @@ Fixes #(issue)
 
 ### Test Configuration
 
-- **OS**: 
-- **MrRSS Version**: 
-- **Go Version**: 
-- **Node Version**: 
+- **OS**:
+- **MrRSS Version**:
+- **Go Version**:
+- **Node Version**:
 
 ### Test Steps
 

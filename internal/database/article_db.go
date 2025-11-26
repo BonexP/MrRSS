@@ -53,9 +53,9 @@ func (db *DB) SaveArticles(ctx context.Context, articles []*models.Article) erro
 func (db *DB) GetArticles(filter string, feedID int64, category string, showHidden bool, limit, offset int) ([]models.Article, error) {
 	db.WaitForReady()
 	baseQuery := `
-		SELECT a.id, a.feed_id, a.title, a.url, a.image_url, a.content, a.published_at, a.is_read, a.is_favorite, a.is_hidden, a.translated_title, f.title 
-		FROM articles a 
-		JOIN feeds f ON a.feed_id = f.id 
+		SELECT a.id, a.feed_id, a.title, a.url, a.image_url, a.content, a.published_at, a.is_read, a.is_favorite, a.is_hidden, a.translated_title, f.title
+		FROM articles a
+		JOIN feeds f ON a.feed_id = f.id
 	`
 	var args []interface{}
 	whereClauses := []string{}
@@ -212,9 +212,9 @@ func (db *DB) GetUnreadCountByFeed(feedID int64) (int, error) {
 func (db *DB) GetUnreadCountsForAllFeeds() (map[int64]int, error) {
 	db.WaitForReady()
 	rows, err := db.Query(`
-		SELECT feed_id, COUNT(*) 
-		FROM articles 
-		WHERE is_read = 0 AND is_hidden = 0 
+		SELECT feed_id, COUNT(*)
+		FROM articles
+		WHERE is_read = 0 AND is_hidden = 0
 		GROUP BY feed_id
 	`)
 	if err != nil {

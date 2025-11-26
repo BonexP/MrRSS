@@ -32,11 +32,11 @@ type FilterRequest struct {
 
 // FilterResponse represents the response for filtered articles with pagination info
 type FilterResponse struct {
-	Articles   []models.Article `json:"articles"`
-	Total      int              `json:"total"`
-	Page       int              `json:"page"`
-	Limit      int              `json:"limit"`
-	HasMore    bool             `json:"has_more"`
+	Articles []models.Article `json:"articles"`
+	Total    int              `json:"total"`
+	Page     int              `json:"page"`
+	Limit    int              `json:"limit"`
+	HasMore  bool             `json:"has_more"`
 }
 
 // HandleArticles returns articles with filtering and pagination.
@@ -367,7 +367,7 @@ func (h *Handler) HandleFilteredArticles(w http.ResponseWriter, r *http.Request)
 		}
 		paginatedArticles = articles[offset:end]
 	}
-	
+
 	hasMore := end < total
 
 	response := FilterResponse{

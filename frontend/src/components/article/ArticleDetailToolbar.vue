@@ -1,0 +1,95 @@
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+import {
+  PhArrowLeft,
+  PhGlobe,
+  PhArticle,
+  PhEnvelopeOpen,
+  PhEnvelope,
+  PhStar,
+  PhArrowSquareOut,
+} from '@phosphor-icons/vue';
+import type { Article } from '@/types/models';
+
+const { t } = useI18n();
+
+interface Props {
+  article: Article | undefined;
+  showContent: boolean;
+}
+
+defineProps<Props>();
+
+const emit = defineEmits<{
+  close: [];
+  'toggle-read': [];
+  'toggle-favorite': [];
+  'toggle-content': [];
+  'open-original': [];
+}>();
+</script>
+
+<template>
+  <div
+    v-if="article"
+    class="header-bar bg-bg-primary border-b border-border p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-4"
+  >
+    <!-- Left: Back button -->
+    <button @click="emit('close')" class="btn-icon" :title="t('back')">
+      <PhArrowLeft :size="20" class="sm:w-6 sm:h-6" />
+    </button>
+
+    <!-- Center: Feed name -->
+    <div class="flex-1 min-w-0 text-center">
+      <h3 class="text-sm sm:text-base font-medium text-text-secondary truncate">
+        {{ article.feed_name }}
+      </h3>
+    </div>
+
+    <!-- Right: Actions -->
+    <div class="flex items-center gap-1 sm:gap-2">
+      <button
+        @click="emit('toggle-read')"
+        class="btn-icon"
+        :title="article.is_read ? t('markUnread') : t('markRead')"
+      >
+        <PhEnvelopeOpen v-if="article.is_read" :size="20" class="sm:w-6 sm:h-6" />
+        <PhEnvelope v-else :size="20" class="sm:w-6 sm:h-6" />
+      </button>
+      <button
+        @click="emit('toggle-favorite')"
+        class="btn-icon"
+        :title="article.is_favorite ? t('unfavorite') : t('favorite')"
+      >
+        <PhStar
+          :size="20"
+          :weight="article.is_favorite ? 'fill' : 'regular'"
+          class="sm:w-6 sm:h-6"
+          :class="{ 'text-yellow-500': article.is_favorite }"
+        />
+      </button>
+      <button
+        @click="emit('toggle-content')"
+        class="btn-icon"
+        :title="showContent ? t('showOriginal') : t('showRendered')"
+      >
+        <PhArticle v-if="showContent" :size="20" class="sm:w-6 sm:h-6" />
+        <PhGlobe v-else :size="20" class="sm:w-6 sm:h-6" />
+      </button>
+      <button @click="emit('open-original')" class="btn-primary" :title="t('openOriginal')">
+        <PhArrowSquareOut :size="20" class="sm:w-6 sm:h-6" />
+        <span class="hidden sm:inline">{{ t('openOriginal') }}</span>
+      </button>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.btn-icon {
+  @apply p-2 sm:p-2.5 rounded-lg bg-transparent border-none cursor-pointer text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors;
+}
+
+.btn-primary {
+  @apply bg-accent text-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg cursor-pointer flex items-center gap-1 sm:gap-2 font-medium hover:bg-accent-hover transition-colors text-sm sm:text-base;
+}
+</style>

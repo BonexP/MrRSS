@@ -121,7 +121,7 @@ Finish:
 	f.mu.Lock()
 	f.progress.IsRunning = false
 	f.mu.Unlock()
-	
+
 	// Update last article update time
 	f.db.SetSetting("last_article_update", time.Now().Format(time.RFC3339))
 }
@@ -134,7 +134,7 @@ func (f *Fetcher) FetchFeed(ctx context.Context, feed models.Feed) {
 		f.db.UpdateFeedError(feed.ID, err.Error())
 		return
 	}
-	
+
 	// Clear any previous error on successful fetch
 	f.db.UpdateFeedError(feed.ID, "")
 
@@ -142,7 +142,7 @@ func (f *Fetcher) FetchFeed(ctx context.Context, feed models.Feed) {
 	if feed.ImageURL == "" && parsedFeed.Image != nil {
 		f.db.UpdateFeedImage(feed.ID, parsedFeed.Image.URL)
 	}
-	
+
 	// Update Feed Link if available and not set
 	if feed.Link == "" && parsedFeed.Link != "" {
 		f.db.UpdateFeedLink(feed.ID, parsedFeed.Link)

@@ -1,0 +1,338 @@
+export interface TranslationMessages {
+  // App
+  appName: string;
+
+  // Sidebar
+  allArticles: string;
+  unread: string;
+  favorites: string;
+  uncategorized: string;
+  addFeed: string;
+  settings: string;
+
+  // Article List
+  articles: string;
+  refresh: string;
+  markAllRead: string;
+  search: string;
+  noArticles: string;
+
+  // Article Detail
+  back: string;
+  markAsUnread: string;
+  markAsRead: string;
+  toggleFavorite: string;
+  addToFavorite: string;
+  removeFromFavorite: string;
+  openInBrowser: string;
+  viewOriginal: string;
+  viewContent: string;
+  renderContent: string;
+  close: string;
+  zoomIn: string;
+  zoomOut: string;
+  imageViewerHelp: string;
+
+  // Context Menu
+  unsubscribe: string;
+  editSubscription: string;
+  renameCategory: string;
+  markAllAsReadFeed: string;
+  addToFavorites: string;
+  removeFromFavorites: string;
+  hideArticle: string;
+  unhideArticle: string;
+  selectArticle: string;
+  showOriginal: string;
+  openWebsite: string;
+  discoverFeeds: string;
+
+  // Feed Discovery
+  fromFeed: string;
+  discovering: string;
+  noFriendLinksFound: string;
+  discoveryFailed: string;
+  foundFeeds: string;
+  deselectAll: string;
+  recentArticles: string;
+  startDiscovery: string;
+  subscribeSelected: string;
+  feedsSubscribedSuccess: string;
+  feedsSubscribedPartial: string;
+  errorSubscribingFeeds: string;
+  discoverAllFeeds: string;
+  discoveringAllFeeds: string;
+  discoveryComplete: string;
+  alreadyDiscovered: string;
+  markAsDiscovered: string;
+  feedsWord: string;
+  preparing: string;
+  analyzingFeed: string;
+  searchingFriendLinks: string;
+  checkingFeeds: string;
+  pleaseWait: string;
+  discoverAllFeedsDesc: string;
+  subscribing: string;
+  fetchingHomepage: string;
+  analyzingLinks: string;
+  preparingDiscovery: string;
+  loadingFeeds: string;
+  analyzingFeeds: string;
+  scanningFriendLinks: string;
+  validatingRSS: string;
+  checkingRssFeed: string;
+  processingFeed: string;
+  foundPotentialLinks: string;
+  fetchingFriendPage: string;
+  checkingSite: string;
+  foundSoFar: string;
+
+  // Settings Modal
+  settingsTitle: string;
+  general: string;
+  feeds: string;
+  about: string;
+
+  // General Settings
+  appearance: string;
+  theme: string;
+  themeDesc: string;
+  light: string;
+  dark: string;
+  auto: string;
+  darkMode: string;
+  darkModeDesc: string;
+  updates: string;
+  autoUpdateInterval: string;
+  autoUpdateIntervalDesc: string;
+  lastArticleUpdate: string;
+  lastArticleUpdateDesc: string;
+  never: string;
+  justNow: string;
+  minutesAgo: string;
+  hoursAgo: string;
+  daysAgo: string;
+  noContent: string;
+  defaultViewMode: string;
+  defaultViewModeDesc: string;
+  viewModeOriginal: string;
+  viewModeRendered: string;
+  showHiddenArticles: string;
+  showHiddenArticlesDesc: string;
+  startupOnBoot: string;
+  startupOnBootDesc: string;
+  database: string;
+  autoCleanup: string;
+  autoCleanupDesc: string;
+  maxCacheSize: string;
+  maxCacheSizeDesc: string;
+  maxArticleAge: string;
+  maxArticleAgeDesc: string;
+  days: string;
+  translation: string;
+  enableTranslation: string;
+  enableTranslationDesc: string;
+  translationProvider: string;
+  translationProviderDesc: string;
+  deeplApiKey: string;
+  deeplApiKeyDesc: string;
+  deeplApiKeyPlaceholder: string;
+  targetLanguage: string;
+  targetLanguageDesc: string;
+  language: string;
+  languageDesc: string;
+
+  // Languages
+  english: string;
+  spanish: string;
+  french: string;
+  german: string;
+  chinese: string;
+  japanese: string;
+
+  // Feeds Settings
+  dataManagement: string;
+  importOPML: string;
+  exportOPML: string;
+  cleanDatabase: string;
+  cleanDatabaseDesc: string;
+  manageFeeds: string;
+  deleteSelected: string;
+  moveSelected: string;
+  selectAll: string;
+  edit: string;
+  delete: string;
+
+  // About
+  aboutApp: string;
+  version: string;
+  viewOnGitHub: string;
+  checkForUpdates: string;
+  checking: string;
+  upToDate: string;
+  updateAvailable: string;
+  currentVersion: string;
+  latestVersion: string;
+  downloadUpdate: string;
+  downloading: string;
+  downloadComplete: string;
+  installingUpdate: string;
+  updateWillRestart: string;
+  downloadFailed: string;
+  installFailed: string;
+  releaseNotes: string;
+  errorCheckingUpdates: string;
+
+  // Modals
+  addNewFeed: string;
+  editFeed: string;
+  rssUrl: string;
+  rssUrlPlaceholder: string;
+  category: string;
+  categoryOptional: string;
+  categoryPlaceholder: string;
+  title: string;
+  titlePlaceholder: string;
+  optional: string;
+  addSubscription: string;
+  saveChanges: string;
+  adding: string;
+  saving: string;
+  saveSettings: string;
+
+  // Confirm Dialogs
+  confirm: string;
+  cancel: string;
+  deleteFeedTitle: string;
+  deleteFeedMessage: string;
+  deleteMultipleFeedsTitle: string;
+  deleteMultipleFeedsMessage: string;
+  unsubscribeTitle: string;
+  unsubscribeMessage: string;
+  cleanDatabaseTitle: string;
+  cleanDatabaseMessage: string;
+  clean: string;
+
+  // Toast Messages
+  feedAddedSuccess: string;
+  feedUpdatedSuccess: string;
+  feedDeletedSuccess: string;
+  feedsDeletedSuccess: string;
+  feedsMovedSuccess: string;
+  unsubscribedSuccess: string;
+  markedAllAsRead: string;
+  databaseCleanedSuccess: string;
+  opmlImportedSuccess: string;
+  errorSavingSettings: string;
+  errorAddingFeed: string;
+  errorUpdatingFeed: string;
+  errorCleaningDatabase: string;
+  importFailed: string;
+
+  // Loading Messages
+  loadingContent: string;
+  fetchingArticleContent: string;
+
+  // Prompts
+  enterCategoryName: string;
+  moveFeeds: string;
+  move: string;
+
+  // Article Filter
+  filter: string;
+  filterArticles: string;
+  addCondition: string;
+  clearFilters: string;
+  applyFilters: string;
+  noFiltersApplied: string;
+  feedName: string;
+  feedCategory: string;
+  articleTitle: string;
+  dateRange: string;
+  publishedAfter: string;
+  publishedBefore: string;
+  readStatus: string;
+  favoriteStatus: string;
+  hiddenStatus: string;
+  yes: string;
+  no: string;
+  contains: string;
+  exactMatch: string;
+  and: string;
+  or: string;
+  not: string;
+  filterCondition: string;
+  filterField: string;
+  filterOperator: string;
+  filterValue: string;
+  removeCondition: string;
+  filtersActive: string;
+  andNMore: string;
+
+  // Keyboard Shortcuts
+  shortcuts: string;
+  shortcutsDesc: string;
+  shortcutNavigation: string;
+  shortcutArticles: string;
+  shortcutOther: string;
+  nextArticle: string;
+  previousArticle: string;
+  openArticle: string;
+  closeArticle: string;
+  toggleReadStatus: string;
+  toggleFavoriteStatus: string;
+  openInBrowserShortcut: string;
+  toggleContentView: string;
+  refreshFeedsShortcut: string;
+  markAllReadShortcut: string;
+  openSettingsShortcut: string;
+  addFeedShortcut: string;
+  focusSearch: string;
+  goToAllArticles: string;
+  goToUnread: string;
+  goToFavorites: string;
+  pressKey: string;
+  resetToDefault: string;
+  shortcutConflict: string;
+  shortcutCleared: string;
+  shortcutUpdated: string;
+  escToClear: string;
+
+  // Rules
+  rules: string;
+  rulesDesc: string;
+  addRule: string;
+  editRule: string;
+  deleteRule: string;
+  noRules: string;
+  noRulesHint: string;
+  ruleEnabled: string;
+  ruleDisabled: string;
+  ruleCondition: string;
+  ruleActions: string;
+  ruleName: string;
+  ruleNamePlaceholder: string;
+  selectCondition: string;
+  selectActions: string;
+  conditionAlways: string;
+  conditionIf: string;
+  actionFavorite: string;
+  actionUnfavorite: string;
+  actionHide: string;
+  actionUnhide: string;
+  actionMarkRead: string;
+  actionMarkUnread: string;
+  addAction: string;
+  removeAction: string;
+  ruleDeleteConfirmTitle: string;
+  ruleDeleteConfirmMessage: string;
+  ruleSavedSuccess: string;
+  ruleDeletedSuccess: string;
+  ruleAppliedSuccess: string;
+  applyRuleNow: string;
+  applyingRule: string;
+  noActionsSelected: string;
+  thenDo: string;
+}
+
+export type SupportedLocale = 'en' | 'zh';

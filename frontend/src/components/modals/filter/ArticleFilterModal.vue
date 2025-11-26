@@ -1,0 +1,211 @@
+<script setup lang="ts">
+import { watch, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { PhPlus, PhFunnel } from '@phosphor-icons/vue';
+import type { FilterCondition } from '@/types/filter';
+import { useFilterFields } from '@/composables/filter/useFilterFields';
+import { useFilterConditions } from '@/composables/filter/useFilterConditions';
+import RuleConditionItem from '../rules/RuleConditionItem.vue';
+
+const { t } = useI18n();
+
+interface Props {
+  show: boolean;
+  currentFilters: FilterCondition[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  show: false,
+  currentFilters: () => [],
+});
+
+const emit = defineEmits<{
+  close: [];
+  apply: [filters: FilterCondition[]];
+}>();
+
+// Use composables
+const { logicOptions, onFieldChange: handleFieldChange } = useFilterFields();
+
+const {
+  conditions,
+  openDropdownIndex,
+  initializeConditions,
+  addCondition,
+  removeCondition,
+  toggleNegate,
+  toggleDropdown,
+  clearConditions,
+  getValidConditions,
+} = useFilterConditions();
+
+// Watch for modal show changes to reload filters
+watch(
+  () => props.show,
+  (newVal) => {
+    if (newVal && props.currentFilters && props.currentFilters.length > 0) {
+      initializeConditions(props.currentFilters);
+    }
+  }
+);
+
+onMounted(() => {
+  // Load existing filters if provided
+  if (props.currentFilters && props.currentFilters.length > 0) {
+    initializeConditions(props.currentFilters);
+  }
+});
+
+function onFieldChange(index: number): void {
+  handleFieldChange(conditions.value[index]);
+}
+
+function clearFilters(): void {
+  clearConditions();
+  // Auto-apply when clearing filters
+  emit('apply', []);
+  emit('close');
+}
+
+function applyFilters(): void {
+  const validConditions = getValidConditions();
+  emit('apply', validConditions);
+  emit('close');
+}
+
+function close() {
+  emit('close');
+}
+</script>
+
+<template>
+  <div
+    v-if="show"
+    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+  >
+    <div
+      class="bg-bg-primary w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl shadow-2xl border border-border overflow-hidden animate-fade-in"
+    >
+      <!-- Header -->
+      <div class="p-4 sm:p-5 border-b border-border flex justify-between items-center shrink-0">
+        <h3 class="text-lg font-semibold m-0 flex items-center gap-2">
+          <PhFunnel :size="20" />
+          {{ t('filterArticles') }}
+        </h3>
+        <span
+          @click="close"
+          class="text-2xl cursor-pointer text-text-secondary hover:text-text-primary"
+          >&times;</span
+        >
+      </div>
+
+      <!-- Content -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6">
+        <!-- Empty state -->
+        <div v-if="conditions.length === 0" class="text-center text-text-secondary py-8">
+          <PhFunnel :size="48" class="mx-auto mb-3 opacity-50" />
+          <p>{{ t('noFiltersApplied') }}</p>
+        </div>
+
+        <!-- Condition list -->
+        <div v-else class="space-y-3">
+          <div v-for="(condition, index) in conditions" :key="condition.id">
+            <!-- Logic connector (AND/OR) between conditions - styled distinctly -->
+            <div v-if="index > 0" class="flex items-center justify-center my-3">
+              <div class="flex-1 h-px bg-border"></div>
+              <div class="logic-connector mx-3">
+                <button
+                  v-for="opt in logicOptions"
+                  :key="opt.value"
+                  @click="(condition.logic as 'and' | 'or' | null) = opt.value"
+                  :class="['logic-btn', condition.logic === opt.value ? 'active' : '']"
+                >
+                  {{ t(opt.labelKey) }}
+                </button>
+              </div>
+              <div class="flex-1 h-px bg-border"></div>
+            </div>
+
+            <!-- Condition card -->
+            <RuleConditionItem
+              :condition="condition"
+              :index="index"
+              :is-dropdown-open="openDropdownIndex === index"
+              @update:field="
+                (value) => {
+                  condition.field = value;
+                  onFieldChange(index);
+                }
+              "
+              @update:operator="(value) => (condition.operator = value)"
+              @update:value="(value) => (condition.value = value)"
+              @update:values="(values) => (condition.values = values)"
+              @update:negate="toggleNegate(index)"
+              @toggle-dropdown="toggleDropdown(index)"
+              @remove="removeCondition(index)"
+            />
+          </div>
+        </div>
+
+        <!-- Add condition button -->
+        <button
+          @click="addCondition"
+          class="btn-secondary w-full mt-4 flex items-center justify-center gap-2"
+        >
+          <PhPlus :size="18" />
+          {{ t('addCondition') }}
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div
+        class="p-4 sm:p-5 border-t border-border bg-bg-secondary flex justify-between gap-3 shrink-0"
+      >
+        <button @click="clearFilters" class="btn-secondary" :disabled="conditions.length === 0">
+          {{ t('clearFilters') }}
+        </button>
+        <button @click="applyFilters" class="btn-primary">
+          {{ t('applyFilters') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.btn-primary {
+  @apply bg-accent text-white border-none px-5 py-2.5 rounded-lg cursor-pointer font-semibold hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+.btn-secondary {
+  @apply bg-bg-tertiary text-text-primary border border-border px-4 py-2.5 rounded-lg cursor-pointer font-medium hover:bg-bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Logic connector styling - distinct visual appearance */
+.logic-connector {
+  @apply flex items-center gap-1 bg-bg-tertiary rounded-full p-1;
+}
+.logic-btn {
+  @apply px-3 py-1 text-xs font-bold rounded-full transition-all cursor-pointer;
+  @apply text-text-secondary bg-transparent;
+}
+.logic-btn:hover {
+  @apply text-text-primary bg-bg-secondary;
+}
+.logic-btn.active {
+  @apply text-white bg-accent;
+}
+
+.animate-fade-in {
+  animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalFadeIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+</style>

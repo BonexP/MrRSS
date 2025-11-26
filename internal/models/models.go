@@ -6,13 +6,13 @@ type Feed struct {
 	ID                 int64     `json:"id"`
 	Title              string    `json:"title"`
 	URL                string    `json:"url"`
-	Link               string    `json:"link"`                    // Website homepage link
+	Link               string    `json:"link"` // Website homepage link
 	Description        string    `json:"description"`
 	Category           string    `json:"category"`
-	ImageURL           string    `json:"image_url"`               // New field
+	ImageURL           string    `json:"image_url"` // New field
 	LastUpdated        time.Time `json:"last_updated"`
-	LastError          string    `json:"last_error,omitempty"`    // Track last fetch error
-	DiscoveryCompleted bool      `json:"discovery_completed"`      // Track if discovery has been run
+	LastError          string    `json:"last_error,omitempty"` // Track last fetch error
+	DiscoveryCompleted bool      `json:"discovery_completed"`  // Track if discovery has been run
 }
 
 type Article struct {

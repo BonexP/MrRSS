@@ -29,7 +29,7 @@ This project and everyone participating in it is governed by our [Code of Conduc
 
 ### Prerequisites
 
-- Go 1.21 or higher
+- Go 1.24 or higher
 - Node.js (LTS version)
 - Wails CLI: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
 
@@ -105,7 +105,7 @@ func (f *Fetcher) FetchFeed(url string) (*Feed, error) {
     if url == "" {
         return nil, errors.New("url cannot be empty")
     }
-    
+
     // Implementation...
 }
 ```
@@ -190,6 +190,28 @@ go test ./internal/feed
 ```bash
 cd frontend
 npm test
+```
+
+### Cross-Platform Scripts
+
+We provide automated scripts for running checks:
+
+**Linux/macOS:**
+```bash
+# Run all quality checks (lint, test, build)
+./scripts/check.sh
+
+# Pre-release checks (includes version consistency)
+./scripts/pre-release.sh
+```
+
+**Windows (PowerShell):**
+```powershell
+# Run all quality checks (lint, test, build)
+.\scripts\check.ps1
+
+# Pre-release checks (includes version consistency)
+.\scripts\pre-release.ps1
 ```
 
 ### Manual Testing

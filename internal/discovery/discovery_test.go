@@ -118,7 +118,7 @@ func TestProgressCallbackCalled(t *testing.T) {
 
 	// Test with a non-existent feed URL - progress callback should still be called
 	_, _ = service.DiscoverFromFeedWithProgress(ctx, "https://nonexistent-feed-url-12345.com/feed", progressCb)
-	
+
 	if !progressCalled {
 		t.Error("Progress callback should have been called at least once")
 	}

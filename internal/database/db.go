@@ -131,7 +131,7 @@ func initSchema(db *sql.DB) error {
 	CREATE INDEX IF NOT EXISTS idx_articles_is_favorite ON articles(is_favorite);
 	CREATE INDEX IF NOT EXISTS idx_articles_is_hidden ON articles(is_hidden);
 	CREATE INDEX IF NOT EXISTS idx_feeds_category ON feeds(category);
-	
+
 	-- Composite indexes for common query patterns
 	CREATE INDEX IF NOT EXISTS idx_articles_feed_published ON articles(feed_id, published_at DESC);
 	CREATE INDEX IF NOT EXISTS idx_articles_read_published ON articles(is_read, published_at DESC);
