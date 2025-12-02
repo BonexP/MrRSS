@@ -18,6 +18,8 @@ import {
   PhGlobe,
   PhPackage,
   PhKey,
+  PhTextAlignLeft,
+  PhTextT,
 } from '@phosphor-icons/vue';
 import type { SettingsData } from '@/types/settings';
 import { useSettingsAutoSave } from '@/composables/core/useSettingsAutoSave';
@@ -325,6 +327,54 @@ function formatLastUpdate(timestamp: string): string {
             <option value="de">{{ t('german') }}</option>
             <option value="zh">{{ t('chinese') }}</option>
             <option value="ja">{{ t('japanese') }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <label
+        class="font-semibold mb-2 sm:mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2"
+      >
+        <PhTextAlignLeft :size="14" class="sm:w-4 sm:h-4" />
+        {{ t('summary') }}
+      </label>
+      <div class="setting-item mb-2 sm:mb-4">
+        <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
+          <PhTextT :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+          <div class="flex-1 min-w-0">
+            <div class="font-medium mb-0 sm:mb-1 text-sm sm:text-base">
+              {{ t('enableSummary') }}
+            </div>
+            <div class="text-xs text-text-secondary hidden sm:block">
+              {{ t('enableSummaryDesc') }}
+            </div>
+          </div>
+        </div>
+        <input type="checkbox" v-model="settings.summary_enabled" class="toggle" />
+      </div>
+
+      <div
+        v-if="settings.summary_enabled"
+        class="ml-2 sm:ml-4 space-y-2 sm:space-y-3 border-l-2 border-border pl-2 sm:pl-4"
+      >
+        <div class="sub-setting-item">
+          <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
+            <PhTextAlignLeft :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+            <div class="flex-1 min-w-0">
+              <div class="font-medium mb-0 sm:mb-1 text-sm">{{ t('summaryLength') }}</div>
+              <div class="text-xs text-text-secondary hidden sm:block">
+                {{ t('summaryLengthDesc') }}
+              </div>
+            </div>
+          </div>
+          <select
+            v-model="settings.summary_length"
+            class="input-field w-24 sm:w-48 text-xs sm:text-sm"
+          >
+            <option value="short">{{ t('summaryLengthShort') }}</option>
+            <option value="medium">{{ t('summaryLengthMedium') }}</option>
+            <option value="long">{{ t('summaryLengthLong') }}</option>
           </select>
         </div>
       </div>

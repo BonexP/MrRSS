@@ -146,6 +146,22 @@ const en: TranslationMessages = {
   language: 'Language',
   languageDesc: 'Select interface language',
 
+  // Summary
+  summary: 'Summary',
+  enableSummary: 'Enable Auto Summary',
+  enableSummaryDesc: 'Automatically generate article summaries using local algorithms',
+  summaryLength: 'Summary Length',
+  summaryLengthDesc: 'Control the length of generated summaries',
+  summaryLengthShort: 'Short',
+  summaryLengthMedium: 'Medium',
+  summaryLengthLong: 'Long',
+  generatingSummary: 'Generating summary...',
+  articleSummary: 'Article Summary',
+  keyPoints: 'Key Points',
+  summaryTooShort: 'Article is too short to generate a meaningful summary',
+  noSummaryAvailable: 'Summary not available',
+  generateSummary: 'Generate Summary',
+
   // Languages
   english: 'English',
   spanish: 'Spanish',

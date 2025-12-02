@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { PhArticle } from '@phosphor-icons/vue';
+import { ref, watch, onMounted } from 'vue';
+import { PhArticle, PhTextAlignLeft, PhListBullets, PhSpinnerGap } from '@phosphor-icons/vue';
 import type { Article } from '@/types/models';
 import { formatDate } from '@/utils/date';
 
 const { t, locale } = useI18n();
+
+interface SummaryResult {
+  summary: string;
+  key_points: string[];
+  sentence_count: number;
+  is_too_short: boolean;
+  error?: string;
+}
 
 interface Props {
   article: Article;
@@ -12,7 +21,83 @@ interface Props {
   isLoadingContent: boolean;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+// Summary state
+const summaryEnabled = ref(false);
+const summaryLength = ref('medium');
+const summaryResult = ref<SummaryResult | null>(null);
+const isLoadingSummary = ref(false);
+const showSummary = ref(true);
+
+// Load summary settings
+async function loadSummarySettings() {
+  try {
+    const res = await fetch('/api/settings');
+    const data = await res.json();
+    summaryEnabled.value = data.summary_enabled === 'true';
+    summaryLength.value = data.summary_length || 'medium';
+  } catch (e) {
+    console.error('Error loading summary settings:', e);
+  }
+}
+
+// Generate summary for the current article
+async function generateSummary() {
+  if (!summaryEnabled.value || !props.article) {
+    return;
+  }
+
+  isLoadingSummary.value = true;
+  summaryResult.value = null;
+
+  try {
+    const res = await fetch('/api/articles/summarize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        article_id: props.article.id,
+        length: summaryLength.value,
+      }),
+    });
+
+    if (res.ok) {
+      summaryResult.value = await res.json();
+    }
+  } catch (e) {
+    console.error('Error generating summary:', e);
+  } finally {
+    isLoadingSummary.value = false;
+  }
+}
+
+// Watch for article changes and regenerate summary
+watch(
+  () => props.article?.id,
+  () => {
+    summaryResult.value = null;
+    if (summaryEnabled.value && props.article) {
+      generateSummary();
+    }
+  }
+);
+
+// Watch for content loading completion
+watch(
+  () => props.isLoadingContent,
+  (isLoading, wasLoading) => {
+    if (wasLoading && !isLoading && summaryEnabled.value && props.article) {
+      generateSummary();
+    }
+  }
+);
+
+onMounted(async () => {
+  await loadSummarySettings();
+  if (summaryEnabled.value && props.article && props.articleContent) {
+    generateSummary();
+  }
+});
 </script>
 
 <template>
@@ -27,6 +112,72 @@ defineProps<Props>();
         <span>{{ article.feed_title }}</span>
         <span class="hidden sm:inline">•</span>
         <span>{{ formatDate(article.published_at, locale === 'zh-CN' ? 'zh-CN' : 'en-US') }}</span>
+      </div>
+
+      <!-- Summary Section -->
+      <div
+        v-if="summaryEnabled && (isLoadingSummary || summaryResult)"
+        class="mb-6 p-4 rounded-lg border border-border bg-bg-secondary"
+      >
+        <!-- Summary Header -->
+        <div
+          class="flex items-center justify-between cursor-pointer"
+          @click="showSummary = !showSummary"
+        >
+          <div class="flex items-center gap-2 text-accent font-medium">
+            <PhTextAlignLeft :size="20" />
+            <span>{{ t('articleSummary') }}</span>
+          </div>
+          <span class="text-xs text-text-secondary">
+            {{ showSummary ? '▲' : '▼' }}
+          </span>
+        </div>
+
+        <!-- Summary Content -->
+        <div v-if="showSummary" class="mt-3">
+          <!-- Loading State -->
+          <div v-if="isLoadingSummary" class="flex items-center gap-2 text-text-secondary">
+            <PhSpinnerGap :size="16" class="animate-spin" />
+            <span class="text-sm">{{ t('generatingSummary') }}</span>
+          </div>
+
+          <!-- Too Short Warning -->
+          <div v-else-if="summaryResult?.is_too_short" class="text-sm text-text-secondary italic">
+            {{ t('summaryTooShort') }}
+          </div>
+
+          <!-- Summary Display -->
+          <div v-else-if="summaryResult?.summary">
+            <p class="text-sm text-text-primary leading-relaxed mb-3">
+              {{ summaryResult.summary }}
+            </p>
+
+            <!-- Key Points -->
+            <div
+              v-if="summaryResult.key_points && summaryResult.key_points.length > 1"
+              class="mt-3"
+            >
+              <div class="flex items-center gap-2 text-text-secondary text-xs font-medium mb-2">
+                <PhListBullets :size="14" />
+                <span>{{ t('keyPoints') }}</span>
+              </div>
+              <ul class="space-y-1">
+                <li
+                  v-for="(point, index) in summaryResult.key_points.slice(0, 3)"
+                  :key="index"
+                  class="text-xs text-text-secondary pl-3 border-l-2 border-accent/30"
+                >
+                  {{ point }}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- No Summary Available -->
+          <div v-else class="text-sm text-text-secondary italic">
+            {{ t('noSummaryAvailable') }}
+          </div>
+        </div>
       </div>
 
       <!-- Loading state with proper background -->

@@ -144,6 +144,22 @@ export interface TranslationMessages {
   language: string;
   languageDesc: string;
 
+  // Summary
+  summary: string;
+  enableSummary: string;
+  enableSummaryDesc: string;
+  summaryLength: string;
+  summaryLengthDesc: string;
+  summaryLengthShort: string;
+  summaryLengthMedium: string;
+  summaryLengthLong: string;
+  generatingSummary: string;
+  articleSummary: string;
+  keyPoints: string;
+  summaryTooShort: string;
+  noSummaryAvailable: string;
+  generateSummary: string;
+
   // Languages
   english: string;
   spanish: string;

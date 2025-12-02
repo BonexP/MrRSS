@@ -145,6 +145,22 @@ const zh: TranslationMessages = {
   language: '语言',
   languageDesc: '选择界面语言',
 
+  // Summary
+  summary: '摘要',
+  enableSummary: '启用自动摘要',
+  enableSummaryDesc: '使用本地算法自动生成文章摘要',
+  summaryLength: '摘要长度',
+  summaryLengthDesc: '控制生成摘要的长度',
+  summaryLengthShort: '短',
+  summaryLengthMedium: '中',
+  summaryLengthLong: '长',
+  generatingSummary: '正在生成摘要...',
+  articleSummary: '文章摘要',
+  keyPoints: '关键要点',
+  summaryTooShort: '文章太短，无法生成有效摘要',
+  noSummaryAvailable: '摘要不可用',
+  generateSummary: '生成摘要',
+
   // Languages
   english: '英语',
   spanish: '西班牙语',

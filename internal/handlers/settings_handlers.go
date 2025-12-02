@@ -28,6 +28,8 @@ func (h *Handler) HandleSettings(w http.ResponseWriter, r *http.Request) {
 		shortcuts, _ := h.DB.GetSetting("shortcuts")
 		rules, _ := h.DB.GetSetting("rules")
 		defaultViewMode, _ := h.DB.GetSetting("default_view_mode")
+		summaryEnabled, _ := h.DB.GetSetting("summary_enabled")
+		summaryLength, _ := h.DB.GetSetting("summary_length")
 		json.NewEncoder(w).Encode(map[string]string{
 			"update_interval":      interval,
 			"translation_enabled":  translationEnabled,
@@ -45,6 +47,8 @@ func (h *Handler) HandleSettings(w http.ResponseWriter, r *http.Request) {
 			"shortcuts":            shortcuts,
 			"rules":                rules,
 			"default_view_mode":    defaultViewMode,
+			"summary_enabled":      summaryEnabled,
+			"summary_length":       summaryLength,
 		})
 	case http.MethodPost:
 		var req struct {
@@ -63,6 +67,8 @@ func (h *Handler) HandleSettings(w http.ResponseWriter, r *http.Request) {
 			Shortcuts           string `json:"shortcuts"`
 			Rules               string `json:"rules"`
 			DefaultViewMode     string `json:"default_view_mode"`
+			SummaryEnabled      string `json:"summary_enabled"`
+			SummaryLength       string `json:"summary_length"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -115,6 +121,14 @@ func (h *Handler) HandleSettings(w http.ResponseWriter, r *http.Request) {
 
 		if req.DefaultViewMode != "" {
 			h.DB.SetSetting("default_view_mode", req.DefaultViewMode)
+		}
+
+		if req.SummaryEnabled != "" {
+			h.DB.SetSetting("summary_enabled", req.SummaryEnabled)
+		}
+
+		if req.SummaryLength != "" {
+			h.DB.SetSetting("summary_length", req.SummaryLength)
 		}
 
 		if req.StartupOnBoot != "" {

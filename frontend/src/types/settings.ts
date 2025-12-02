@@ -19,6 +19,8 @@ export interface SettingsData {
   startup_on_boot: boolean;
   shortcuts: string;
   rules: string;
+  summary_enabled: boolean;
+  summary_length: string;
   [key: string]: unknown; // Allow additional properties
 }
 
