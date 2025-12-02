@@ -26,6 +26,8 @@ export function useSettings() {
     startup_on_boot: false,
     shortcuts: '',
     rules: '',
+    summary_enabled: false,
+    summary_length: 'medium',
   });
 
   /**
@@ -53,6 +55,8 @@ export function useSettings() {
         startup_on_boot: data.startup_on_boot === 'true',
         shortcuts: data.shortcuts || '',
         rules: data.rules || '',
+        summary_enabled: data.summary_enabled === 'true',
+        summary_length: data.summary_length || 'medium',
       };
 
       return settings.value;
