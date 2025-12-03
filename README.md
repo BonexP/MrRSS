@@ -91,7 +91,11 @@ sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev gcc pkg-config
 3. **Build the application**
 
    ```bash
-   wails build
+   # Using Makefile (recommended)
+   make build
+
+   # Or manually with wails (requires -skipbindings flag)
+   wails build -skipbindings
    ```
 
    The executable will be created in the `build/bin` directory.

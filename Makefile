@@ -24,7 +24,7 @@ dev: ## Start development server
 
 # Building
 build: build-frontend build-backend ## Build both frontend and backend
-	wails build
+	wails build -skipbindings
 
 build-frontend: ## Build frontend only
 	cd frontend && npm run build

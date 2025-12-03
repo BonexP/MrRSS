@@ -91,7 +91,11 @@ sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev gcc pkg-config
 3. **构建应用**
 
    ```bash
-   wails build
+   # 使用 Makefile（推荐）
+   make build
+
+   # 或手动使用 wails（需要 -skipbindings 标志）
+   wails build -skipbindings
    ```
 
    可执行文件将在 `build/bin` 目录下生成。

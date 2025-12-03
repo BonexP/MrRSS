@@ -393,6 +393,11 @@ When updating version, modify ALL of these files:
 
 ## Quick Reference
 
+**Build Commands**:
+- Development: `wails dev`
+- Production Build: `make build` or `wails build -skipbindings`
+- Important: Always use `-skipbindings` flag with `wails build` (MrRSS uses HTTP API, not Wails bindings)
+
 **Store Access**: `const store = useAppStore()`
 **i18n**: `const { t } = useI18n()`
 **Theme**: `store.theme` returns `'light'` or `'dark'`

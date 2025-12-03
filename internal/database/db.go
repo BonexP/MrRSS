@@ -104,6 +104,12 @@ func (db *DB) WaitForReady() {
 }
 
 func initSchema(db *sql.DB) error {
+	// First, run migrations to ensure all columns exist
+	// This must happen BEFORE creating indexes that depend on those columns
+	if err := runMigrations(db); err != nil {
+		return err
+	}
+
 	query := `
 	CREATE TABLE IF NOT EXISTS feeds (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -149,12 +155,7 @@ func initSchema(db *sql.DB) error {
 	CREATE INDEX IF NOT EXISTS idx_articles_readlater_published ON articles(is_read_later, published_at DESC);
 	`
 	_, err := db.Exec(query)
-	if err != nil {
-		return err
-	}
-
-	// Run migrations for existing databases
-	return runMigrations(db)
+	return err
 }
 
 // runMigrations applies database migrations for existing databases

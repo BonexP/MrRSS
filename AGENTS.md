@@ -111,7 +111,9 @@ MrRSS/
 1. **Prerequisites**: Go 1.24+, Node.js 18+, Wails CLI v2.11+
 2. **Setup**: `go mod download && cd frontend && npm install`
 3. **Development**: `wails dev` (hot reload enabled)
-4. **Build**: `wails build` (production build)
+4. **Build**: Use `make build` or `wails build -skipbindings` (production build)
+   - **Important**: MrRSS uses HTTP REST API instead of Wails bindings, so always use the `-skipbindings` flag when calling `wails build` directly
+   - The Makefile automatically includes this flag
 
 ### Development Scripts
 

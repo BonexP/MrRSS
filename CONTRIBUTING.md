@@ -62,7 +62,11 @@ sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev gcc pkg-config
 3. Build for production:
 
    ```bash
-   wails build
+   # Using Makefile (recommended)
+   make build
+
+   # Or manually with wails (requires -skipbindings flag)
+   wails build -skipbindings
    ```
 
 ## How to Contribute
