@@ -22,6 +22,7 @@ import {
   PhHeart,
   PhArrowCounterClockwise,
   PhInfo,
+  PhFunnel,
 } from '@phosphor-icons/vue';
 import ShortcutItem from './ShortcutItem.vue';
 
@@ -53,6 +54,7 @@ interface Shortcuts {
   openSettings: string;
   addFeed: string;
   focusSearch: string;
+  toggleFilter: string;
   goToAllArticles: string;
   goToUnread: string;
   goToFavorites: string;
@@ -81,6 +83,7 @@ const defaultShortcuts: Shortcuts = {
   openSettings: ',',
   addFeed: 'a',
   focusSearch: '/',
+  toggleFilter: 'f',
   goToAllArticles: '1',
   goToUnread: '2',
   goToFavorites: '3',
@@ -126,7 +129,8 @@ const shortcutGroups = computed<Array<{ label: string; items: ShortcutItemData[]
       { key: 'markAllRead', label: t('markAllReadShortcut'), icon: PhCheckCircle },
       { key: 'openSettings', label: t('openSettingsShortcut'), icon: PhGear },
       { key: 'addFeed', label: t('addFeedShortcut'), icon: PhPlus },
-      { key: 'focusSearch', label: t('focusSearch'), icon: PhMagnifyingGlass },
+      { key: 'focusSearch', label: t('focusFeedSearch'), icon: PhMagnifyingGlass },
+      { key: 'toggleFilter', label: t('toggleFilter'), icon: PhFunnel },
     ],
   },
 ]);
@@ -312,7 +316,7 @@ watch(
 
 <style scoped>
 .btn-secondary {
-  @apply bg-transparent border border-border text-text-primary rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-tertiary transition-colors;
+  @apply bg-bg-tertiary border border-border text-text-primary rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-secondary transition-colors;
 }
 
 .tip-box {

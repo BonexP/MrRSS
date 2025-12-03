@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { PhArrowClockwise, PhClock, PhCalendarCheck, PhPower } from '@phosphor-icons/vue';
+import { PhArrowClockwise, PhClock, PhPower } from '@phosphor-icons/vue';
 import type { SettingsData } from '@/types/settings';
 import { formatRelativeTime } from '@/utils/date';
 
@@ -36,6 +36,13 @@ function formatLastUpdate(timestamp: string): string {
           <div class="text-xs text-text-secondary hidden sm:block">
             {{ t('autoUpdateIntervalDesc') }}
           </div>
+          <!-- Last update time - now as sub-item -->
+          <div class="text-xs text-text-secondary mt-1 flex items-center gap-1">
+            <span>{{ t('lastArticleUpdate') }}:</span>
+            <span class="font-medium text-accent">{{
+              formatLastUpdate(settings.last_article_update)
+            }}</span>
+          </div>
         </div>
       </div>
       <input
@@ -44,21 +51,6 @@ function formatLastUpdate(timestamp: string): string {
         min="1"
         class="input-field w-16 sm:w-20 text-center text-xs sm:text-sm"
       />
-    </div>
-
-    <!-- Last update time - read-only info display -->
-    <div class="info-display mt-2 sm:mt-3">
-      <div class="flex items-center gap-2">
-        <PhCalendarCheck :size="18" class="text-text-secondary shrink-0 sm:w-5 sm:h-5" />
-        <div class="flex-1 min-w-0">
-          <div class="text-xs sm:text-sm text-text-secondary truncate">
-            {{ t('lastArticleUpdate') }}
-          </div>
-        </div>
-        <div class="text-xs sm:text-sm font-medium text-accent shrink-0">
-          {{ formatLastUpdate(settings.last_article_update) }}
-        </div>
-      </div>
     </div>
 
     <div class="setting-item mt-2 sm:mt-3">
@@ -94,12 +86,5 @@ function formatLastUpdate(timestamp: string): string {
 }
 .setting-item {
   @apply flex items-center sm:items-start justify-between gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-bg-secondary border border-border;
-}
-.info-display {
-  @apply px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-border;
-  background-color: rgba(233, 236, 239, 0.3);
-}
-.dark-mode .info-display {
-  background-color: rgba(45, 45, 45, 0.3);
 }
 </style>

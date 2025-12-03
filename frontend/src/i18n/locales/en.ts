@@ -322,6 +322,8 @@ const en: TranslationMessages = {
   openSettingsShortcut: 'Open Settings',
   addFeedShortcut: 'Add Feed',
   focusSearch: 'Focus Search',
+  focusFeedSearch: 'Focus Feed Search',
+  toggleFilter: 'Toggle Article Filter',
   goToAllArticles: 'Go to All Articles',
   goToUnread: 'Go to Unread',
   goToFavorites: 'Go to Favorites',

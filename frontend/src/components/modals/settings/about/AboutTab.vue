@@ -69,8 +69,7 @@ function handleDownloadInstall() {
   <div class="text-center py-6 sm:py-10 px-2">
     <img src="/assets/logo.svg" alt="Logo" class="h-12 sm:h-16 w-auto mb-3 sm:mb-4 mx-auto" />
     <h3 class="text-lg sm:text-xl font-bold mb-2">{{ t('appName') }}</h3>
-    <p class="text-text-secondary text-sm sm:text-base">{{ t('aboutApp') }}</p>
-    <p class="text-text-secondary text-xs sm:text-sm mt-2">{{ t('version') }} {{ appVersion }}</p>
+    <p class="text-text-secondary text-xs sm:text-sm">{{ t('version') }} {{ appVersion }}</p>
 
     <div class="mt-4 sm:mt-6 mb-4 sm:mb-6 flex justify-center">
       <button
@@ -173,7 +172,7 @@ function handleDownloadInstall() {
 
 <style scoped>
 .btn-secondary {
-  @apply bg-transparent border border-border text-text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-tertiary transition-colors;
+  @apply bg-bg-tertiary border border-border text-text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-secondary transition-colors;
 }
 .btn-secondary:disabled {
   @apply opacity-50 cursor-not-allowed;

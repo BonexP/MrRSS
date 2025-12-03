@@ -84,6 +84,8 @@ onMounted(async () => {
   window.addEventListener('default-view-mode-changed', onDefaultViewModeChanged as EventListener);
   // Listen for refresh articles events
   window.addEventListener('refresh-articles', onRefreshArticles);
+  // Listen for toggle filter events (from keyboard shortcut)
+  window.addEventListener('toggle-filter', onToggleFilter);
 });
 
 // Watch for articles changes during refresh to maintain scroll position
@@ -123,6 +125,7 @@ onBeforeUnmount(() => {
     onDefaultViewModeChanged as EventListener
   );
   window.removeEventListener('refresh-articles', onRefreshArticles);
+  window.removeEventListener('toggle-filter', onToggleFilter);
 });
 
 interface CustomEventDetail {
@@ -154,6 +157,10 @@ function onTranslationSettingsChanged(e: Event): void {
 
 function onRefreshArticles(): void {
   store.fetchArticles();
+}
+
+function onToggleFilter(): void {
+  showFilterModal.value = !showFilterModal.value;
 }
 
 // Article selection and interaction

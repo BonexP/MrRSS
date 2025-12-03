@@ -61,6 +61,9 @@ onMounted(async () => {
   store.initTheme();
 
   // Load remaining settings (theme and other settings are already loaded in main.ts)
+  let updateInterval = 10;
+  let lastArticleUpdate = '';
+
   try {
     const res = await fetch('/api/settings');
     const data = await res.json();
@@ -72,7 +75,12 @@ onMounted(async () => {
 
     // Apply other settings
     if (data.update_interval) {
-      store.startAutoRefresh(parseInt(data.update_interval));
+      updateInterval = parseInt(data.update_interval);
+      store.startAutoRefresh(updateInterval);
+    }
+
+    if (data.last_article_update) {
+      lastArticleUpdate = data.last_article_update;
     }
 
     // Load saved shortcuts
@@ -94,9 +102,12 @@ onMounted(async () => {
     store.fetchFeeds();
     store.fetchArticles();
 
-    // Trigger feed refresh after initial load
+    // Only trigger feed refresh if enough time has passed since last update
     setTimeout(() => {
-      store.refreshFeeds();
+      const shouldRefresh = shouldTriggerRefresh(lastArticleUpdate, updateInterval);
+      if (shouldRefresh) {
+        store.refreshFeeds();
+      }
     }, 1000);
   }, 100);
 
@@ -119,6 +130,24 @@ onMounted(async () => {
     openContextMenu(e as CustomEvent);
   });
 });
+
+// Check if we should trigger refresh based on last update time and interval
+function shouldTriggerRefresh(lastUpdate: string, intervalMinutes: number): boolean {
+  if (!lastUpdate) {
+    return true; // Never updated, should refresh
+  }
+
+  try {
+    const lastUpdateTime = new Date(lastUpdate).getTime();
+    const now = Date.now();
+    const intervalMs = intervalMinutes * 60 * 1000;
+
+    // Refresh if more than interval time has passed since last update
+    return now - lastUpdateTime >= intervalMs;
+  } catch {
+    return true; // Invalid date, should refresh
+  }
+}
 
 function toggleSidebar(): void {
   isSidebarOpen.value = !isSidebarOpen.value;
@@ -222,11 +251,12 @@ function onFeedUpdated(): void {
 .toast-container {
   position: fixed;
   top: 10px;
-  right: 10px;
-  left: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 60;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 8px;
   pointer-events: none;
 }
@@ -236,8 +266,6 @@ function onFeedUpdated(): void {
 @media (min-width: 640px) {
   .toast-container {
     top: 20px;
-    right: 20px;
-    left: auto;
     gap: 10px;
   }
 }

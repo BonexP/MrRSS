@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { ref } from 'vue';
+import { ref, type Ref } from 'vue';
 import {
   PhHardDrives,
   PhUpload,
@@ -95,13 +95,16 @@ function handleDiscoverAll() {
   @apply opacity-50 cursor-not-allowed;
 }
 .btn-secondary {
-  @apply bg-transparent border border-border text-text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-tertiary transition-colors;
+  @apply bg-bg-tertiary border border-border text-text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-secondary transition-colors;
 }
 .btn-secondary:disabled {
   @apply opacity-50 cursor-not-allowed;
 }
 .btn-danger {
-  @apply bg-transparent border border-red-300 text-red-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 dark:border-red-400 dark:text-red-400 transition-colors;
+  @apply bg-red-50 border border-red-300 text-red-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-semibold hover:bg-red-100 transition-colors;
+}
+:global(.dark-mode) .btn-danger {
+  @apply bg-red-900/20 border-red-400 text-red-400 hover:bg-red-900/30;
 }
 .btn-danger:disabled {
   @apply opacity-50 cursor-not-allowed;

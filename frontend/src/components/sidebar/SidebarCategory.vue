@@ -61,6 +61,7 @@ const emit = defineEmits<{
 <style scoped>
 .category-header {
   @apply px-2 sm:px-3 py-1.5 sm:py-2 cursor-pointer font-semibold text-xs sm:text-sm text-text-secondary flex items-center justify-between rounded-md hover:bg-bg-tertiary hover:text-text-primary transition-colors;
+  @apply sticky top-0 z-10 bg-bg-secondary;
 }
 .category-header.active {
   @apply bg-bg-tertiary text-accent;
@@ -70,7 +71,7 @@ const emit = defineEmits<{
   background-color: rgba(200, 200, 200, 0.3);
   color: #666666;
 }
-.dark-mode .unread-badge {
+:global(.dark-mode) .unread-badge {
   background-color: rgba(160, 160, 160, 0.25);
   color: #cccccc;
 }

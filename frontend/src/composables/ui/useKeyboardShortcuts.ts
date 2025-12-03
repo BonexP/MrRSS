@@ -17,6 +17,7 @@ export interface KeyboardShortcuts {
   openSettings: string;
   addFeed: string;
   focusSearch: string;
+  toggleFilter: string;
   goToAllArticles: string;
   goToUnread: string;
   goToFavorites: string;
@@ -47,6 +48,7 @@ export function useKeyboardShortcuts(callbacks: KeyboardShortcutCallbacks) {
     openSettings: ',',
     addFeed: 'a',
     focusSearch: '/',
+    toggleFilter: 'f',
     goToAllArticles: '1',
     goToUnread: '2',
     goToFavorites: '3',
@@ -250,6 +252,9 @@ export function useKeyboardShortcuts(callbacks: KeyboardShortcutCallbacks) {
         break;
       case 'focusSearch':
         focusSearchInput();
+        break;
+      case 'toggleFilter':
+        window.dispatchEvent(new CustomEvent('toggle-filter'));
         break;
       case 'goToAllArticles':
         store.setFilter('all');

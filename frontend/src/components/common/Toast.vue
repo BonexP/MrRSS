@@ -53,7 +53,7 @@ function handleClose() {
 
 <style scoped>
 .toast {
-  @apply fixed top-5 right-5 z-[60] px-5 py-3 rounded-lg shadow-lg border min-w-[300px] max-w-md;
+  @apply z-[60] px-5 py-3 rounded-lg shadow-lg border min-w-[300px] max-w-md;
 }
 .toast-show {
   animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -64,44 +64,44 @@ function handleClose() {
 .toast-info {
   @apply bg-blue-50 border-blue-200 text-blue-900;
 }
-.dark-mode .toast-info {
-  @apply bg-blue-900/20 border-blue-700 text-blue-100;
+:global(.dark-mode) .toast-info {
+  @apply bg-blue-950 border-blue-700 text-blue-100;
 }
 .toast-success {
   @apply bg-green-50 border-green-200 text-green-900;
 }
-.dark-mode .toast-success {
-  @apply bg-green-900/20 border-green-700 text-green-100;
+:global(.dark-mode) .toast-success {
+  @apply bg-green-950 border-green-700 text-green-100;
 }
 .toast-error {
   @apply bg-red-50 border-red-200 text-red-900;
 }
-.dark-mode .toast-error {
-  @apply bg-red-900/20 border-red-700 text-red-100;
+:global(.dark-mode) .toast-error {
+  @apply bg-red-950 border-red-700 text-red-100;
 }
 .toast-warning {
   @apply bg-orange-50 border-orange-200 text-orange-900;
 }
-.dark-mode .toast-warning {
-  @apply bg-orange-900/20 border-orange-700 text-orange-100;
+:global(.dark-mode) .toast-warning {
+  @apply bg-orange-950 border-orange-700 text-orange-100;
 }
 @keyframes slideIn {
   from {
-    transform: translateX(400px);
+    transform: translateY(-20px);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: translateY(0);
     opacity: 1;
   }
 }
 @keyframes slideOut {
   from {
-    transform: translateX(0);
+    transform: translateY(0);
     opacity: 1;
   }
   to {
-    transform: translateX(400px);
+    transform: translateY(-20px);
     opacity: 0;
   }
 }

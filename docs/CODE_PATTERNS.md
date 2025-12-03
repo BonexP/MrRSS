@@ -4,10 +4,43 @@ This document provides common coding patterns and best practices for the MrRSS p
 
 ## Table of Contents
 
+- [Code Organization Guidelines](#code-organization-guidelines)
 - [Backend Patterns (Go)](#backend-patterns-go)
 - [Frontend Patterns (Vue)](#frontend-patterns-vue)
 - [Styling Patterns](#styling-patterns)
 - [API Communication](#api-communication)
+
+## Code Organization Guidelines
+
+### File Size
+
+When a file becomes too long (typically over 300-400 lines), consider refactoring:
+
+- **Go**: Extract related functions into separate files within the same package
+- **Vue**: Split into smaller components or extract logic into composables
+- **TypeScript**: Extract utilities into separate modules
+
+### Folder Organization
+
+When a folder contains too many files (typically over 10-15 files), create subfolders:
+
+- Group by feature or domain (e.g., `handlers/article/`, `handlers/feed/`)
+- Keep related tests alongside their source files
+- Use index files for clean exports when appropriate
+
+### Build Verification
+
+Before completing any significant change, verify the build:
+
+```bash
+# Run full build check
+wails build -skipbindings
+
+# Or use the Makefile
+make build
+```
+
+This ensures the application can be properly packaged and distributed.
 
 ## Backend Patterns (Go)
 

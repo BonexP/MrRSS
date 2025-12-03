@@ -25,7 +25,7 @@ const iconMap: Record<string, Component> = {
 
 <template>
   <button @click="emit('click')" :class="['nav-item', isActive ? 'active' : '']">
-    <component :is="iconMap[icon]" :size="20" />
+    <component :is="iconMap[icon]" :size="20" :weight="isActive ? 'fill' : 'regular'" />
     <span class="flex-1 text-left">{{ label }}</span>
     <span v-if="unreadCount && unreadCount > 0" class="unread-badge">{{ unreadCount }}</span>
   </button>
@@ -43,7 +43,7 @@ const iconMap: Record<string, Component> = {
   background-color: rgba(200, 200, 200, 0.3);
   color: #666666;
 }
-.dark-mode .unread-badge {
+:global(.dark-mode) .unread-badge {
   background-color: rgba(160, 160, 160, 0.25);
   color: #cccccc;
 }

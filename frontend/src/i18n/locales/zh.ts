@@ -320,6 +320,8 @@ const zh: TranslationMessages = {
   openSettingsShortcut: '打开设置',
   addFeedShortcut: '添加订阅',
   focusSearch: '聚焦搜索',
+  focusFeedSearch: '聚焦订阅源搜索',
+  toggleFilter: '切换文章过滤',
   goToAllArticles: '转到所有文章',
   goToUnread: '转到未读',
   goToFavorites: '转到收藏',
