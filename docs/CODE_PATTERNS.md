@@ -5,6 +5,7 @@ This document provides common coding patterns and best practices for the MrRSS p
 ## Table of Contents
 
 - [Code Organization Guidelines](#code-organization-guidelines)
+- [Settings Management](#settings-management)
 - [Backend Patterns (Go)](#backend-patterns-go)
 - [Frontend Patterns (Vue)](#frontend-patterns-vue)
 - [Styling Patterns](#styling-patterns)
@@ -41,6 +42,124 @@ make build
 ```
 
 This ensures the application can be properly packaged and distributed.
+
+## Settings Management
+
+### Adding a New Setting
+
+When adding/modifying/deleting a setting, update **ALL** of these files:
+
+#### 1. **Default Values** (2 files)
+- `config/defaults.json` - Shared defaults (frontend reads this)
+- `internal/config/defaults.json` - Backend embedded defaults
+
+#### 2. **Backend Type Definition**
+- `internal/config/config.go`:
+  - Add field to `Defaults` struct with json tag
+  - Add case in `GetString()` switch statement
+
+#### 3. **Database Initialization**
+- `internal/database/db.go`:
+  - Add key to `settingsKeys` array in `Init()` method
+
+#### 4. **Backend API Handler**
+- `internal/handlers/settings/settings_handlers.go`:
+  - **GET**: Add `GetSetting()` call and include in response map
+  - **POST**: Add field to request struct and `SetSetting()` call
+
+#### 5. **Frontend Type Definition**
+- `frontend/src/types/settings.ts`:
+  - Add field to `SettingsData` interface
+
+#### 6. **Frontend Settings Management**
+- `frontend/src/composables/core/useSettings.ts`:
+  - Add to initial `settings` ref object
+  - Add to `fetchSettings()` data mapping
+
+#### 7. **Frontend Auto-Save**
+- `frontend/src/composables/core/useSettingsAutoSave.ts`:
+  - Add field to POST body in `autoSave()` function
+
+#### 8. **UI Component** (if user-facing)
+- Create/update Vue component in `frontend/src/components/modals/settings/general/`
+- Use `v-model="settings.your_setting"` to bind
+
+### Example: Adding `new_feature_enabled`
+
+**Step 1**: `config/defaults.json` & `internal/config/defaults.json`
+```json
+{
+  "new_feature_enabled": false
+}
+```
+
+**Step 2**: `internal/config/config.go`
+```go
+type Defaults struct {
+    NewFeatureEnabled bool `json:"new_feature_enabled"`
+}
+
+func GetString(key string) string {
+    case "new_feature_enabled":
+        return strconv.FormatBool(defaults.NewFeatureEnabled)
+}
+```
+
+**Step 3**: `internal/database/db.go`
+```go
+settingsKeys := []string{
+    // ... existing keys
+    "new_feature_enabled",
+}
+```
+
+**Step 4**: `internal/handlers/settings/settings_handlers.go`
+```go
+// GET
+newFeature, _ := h.DB.GetSetting("new_feature_enabled")
+// Add to response map
+"new_feature_enabled": newFeature,
+
+// POST struct
+NewFeatureEnabled string `json:"new_feature_enabled"`
+
+// POST handler
+if req.NewFeatureEnabled != "" {
+    h.DB.SetSetting("new_feature_enabled", req.NewFeatureEnabled)
+}
+```
+
+**Step 5**: `frontend/src/types/settings.ts`
+```typescript
+export interface SettingsData {
+  new_feature_enabled: boolean;
+}
+```
+
+**Step 6**: `frontend/src/composables/core/useSettings.ts`
+```typescript
+const settings = ref({
+  new_feature_enabled: settingsDefaults.new_feature_enabled,
+});
+
+// In fetchSettings()
+new_feature_enabled: data.new_feature_enabled === 'true',
+```
+
+**Step 7**: `frontend/src/composables/core/useSettingsAutoSave.ts`
+```typescript
+await fetch('/api/settings', {
+  body: JSON.stringify({
+    new_feature_enabled: (settings.value.new_feature_enabled ??
+                         settingsDefaults.new_feature_enabled).toString(),
+  }),
+});
+```
+
+**Step 8**: UI Component (optional)
+```vue
+<input type="checkbox" v-model="settings.new_feature_enabled" />
+```
 
 ## Backend Patterns (Go)
 

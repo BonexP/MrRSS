@@ -29,6 +29,15 @@ export function useSettings() {
     rules: settingsDefaults.rules,
     summary_enabled: settingsDefaults.summary_enabled,
     summary_length: settingsDefaults.summary_length,
+    summary_provider: settingsDefaults.summary_provider,
+    summary_ai_api_key: settingsDefaults.summary_ai_api_key,
+    summary_ai_endpoint: settingsDefaults.summary_ai_endpoint,
+    summary_ai_model: settingsDefaults.summary_ai_model,
+    baidu_app_id: settingsDefaults.baidu_app_id,
+    baidu_secret_key: settingsDefaults.baidu_secret_key,
+    ai_api_key: settingsDefaults.ai_api_key,
+    ai_endpoint: settingsDefaults.ai_endpoint,
+    ai_model: settingsDefaults.ai_model,
   });
 
   /**
@@ -59,6 +68,15 @@ export function useSettings() {
         rules: data.rules || settingsDefaults.rules,
         summary_enabled: data.summary_enabled === 'true',
         summary_length: data.summary_length || settingsDefaults.summary_length,
+        summary_provider: data.summary_provider || settingsDefaults.summary_provider,
+        summary_ai_api_key: data.summary_ai_api_key || settingsDefaults.summary_ai_api_key,
+        summary_ai_endpoint: data.summary_ai_endpoint || settingsDefaults.summary_ai_endpoint,
+        summary_ai_model: data.summary_ai_model || settingsDefaults.summary_ai_model,
+        baidu_app_id: data.baidu_app_id || settingsDefaults.baidu_app_id,
+        baidu_secret_key: data.baidu_secret_key || settingsDefaults.baidu_secret_key,
+        ai_api_key: data.ai_api_key || settingsDefaults.ai_api_key,
+        ai_endpoint: data.ai_endpoint || settingsDefaults.ai_endpoint,
+        ai_model: data.ai_model || settingsDefaults.ai_model,
       };
 
       return settings.value;

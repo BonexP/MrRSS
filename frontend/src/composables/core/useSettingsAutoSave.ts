@@ -98,6 +98,12 @@ export function useSettingsAutoSave(settings: Ref<SettingsData>) {
             settings.value.summary_enabled ?? settingsDefaults.summary_enabled
           ).toString(),
           summary_length: settings.value.summary_length ?? settingsDefaults.summary_length,
+          summary_provider: settings.value.summary_provider ?? settingsDefaults.summary_provider,
+          summary_ai_api_key:
+            settings.value.summary_ai_api_key ?? settingsDefaults.summary_ai_api_key,
+          summary_ai_endpoint:
+            settings.value.summary_ai_endpoint ?? settingsDefaults.summary_ai_endpoint,
+          summary_ai_model: settings.value.summary_ai_model ?? settingsDefaults.summary_ai_model,
         }),
       });
 

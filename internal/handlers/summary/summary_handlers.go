@@ -59,9 +59,9 @@ func HandleSummarizeArticle(h *core.Handler, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Get summary provider from settings
-	provider, _ := h.DB.GetSetting("summary_provider")
-	if provider == "" {
+	// Get summary provider from settings (with default)
+	provider, err := h.DB.GetSetting("summary_provider")
+	if err != nil || provider == "" {
 		provider = "local" // Default to local algorithm
 	}
 
@@ -69,11 +69,13 @@ func HandleSummarizeArticle(h *core.Handler, w http.ResponseWriter, r *http.Requ
 
 	if provider == "ai" {
 		// Use AI summarization
-		apiKey, _ := h.DB.GetSetting("summary_ai_api_key")
-		if apiKey == "" {
+		apiKey, err := h.DB.GetSetting("summary_ai_api_key")
+		if err != nil || apiKey == "" {
 			http.Error(w, "AI API key is required for AI summarization", http.StatusBadRequest)
 			return
 		}
+
+		// Get endpoint and model with fallback to defaults
 		endpoint, _ := h.DB.GetSetting("summary_ai_endpoint")
 		model, _ := h.DB.GetSetting("summary_ai_model")
 

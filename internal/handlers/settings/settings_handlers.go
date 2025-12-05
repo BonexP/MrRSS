@@ -36,6 +36,10 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		defaultViewMode, _ := h.DB.GetSetting("default_view_mode")
 		summaryEnabled, _ := h.DB.GetSetting("summary_enabled")
 		summaryLength, _ := h.DB.GetSetting("summary_length")
+		summaryProvider, _ := h.DB.GetSetting("summary_provider")
+		summaryAIAPIKey, _ := h.DB.GetSetting("summary_ai_api_key")
+		summaryAIEndpoint, _ := h.DB.GetSetting("summary_ai_endpoint")
+		summaryAIModel, _ := h.DB.GetSetting("summary_ai_model")
 		json.NewEncoder(w).Encode(map[string]string{
 			"update_interval":      interval,
 			"translation_enabled":  translationEnabled,
@@ -60,6 +64,10 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 			"default_view_mode":    defaultViewMode,
 			"summary_enabled":      summaryEnabled,
 			"summary_length":       summaryLength,
+			"summary_provider":     summaryProvider,
+			"summary_ai_api_key":   summaryAIAPIKey,
+			"summary_ai_endpoint":  summaryAIEndpoint,
+			"summary_ai_model":     summaryAIModel,
 		})
 	case http.MethodPost:
 		var req struct {
@@ -85,6 +93,10 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 			DefaultViewMode     string `json:"default_view_mode"`
 			SummaryEnabled      string `json:"summary_enabled"`
 			SummaryLength       string `json:"summary_length"`
+			SummaryProvider     string `json:"summary_provider"`
+			SummaryAIAPIKey     string `json:"summary_ai_api_key"`
+			SummaryAIEndpoint   string `json:"summary_ai_endpoint"`
+			SummaryAIModel      string `json:"summary_ai_model"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -151,6 +163,15 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		if req.SummaryLength != "" {
 			h.DB.SetSetting("summary_length", req.SummaryLength)
 		}
+
+		if req.SummaryProvider != "" {
+			h.DB.SetSetting("summary_provider", req.SummaryProvider)
+		}
+
+		// Always update AI summary keys as they might be cleared
+		h.DB.SetSetting("summary_ai_api_key", req.SummaryAIAPIKey)
+		h.DB.SetSetting("summary_ai_endpoint", req.SummaryAIEndpoint)
+		h.DB.SetSetting("summary_ai_model", req.SummaryAIModel)
 
 		if req.StartupOnBoot != "" {
 			// Get current value to check if it changed

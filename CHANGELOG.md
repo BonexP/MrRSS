@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Supported Baidu Translation and AI-based translation.
+- Supported AI-based article summarization using OpenAI-compatible APIs.
 
 ### Changed
 
