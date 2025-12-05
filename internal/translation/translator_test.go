@@ -2,6 +2,8 @@ package translation
 
 import (
 	"testing"
+
+	"MrRSS/internal/config"
 )
 
 func TestMockTranslator(t *testing.T) {
@@ -73,12 +75,13 @@ func TestAITranslator_EmptyText(t *testing.T) {
 }
 
 func TestAITranslator_Defaults(t *testing.T) {
+	defaults := config.Get()
 	translator := NewAITranslator("api_key", "", "")
-	if translator.Endpoint != "https://api.openai.com/v1" {
-		t.Errorf("Expected default endpoint, got '%s'", translator.Endpoint)
+	if translator.Endpoint != defaults.AIEndpoint {
+		t.Errorf("Expected default endpoint %s, got '%s'", defaults.AIEndpoint, translator.Endpoint)
 	}
-	if translator.Model != "gpt-4o-mini" {
-		t.Errorf("Expected default model, got '%s'", translator.Model)
+	if translator.Model != defaults.AIModel {
+		t.Errorf("Expected default model %s, got '%s'", defaults.AIModel, translator.Model)
 	}
 }
 

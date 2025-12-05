@@ -2,9 +2,12 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"strings"
 	"sync"
 	"time"
+
+	"MrRSS/internal/config"
 
 	_ "modernc.org/sqlite"
 )
@@ -63,25 +66,18 @@ func (db *DB) Init() error {
 			value TEXT
 		)`)
 
-		// Insert default settings if they don't exist
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('update_interval', '30')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('translation_enabled', 'false')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('target_language', 'zh-CN')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('translation_provider', 'google')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('deepl_api_key', '')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('baidu_app_id', '')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('baidu_secret_key', '')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_api_key', '')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_endpoint', '')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('ai_model', '')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('auto_cleanup_enabled', 'false')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('max_cache_size_mb', '20')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('max_article_age_days', '30')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('language', 'en-US')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('theme', 'auto')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('last_article_update', '')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('show_hidden_articles', 'false')`)
-		_, _ = db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('default_view_mode', 'original')`)
+		// Insert default settings if they don't exist (using centralized defaults from config)
+		settingsKeys := []string{
+			"update_interval", "translation_enabled", "target_language", "translation_provider",
+			"deepl_api_key", "baidu_app_id", "baidu_secret_key", "ai_api_key", "ai_endpoint", "ai_model",
+			"auto_cleanup_enabled", "max_cache_size_mb", "max_article_age_days", "language", "theme",
+			"last_article_update", "show_hidden_articles", "default_view_mode", "summary_enabled", "summary_length",
+			"shortcuts", "rules", "startup_on_boot",
+		}
+		for _, key := range settingsKeys {
+			defaultVal := config.GetString(key)
+			_, _ = db.Exec(fmt.Sprintf(`INSERT OR IGNORE INTO settings (key, value) VALUES ('%s', '%s')`, key, defaultVal))
+		}
 
 		// Migration: Add link column to feeds table if it doesn't exist
 		// Note: SQLite doesn't support IF NOT EXISTS for ALTER TABLE ADD COLUMN.

@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"MrRSS/internal/config"
 )
 
 // AITranslator implements translation using OpenAI-compatible APIs (GPT, Claude, etc.).
@@ -21,13 +23,14 @@ type AITranslator struct {
 // endpoint should be the API base URL (e.g., "https://api.openai.com/v1" for OpenAI)
 // model should be the model name (e.g., "gpt-4o-mini", "claude-3-haiku-20240307")
 func NewAITranslator(apiKey, endpoint, model string) *AITranslator {
+	defaults := config.Get()
 	// Default to OpenAI endpoint if not specified
 	if endpoint == "" {
-		endpoint = "https://api.openai.com/v1"
+		endpoint = defaults.AIEndpoint
 	}
 	// Default to a cost-effective model if not specified
 	if model == "" {
-		model = "gpt-4o-mini"
+		model = defaults.AIModel
 	}
 	return &AITranslator{
 		APIKey:   apiKey,

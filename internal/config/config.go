@@ -1,0 +1,107 @@
+// Package config provides centralized default values for settings.
+// The defaults are loaded from config/defaults.json which is shared between
+// frontend and backend to ensure consistency.
+package config
+
+import (
+	_ "embed"
+	"encoding/json"
+	"strconv"
+)
+
+//go:embed defaults.json
+var defaultsJSON []byte
+
+// Defaults holds all default settings values
+type Defaults struct {
+	UpdateInterval      int    `json:"update_interval"`
+	Language            string `json:"language"`
+	Theme               string `json:"theme"`
+	DefaultViewMode     string `json:"default_view_mode"`
+	StartupOnBoot       bool   `json:"startup_on_boot"`
+	ShowHiddenArticles  bool   `json:"show_hidden_articles"`
+	TranslationEnabled  bool   `json:"translation_enabled"`
+	TargetLanguage      string `json:"target_language"`
+	TranslationProvider string `json:"translation_provider"`
+	DeepLAPIKey         string `json:"deepl_api_key"`
+	BaiduAppID          string `json:"baidu_app_id"`
+	BaiduSecretKey      string `json:"baidu_secret_key"`
+	AIAPIKey            string `json:"ai_api_key"`
+	AIEndpoint          string `json:"ai_endpoint"`
+	AIModel             string `json:"ai_model"`
+	SummaryEnabled      bool   `json:"summary_enabled"`
+	SummaryLength       string `json:"summary_length"`
+	AutoCleanupEnabled  bool   `json:"auto_cleanup_enabled"`
+	MaxCacheSizeMB      int    `json:"max_cache_size_mb"`
+	MaxArticleAgeDays   int    `json:"max_article_age_days"`
+	Shortcuts           string `json:"shortcuts"`
+	Rules               string `json:"rules"`
+	LastArticleUpdate   string `json:"last_article_update"`
+}
+
+var defaults Defaults
+
+func init() {
+	if err := json.Unmarshal(defaultsJSON, &defaults); err != nil {
+		panic("failed to parse defaults.json: " + err.Error())
+	}
+}
+
+// Get returns the loaded defaults
+func Get() Defaults {
+	return defaults
+}
+
+// GetString returns a setting default as a string
+func GetString(key string) string {
+	switch key {
+	case "update_interval":
+		return strconv.Itoa(defaults.UpdateInterval)
+	case "language":
+		return defaults.Language
+	case "theme":
+		return defaults.Theme
+	case "default_view_mode":
+		return defaults.DefaultViewMode
+	case "startup_on_boot":
+		return strconv.FormatBool(defaults.StartupOnBoot)
+	case "show_hidden_articles":
+		return strconv.FormatBool(defaults.ShowHiddenArticles)
+	case "translation_enabled":
+		return strconv.FormatBool(defaults.TranslationEnabled)
+	case "target_language":
+		return defaults.TargetLanguage
+	case "translation_provider":
+		return defaults.TranslationProvider
+	case "deepl_api_key":
+		return defaults.DeepLAPIKey
+	case "baidu_app_id":
+		return defaults.BaiduAppID
+	case "baidu_secret_key":
+		return defaults.BaiduSecretKey
+	case "ai_api_key":
+		return defaults.AIAPIKey
+	case "ai_endpoint":
+		return defaults.AIEndpoint
+	case "ai_model":
+		return defaults.AIModel
+	case "summary_enabled":
+		return strconv.FormatBool(defaults.SummaryEnabled)
+	case "summary_length":
+		return defaults.SummaryLength
+	case "auto_cleanup_enabled":
+		return strconv.FormatBool(defaults.AutoCleanupEnabled)
+	case "max_cache_size_mb":
+		return strconv.Itoa(defaults.MaxCacheSizeMB)
+	case "max_article_age_days":
+		return strconv.Itoa(defaults.MaxArticleAgeDays)
+	case "shortcuts":
+		return defaults.Shortcuts
+	case "rules":
+		return defaults.Rules
+	case "last_article_update":
+		return defaults.LastArticleUpdate
+	default:
+		return ""
+	}
+}
