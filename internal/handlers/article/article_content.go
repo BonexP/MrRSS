@@ -86,6 +86,8 @@ func HandleGetArticleContent(h *core.Handler, w http.ResponseWriter, r *http.Req
 			if content == "" {
 				content = item.Description
 			}
+			// Clean HTML to fix malformed tags that can cause rendering issues
+			content = utils.CleanHTML(content)
 			break
 		}
 	}

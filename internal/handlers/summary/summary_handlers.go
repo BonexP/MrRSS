@@ -166,9 +166,9 @@ func getArticleContent(h *core.Handler, articleID int64) (string, error) {
 	for _, item := range parsedFeed.Items {
 		if utils.URLsMatch(item.Link, article.URL) {
 			if item.Content != "" {
-				return item.Content, nil
+				return utils.CleanHTML(item.Content), nil
 			}
-			return item.Description, nil
+			return utils.CleanHTML(item.Description), nil
 		}
 	}
 

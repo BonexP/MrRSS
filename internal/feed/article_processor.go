@@ -2,6 +2,7 @@ package feed
 
 import (
 	"MrRSS/internal/models"
+	"MrRSS/internal/utils"
 	"regexp"
 	"strings"
 	"time"
@@ -40,6 +41,9 @@ func (f *Fetcher) processArticles(feed models.Feed, items []*gofeed.Item) []*mod
 		if content == "" {
 			content = item.Description
 		}
+
+		// Clean HTML to fix malformed tags that can cause rendering issues
+		content = utils.CleanHTML(content)
 
 		// Determine title: prefer media:title if available, then item.Title, then generate from content
 		title := item.Title
