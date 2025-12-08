@@ -13,10 +13,11 @@ import (
 
 // AITranslator implements translation using OpenAI-compatible APIs (GPT, Claude, etc.).
 type AITranslator struct {
-	APIKey   string
-	Endpoint string
-	Model    string
-	client   *http.Client
+	APIKey       string
+	Endpoint     string
+	Model        string
+	SystemPrompt string
+	client       *http.Client
 }
 
 // NewAITranslator creates a new AI translator with the given credentials.
@@ -33,11 +34,17 @@ func NewAITranslator(apiKey, endpoint, model string) *AITranslator {
 		model = defaults.AIModel
 	}
 	return &AITranslator{
-		APIKey:   apiKey,
-		Endpoint: strings.TrimSuffix(endpoint, "/"),
-		Model:    model,
-		client:   &http.Client{Timeout: 30 * time.Second},
+		APIKey:       apiKey,
+		Endpoint:     strings.TrimSuffix(endpoint, "/"),
+		Model:        model,
+		SystemPrompt: "", // Will be set from settings when used
+		client:       &http.Client{Timeout: 30 * time.Second},
 	}
+}
+
+// SetSystemPrompt sets a custom system prompt for the translator.
+func (t *AITranslator) SetSystemPrompt(prompt string) {
+	t.SystemPrompt = prompt
 }
 
 // Translate translates text to the target language using an OpenAI-compatible API.
@@ -48,8 +55,11 @@ func (t *AITranslator) Translate(text, targetLang string) (string, error) {
 
 	langName := getLanguageName(targetLang)
 
-	// Concise prompt to minimize token usage
-	systemPrompt := "You are a translator. Translate the given text accurately. Output ONLY the translated text, nothing else."
+	// Use custom system prompt if provided, otherwise use default
+	systemPrompt := t.SystemPrompt
+	if systemPrompt == "" {
+		systemPrompt = "You are a translator. Translate the given text accurately. Output ONLY the translated text, nothing else."
+	}
 	userPrompt := fmt.Sprintf("Translate to %s:\n%s", langName, text)
 
 	requestBody := map[string]interface{}{

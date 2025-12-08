@@ -170,6 +170,23 @@ defineProps<Props>();
             class="input-field w-32 sm:w-48 text-xs sm:text-sm"
           />
         </div>
+        <div class="sub-setting-item flex-col items-stretch gap-2">
+          <div class="flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
+            <PhRobot :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+            <div class="flex-1 min-w-0">
+              <div class="font-medium mb-0 sm:mb-1 text-sm">{{ t('aiSystemPrompt') }}</div>
+              <div class="text-xs text-text-secondary hidden sm:block">
+                {{ t('aiSystemPromptDesc') }}
+              </div>
+            </div>
+          </div>
+          <textarea
+            v-model="settings.ai_system_prompt"
+            :placeholder="t('aiSystemPromptPlaceholder')"
+            class="input-field text-xs sm:text-sm resize-y"
+            rows="3"
+          />
+        </div>
       </template>
 
       <div class="sub-setting-item">

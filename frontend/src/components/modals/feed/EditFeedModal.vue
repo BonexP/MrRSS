@@ -4,8 +4,10 @@ import { useI18n } from 'vue-i18n';
 import { PhCode, PhBookOpen } from '@phosphor-icons/vue';
 import type { Feed } from '@/types/models';
 import { useModalClose } from '@/composables/ui/useModalClose';
+import { useAppStore } from '@/stores/app';
 
 const { t } = useI18n();
+const store = useAppStore();
 
 type FeedType = 'url' | 'script';
 
@@ -31,6 +33,17 @@ const isSubmitting = ref(false);
 // Available scripts from the scripts directory
 const availableScripts = ref<Array<{ name: string; path: string; type: string }>>([]);
 const scriptsDir = ref('');
+
+// Get unique categories from existing feeds
+const existingCategories = computed(() => {
+  const categories = new Set<string>();
+  store.feeds.forEach(feed => {
+    if (feed.category && feed.category.trim() !== '') {
+      categories.add(feed.category);
+    }
+  });
+  return Array.from(categories).sort();
+});
 
 // Modal close handling
 useModalClose(() => close());
@@ -230,7 +243,11 @@ async function openScriptsFolder() {
             type="text"
             :placeholder="t('categoryPlaceholder')"
             class="input-field"
+            list="existing-categories"
           />
+          <datalist id="existing-categories">
+            <option v-for="cat in existingCategories" :key="cat" :value="cat" />
+          </datalist>
         </div>
 
         <!-- Hide from Timeline Toggle -->

@@ -71,8 +71,31 @@ function seek(event: MouseEvent) {
   const progressBar = event.currentTarget as HTMLElement;
   const rect = progressBar.getBoundingClientRect();
   const clickX = event.clientX - rect.left;
-  const percentage = clickX / rect.width;
+  const percentage = Math.max(0, Math.min(1, clickX / rect.width));
   audioRef.value.currentTime = percentage * duration.value;
+}
+
+// Handle dragging on progress bar
+const isDragging = ref(false);
+
+function onProgressMouseDown(event: MouseEvent) {
+  isDragging.value = true;
+  seek(event);
+  
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging.value) {
+      seek(e);
+    }
+  };
+  
+  const handleMouseUp = () => {
+    isDragging.value = false;
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
+  
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
 }
 
 // Computed progress percentage
@@ -135,7 +158,10 @@ const downloadFilename = computed(() => {
         <span class="text-xs text-text-secondary min-w-[40px] text-right">{{
           formatTime(currentTime)
         }}</span>
-        <div class="flex-1 h-1.5 bg-bg-tertiary rounded-full cursor-pointer relative" @click="seek">
+        <div 
+          class="flex-1 h-1.5 bg-bg-tertiary rounded-full cursor-pointer relative hover:h-2 transition-all" 
+          @mousedown="onProgressMouseDown"
+        >
           <div
             class="h-full bg-accent rounded-full transition-all duration-100"
             :style="{ width: `${progressPercentage}%` }"

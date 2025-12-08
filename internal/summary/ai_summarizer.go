@@ -14,10 +14,11 @@ import (
 
 // AISummarizer implements summarization using OpenAI-compatible APIs (GPT, Claude, etc.).
 type AISummarizer struct {
-	APIKey   string
-	Endpoint string
-	Model    string
-	client   *http.Client
+	APIKey       string
+	Endpoint     string
+	Model        string
+	SystemPrompt string
+	client       *http.Client
 }
 
 // NewAISummarizer creates a new AI summarizer with the given credentials.
@@ -34,11 +35,17 @@ func NewAISummarizer(apiKey, endpoint, model string) *AISummarizer {
 		model = defaults.SummaryAIModel
 	}
 	return &AISummarizer{
-		APIKey:   apiKey,
-		Endpoint: strings.TrimSuffix(endpoint, "/"),
-		Model:    model,
-		client:   &http.Client{Timeout: 30 * time.Second},
+		APIKey:       apiKey,
+		Endpoint:     strings.TrimSuffix(endpoint, "/"),
+		Model:        model,
+		SystemPrompt: "", // Will be set from settings when used
+		client:       &http.Client{Timeout: 30 * time.Second},
 	}
+}
+
+// SetSystemPrompt sets a custom system prompt for the summarizer.
+func (s *AISummarizer) SetSystemPrompt(prompt string) {
+	s.SystemPrompt = prompt
 }
 
 // Summarize generates a summary of the given text using an OpenAI-compatible API.
@@ -63,8 +70,11 @@ func (s *AISummarizer) Summarize(text string, length SummaryLength) (SummaryResu
 
 	targetWords := getTargetWordCount(length)
 
-	// Concise prompt to minimize token usage
-	systemPrompt := "You are a summarizer. Generate a concise summary of the given text. Output ONLY the summary, nothing else."
+	// Use custom system prompt if provided, otherwise use default
+	systemPrompt := s.SystemPrompt
+	if systemPrompt == "" {
+		systemPrompt = "You are a summarizer. Generate a concise summary of the given text. Output ONLY the summary, nothing else."
+	}
 	userPrompt := fmt.Sprintf("Summarize the following text in approximately %d words:\n\n%s", targetWords, cleanedText)
 
 	requestBody := map[string]interface{}{

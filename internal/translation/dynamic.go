@@ -23,6 +23,7 @@ type DynamicTranslator struct {
 	cachedSecretKey  string
 	cachedEndpoint   string
 	cachedModel      string
+	cachedPrompt     string
 }
 
 // NewDynamicTranslator creates a new dynamic translator that uses the given settings provider.
@@ -55,7 +56,7 @@ func (t *DynamicTranslator) getTranslator() (Translator, error) {
 	}
 
 	// Get provider-specific settings
-	var apiKey, appID, secretKey, endpoint, model string
+	var apiKey, appID, secretKey, endpoint, model, systemPrompt string
 	switch provider {
 	case "deepl":
 		apiKey, _ = t.settings.GetSetting("deepl_api_key")
@@ -66,6 +67,7 @@ func (t *DynamicTranslator) getTranslator() (Translator, error) {
 		apiKey, _ = t.settings.GetSetting("ai_api_key")
 		endpoint, _ = t.settings.GetSetting("ai_endpoint")
 		model, _ = t.settings.GetSetting("ai_model")
+		systemPrompt, _ = t.settings.GetSetting("ai_system_prompt")
 	}
 
 	// Check if we can reuse the cached translator
@@ -76,7 +78,8 @@ func (t *DynamicTranslator) getTranslator() (Translator, error) {
 		t.cachedAppID == appID &&
 		t.cachedSecretKey == secretKey &&
 		t.cachedEndpoint == endpoint &&
-		t.cachedModel == model {
+		t.cachedModel == model &&
+		t.cachedPrompt == systemPrompt {
 		translator := t.cachedTranslator
 		t.mu.RUnlock()
 		return translator, nil
@@ -105,7 +108,11 @@ func (t *DynamicTranslator) getTranslator() (Translator, error) {
 		if apiKey == "" {
 			return nil, fmt.Errorf("AI API key is required")
 		}
-		translator = NewAITranslator(apiKey, endpoint, model)
+		aiTranslator := NewAITranslator(apiKey, endpoint, model)
+		if systemPrompt != "" {
+			aiTranslator.SetSystemPrompt(systemPrompt)
+		}
+		translator = aiTranslator
 	default:
 		translator = NewGoogleFreeTranslator()
 	}
@@ -118,6 +125,7 @@ func (t *DynamicTranslator) getTranslator() (Translator, error) {
 	t.cachedSecretKey = secretKey
 	t.cachedEndpoint = endpoint
 	t.cachedModel = model
+	t.cachedPrompt = systemPrompt
 
 	return translator, nil
 }

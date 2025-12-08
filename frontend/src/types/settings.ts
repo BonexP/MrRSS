@@ -13,6 +13,7 @@ export interface SettingsData {
   ai_api_key: string;
   ai_endpoint: string;
   ai_model: string;
+  ai_system_prompt: string;
   auto_cleanup_enabled: boolean;
   max_cache_size_mb: number;
   max_article_age_days: number;
@@ -30,6 +31,7 @@ export interface SettingsData {
   summary_ai_api_key: string;
   summary_ai_endpoint: string;
   summary_ai_model: string;
+  summary_ai_system_prompt: string;
   [key: string]: unknown; // Allow additional properties
 }
 

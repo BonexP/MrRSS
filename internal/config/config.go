@@ -14,33 +14,35 @@ var defaultsJSON []byte
 
 // Defaults holds all default settings values
 type Defaults struct {
-	UpdateInterval      int    `json:"update_interval"`
-	Language            string `json:"language"`
-	Theme               string `json:"theme"`
-	DefaultViewMode     string `json:"default_view_mode"`
-	StartupOnBoot       bool   `json:"startup_on_boot"`
-	ShowHiddenArticles  bool   `json:"show_hidden_articles"`
-	TranslationEnabled  bool   `json:"translation_enabled"`
-	TargetLanguage      string `json:"target_language"`
-	TranslationProvider string `json:"translation_provider"`
-	DeepLAPIKey         string `json:"deepl_api_key"`
-	BaiduAppID          string `json:"baidu_app_id"`
-	BaiduSecretKey      string `json:"baidu_secret_key"`
-	AIAPIKey            string `json:"ai_api_key"`
-	AIEndpoint          string `json:"ai_endpoint"`
-	AIModel             string `json:"ai_model"`
-	SummaryEnabled      bool   `json:"summary_enabled"`
-	SummaryLength       string `json:"summary_length"`
-	SummaryProvider     string `json:"summary_provider"`
-	SummaryAIAPIKey     string `json:"summary_ai_api_key"`
-	SummaryAIEndpoint   string `json:"summary_ai_endpoint"`
-	SummaryAIModel      string `json:"summary_ai_model"`
-	AutoCleanupEnabled  bool   `json:"auto_cleanup_enabled"`
-	MaxCacheSizeMB      int    `json:"max_cache_size_mb"`
-	MaxArticleAgeDays   int    `json:"max_article_age_days"`
-	Shortcuts           string `json:"shortcuts"`
-	Rules               string `json:"rules"`
-	LastArticleUpdate   string `json:"last_article_update"`
+	UpdateInterval           int    `json:"update_interval"`
+	Language                 string `json:"language"`
+	Theme                    string `json:"theme"`
+	DefaultViewMode          string `json:"default_view_mode"`
+	StartupOnBoot            bool   `json:"startup_on_boot"`
+	ShowHiddenArticles       bool   `json:"show_hidden_articles"`
+	TranslationEnabled       bool   `json:"translation_enabled"`
+	TargetLanguage           string `json:"target_language"`
+	TranslationProvider      string `json:"translation_provider"`
+	DeepLAPIKey              string `json:"deepl_api_key"`
+	BaiduAppID               string `json:"baidu_app_id"`
+	BaiduSecretKey           string `json:"baidu_secret_key"`
+	AIAPIKey                 string `json:"ai_api_key"`
+	AIEndpoint               string `json:"ai_endpoint"`
+	AIModel                  string `json:"ai_model"`
+	AISystemPrompt           string `json:"ai_system_prompt"`
+	SummaryEnabled           bool   `json:"summary_enabled"`
+	SummaryLength            string `json:"summary_length"`
+	SummaryProvider          string `json:"summary_provider"`
+	SummaryAIAPIKey          string `json:"summary_ai_api_key"`
+	SummaryAIEndpoint        string `json:"summary_ai_endpoint"`
+	SummaryAIModel           string `json:"summary_ai_model"`
+	SummaryAISystemPrompt    string `json:"summary_ai_system_prompt"`
+	AutoCleanupEnabled       bool   `json:"auto_cleanup_enabled"`
+	MaxCacheSizeMB           int    `json:"max_cache_size_mb"`
+	MaxArticleAgeDays        int    `json:"max_article_age_days"`
+	Shortcuts                string `json:"shortcuts"`
+	Rules                    string `json:"rules"`
+	LastArticleUpdate        string `json:"last_article_update"`
 }
 
 var defaults Defaults
@@ -89,6 +91,8 @@ func GetString(key string) string {
 		return defaults.AIEndpoint
 	case "ai_model":
 		return defaults.AIModel
+	case "ai_system_prompt":
+		return defaults.AISystemPrompt
 	case "summary_enabled":
 		return strconv.FormatBool(defaults.SummaryEnabled)
 	case "summary_length":
@@ -101,6 +105,8 @@ func GetString(key string) string {
 		return defaults.SummaryAIEndpoint
 	case "summary_ai_model":
 		return defaults.SummaryAIModel
+	case "summary_ai_system_prompt":
+		return defaults.SummaryAISystemPrompt
 	case "auto_cleanup_enabled":
 		return strconv.FormatBool(defaults.AutoCleanupEnabled)
 	case "max_cache_size_mb":

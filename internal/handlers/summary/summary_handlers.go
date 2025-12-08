@@ -83,8 +83,12 @@ func HandleSummarizeArticle(h *core.Handler, w http.ResponseWriter, r *http.Requ
 		// Get endpoint and model with fallback to defaults
 		endpoint, _ := h.DB.GetSetting("summary_ai_endpoint")
 		model, _ := h.DB.GetSetting("summary_ai_model")
+		systemPrompt, _ := h.DB.GetSetting("summary_ai_system_prompt")
 
 		aiSummarizer := summary.NewAISummarizer(apiKey, endpoint, model)
+		if systemPrompt != "" {
+			aiSummarizer.SetSystemPrompt(systemPrompt)
+		}
 		aiResult, err := aiSummarizer.Summarize(content, summaryLength)
 		if err != nil {
 			log.Printf("Error generating AI summary: %v", err)
