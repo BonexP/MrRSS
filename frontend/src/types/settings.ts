@@ -4,6 +4,7 @@
 
 export interface SettingsData {
   update_interval: number;
+  refresh_mode: string;
   translation_enabled: boolean;
   target_language: string;
   translation_provider: string;
@@ -32,6 +33,12 @@ export interface SettingsData {
   summary_ai_endpoint: string;
   summary_ai_model: string;
   summary_ai_system_prompt: string;
+  proxy_enabled: boolean;
+  proxy_type: string;
+  proxy_host: string;
+  proxy_port: string;
+  proxy_username: string;
+  proxy_password: string;
   [key: string]: unknown; // Allow additional properties
 }
 

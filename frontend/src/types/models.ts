@@ -31,6 +31,9 @@ export interface Feed {
   last_error?: string;
   script_path?: string;
   hide_from_timeline?: boolean;
+  proxy_url?: string;
+  proxy_enabled?: boolean;
+  refresh_interval?: number;
 }
 
 export interface UnreadCounts {
