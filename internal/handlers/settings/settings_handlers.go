@@ -14,6 +14,7 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		interval, _ := h.DB.GetSetting("update_interval")
+		refreshMode, _ := h.DB.GetSetting("refresh_mode")
 		translationEnabled, _ := h.DB.GetSetting("translation_enabled")
 		targetLang, _ := h.DB.GetSetting("target_language")
 		provider, _ := h.DB.GetSetting("translation_provider")
@@ -42,8 +43,15 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		summaryAIEndpoint, _ := h.DB.GetSetting("summary_ai_endpoint")
 		summaryAIModel, _ := h.DB.GetSetting("summary_ai_model")
 		summaryAISystemPrompt, _ := h.DB.GetSetting("summary_ai_system_prompt")
+		proxyEnabled, _ := h.DB.GetSetting("proxy_enabled")
+		proxyType, _ := h.DB.GetSetting("proxy_type")
+		proxyHost, _ := h.DB.GetSetting("proxy_host")
+		proxyPort, _ := h.DB.GetSetting("proxy_port")
+		proxyUsername, _ := h.DB.GetSetting("proxy_username")
+		proxyPassword, _ := h.DB.GetSetting("proxy_password")
 		json.NewEncoder(w).Encode(map[string]string{
 			"update_interval":          interval,
+			"refresh_mode":             refreshMode,
 			"translation_enabled":      translationEnabled,
 			"target_language":          targetLang,
 			"translation_provider":     provider,
@@ -72,10 +80,17 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 			"summary_ai_endpoint":      summaryAIEndpoint,
 			"summary_ai_model":         summaryAIModel,
 			"summary_ai_system_prompt": summaryAISystemPrompt,
+			"proxy_enabled":            proxyEnabled,
+			"proxy_type":               proxyType,
+			"proxy_host":               proxyHost,
+			"proxy_port":               proxyPort,
+			"proxy_username":           proxyUsername,
+			"proxy_password":           proxyPassword,
 		})
 	case http.MethodPost:
 		var req struct {
 			UpdateInterval        string `json:"update_interval"`
+			RefreshMode           string `json:"refresh_mode"`
 			TranslationEnabled    string `json:"translation_enabled"`
 			TargetLanguage        string `json:"target_language"`
 			TranslationProvider   string `json:"translation_provider"`
@@ -103,6 +118,12 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 			SummaryAIEndpoint     string `json:"summary_ai_endpoint"`
 			SummaryAIModel        string `json:"summary_ai_model"`
 			SummaryAISystemPrompt string `json:"summary_ai_system_prompt"`
+			ProxyEnabled          string `json:"proxy_enabled"`
+			ProxyType             string `json:"proxy_type"`
+			ProxyHost             string `json:"proxy_host"`
+			ProxyPort             string `json:"proxy_port"`
+			ProxyUsername         string `json:"proxy_username"`
+			ProxyPassword         string `json:"proxy_password"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -110,6 +131,9 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		}
 		if req.UpdateInterval != "" {
 			h.DB.SetSetting("update_interval", req.UpdateInterval)
+		}
+		if req.RefreshMode != "" {
+			h.DB.SetSetting("refresh_mode", req.RefreshMode)
 		}
 		if req.TranslationEnabled != "" {
 			h.DB.SetSetting("translation_enabled", req.TranslationEnabled)
@@ -180,6 +204,17 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		h.DB.SetSetting("summary_ai_endpoint", req.SummaryAIEndpoint)
 		h.DB.SetSetting("summary_ai_model", req.SummaryAIModel)
 		h.DB.SetSetting("summary_ai_system_prompt", req.SummaryAISystemPrompt)
+
+		if req.ProxyEnabled != "" {
+			h.DB.SetSetting("proxy_enabled", req.ProxyEnabled)
+		}
+
+		// Always update proxy settings as they might be cleared
+		h.DB.SetSetting("proxy_type", req.ProxyType)
+		h.DB.SetSetting("proxy_host", req.ProxyHost)
+		h.DB.SetSetting("proxy_port", req.ProxyPort)
+		h.DB.SetSetting("proxy_username", req.ProxyUsername)
+		h.DB.SetSetting("proxy_password", req.ProxyPassword)
 
 		if req.StartupOnBoot != "" {
 			// Get current value to check if it changed
