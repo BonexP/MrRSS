@@ -170,6 +170,11 @@ func main() {
 		fileServer: fileServer,
 	}
 
+	shouldCloseToTray := func() bool {
+		val, err := db.GetSetting("close_to_tray")
+		return err == nil && val == "true"
+	}
+
 	startTray := func(ctx context.Context) {
 		if trayManager == nil || trayManager.IsRunning() {
 			return
@@ -230,8 +235,7 @@ func main() {
 		OnStartup: func(ctx context.Context) {
 			log.Println("App started")
 
-			closeToTraySetting, err := db.GetSetting("close_to_tray")
-			if err == nil && closeToTraySetting == "true" {
+			if shouldCloseToTray() {
 				startTray(ctx)
 			}
 
@@ -247,8 +251,7 @@ func main() {
 				return false
 			}
 
-			closeToTraySetting, err := db.GetSetting("close_to_tray")
-			if err == nil && closeToTraySetting == "true" {
+			if shouldCloseToTray() {
 				startTray(ctx)
 				if trayManager != nil && trayManager.IsRunning() {
 					runtime.WindowHide(ctx)

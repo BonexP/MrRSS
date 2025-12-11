@@ -4,6 +4,7 @@ package tray
 
 import (
 	"context"
+	"sync"
 	"sync/atomic"
 
 	"github.com/getlantern/systray"
@@ -17,6 +18,7 @@ type Manager struct {
 	icon    []byte
 	running atomic.Bool
 	stopCh  chan struct{}
+	mu      sync.Mutex
 }
 
 // NewManager creates a new tray manager for supported platforms.
@@ -30,11 +32,15 @@ func NewManager(handler *core.Handler, icon []byte) *Manager {
 // Start initialises the system tray if it isn't already running.
 // onQuit should trigger an application shutdown, and onShow should restore the main window.
 func (m *Manager) Start(ctx context.Context, onQuit func(), onShow func()) {
-	if !m.running.CompareAndSwap(false, true) {
+	m.mu.Lock()
+	if m.running.Load() {
+		m.mu.Unlock()
 		return
 	}
 
 	m.stopCh = make(chan struct{})
+	m.running.Store(true)
+	m.mu.Unlock()
 
 	go systray.Run(func() {
 		m.run(ctx, onQuit, onShow)
@@ -83,12 +89,21 @@ func (m *Manager) run(ctx context.Context, onQuit func(), onShow func()) {
 
 // Stop tears down the system tray if it is running.
 func (m *Manager) Stop() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	if !m.running.Load() {
 		return
 	}
 	if m.stopCh != nil {
-		close(m.stopCh)
+		select {
+		case <-m.stopCh:
+		default:
+			close(m.stopCh)
+		}
+		m.stopCh = nil
 	}
+	m.running.Store(false)
 }
 
 // IsRunning returns true if the tray has been started.
