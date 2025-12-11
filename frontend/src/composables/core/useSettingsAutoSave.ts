@@ -184,6 +184,15 @@ export function useSettingsAutoSave(settings: Ref<SettingsData>) {
       if (settings.value.show_hidden_articles !== undefined) {
         store.fetchArticles();
       }
+
+      // Notify about show_article_preview_images change
+      window.dispatchEvent(
+        new CustomEvent('show-preview-images-changed', {
+          detail: {
+            value: settings.value.show_article_preview_images,
+          },
+        })
+      );
     } catch (e) {
       console.error('Error auto-saving settings:', e);
     }

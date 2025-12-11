@@ -5,6 +5,7 @@ import { PhEyeSlash, PhStar, PhClockCountdown } from '@phosphor-icons/vue';
 import type { Article } from '@/types/models';
 import { formatDate as formatDateUtil } from '@/utils/date';
 import { getProxiedMediaUrl, isMediaCacheEnabled } from '@/utils/mediaProxy';
+import { useShowPreviewImages } from '@/composables/ui/useShowPreviewImages';
 
 interface Props {
   article: Article;
@@ -20,9 +21,9 @@ const emit = defineEmits<{
 }>();
 
 const { t, locale } = useI18n();
+const { showPreviewImages } = useShowPreviewImages();
 
 const mediaCacheEnabled = ref(false);
-const showPreviewImages = ref(true);
 
 const imageUrl = computed(() => {
   if (!props.article.image_url) return '';
@@ -45,19 +46,8 @@ function handleImageError(event: Event) {
   target.style.display = 'none';
 }
 
-async function loadSettings() {
-  try {
-    const res = await fetch('/api/settings');
-    const data = await res.json();
-    showPreviewImages.value = data.show_article_preview_images === 'true';
-  } catch (e) {
-    console.error('Error loading settings:', e);
-  }
-}
-
 onMounted(async () => {
   mediaCacheEnabled.value = await isMediaCacheEnabled();
-  await loadSettings();
 });
 </script>
 

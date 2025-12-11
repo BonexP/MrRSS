@@ -15,6 +15,7 @@ import ArticleItem from './ArticleItem.vue';
 import { useArticleTranslation } from '@/composables/article/useArticleTranslation';
 import { useArticleFilter } from '@/composables/article/useArticleFilter';
 import { useArticleActions } from '@/composables/article/useArticleActions';
+import { useShowPreviewImages } from '@/composables/ui/useShowPreviewImages';
 import type { Article } from '@/types/models';
 
 const store = useAppStore();
@@ -65,9 +66,13 @@ const filteredArticles = computed(() => {
   return activeFilters.value.length > 0 ? filteredArticlesFromServer.value : store.articles;
 });
 
+// Initialize show preview images setting
+const { initialize: initializeShowPreviewImages } = useShowPreviewImages();
+
 // Load settings and setup
 onMounted(async () => {
   await loadTranslationSettings();
+  await initializeShowPreviewImages();
 
   try {
     const res = await fetch('/api/settings');
@@ -89,6 +94,11 @@ onMounted(async () => {
   );
   // Listen for default view mode changes
   window.addEventListener('default-view-mode-changed', onDefaultViewModeChanged as EventListener);
+  // Listen for show preview images changes
+  window.addEventListener(
+    'show-preview-images-changed',
+    onShowPreviewImagesChanged as EventListener
+  );
   // Listen for refresh articles events
   window.addEventListener('refresh-articles', onRefreshArticles);
   // Listen for toggle filter events (from keyboard shortcut)
@@ -131,6 +141,10 @@ onBeforeUnmount(() => {
     'default-view-mode-changed',
     onDefaultViewModeChanged as EventListener
   );
+  window.removeEventListener(
+    'show-preview-images-changed',
+    onShowPreviewImagesChanged as EventListener
+  );
   window.removeEventListener('refresh-articles', onRefreshArticles);
   window.removeEventListener('toggle-filter', onToggleFilter);
 });
@@ -160,6 +174,12 @@ function onTranslationSettingsChanged(e: Event): void {
       setupIntersectionObserver(listRef.value, store.articles);
     }
   }
+}
+
+function onShowPreviewImagesChanged(e: Event): void {
+  const customEvent = e as CustomEvent<{ value: boolean }>;
+  const { updateValue } = useShowPreviewImages();
+  updateValue(customEvent.detail.value);
 }
 
 function onRefreshArticles(): void {
