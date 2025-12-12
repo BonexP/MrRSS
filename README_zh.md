@@ -69,14 +69,20 @@
 - [Node.js](https://nodejs.org/) (LTS 版本，带 npm)
 - [Wails](https://wails.io/docs/gettingstarted/installation) CLI
 
-**仅限 Linux:** 还需要安装系统依赖：
+**平台特定要求：**
+
+- **Linux**: 需要系统依赖（GTK、WebKit、AppIndicator）
+- **Windows**: 需要 MinGW（用于 CGO/systray 支持）
+- **macOS**: 需要 Xcode 命令行工具
+
+详细安装说明请参见[构建要求](docs/BUILD_REQUIREMENTS.md)
 
 ```bash
-# Ubuntu/Debian
-sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev gcc pkg-config
+# Linux 快速设置（Ubuntu/Debian）：
+sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev gcc pkg-config
 
-# 对于旧版 Ubuntu（24.04 之前），请使用：
-# sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev gcc pkg-config
+# 对于旧版 Ubuntu（24.04 之前）：
+# sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev gcc pkg-config
 ```
 
 ##### 安装步骤

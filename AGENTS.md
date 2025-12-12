@@ -1,6 +1,6 @@
 # AI Agent Guidelines for MrRSS
 
-> **Quick Links**: [Architecture](docs/ARCHITECTURE.md) | [Code Patterns](docs/CODE_PATTERNS.md) | [Testing](docs/TESTING.md) | [Custom Scripts](docs/CUSTOM_SCRIPTS.md) | [Version Management](docs/VERSION_MANAGEMENT.md)
+> **Quick Links**: [Architecture](docs/ARCHITECTURE.md) | [Code Patterns](docs/CODE_PATTERNS.md) | [Testing](docs/TESTING.md) | [Build Requirements](docs/BUILD_REQUIREMENTS.md) | [Custom Scripts](docs/CUSTOM_SCRIPTS.md) | [Version Management](docs/VERSION_MANAGEMENT.md)
 
 ## Project Overview
 

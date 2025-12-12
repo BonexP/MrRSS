@@ -69,14 +69,20 @@ Before you begin, ensure you have the following installed:
 - [Node.js](https://nodejs.org/) (LTS version with npm)
 - [Wails](https://wails.io/docs/gettingstarted/installation) CLI
 
-**Linux only:** You also need to install system dependencies:
+**Platform-specific requirements:**
+
+- **Linux**: System dependencies required (GTK, WebKit, AppIndicator)
+- **Windows**: MinGW required (for CGO/systray support)
+- **macOS**: Xcode Command Line Tools
+
+For detailed installation instructions, see [Build Requirements](docs/BUILD_REQUIREMENTS.md)
 
 ```bash
-# Ubuntu/Debian
-sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev gcc pkg-config
+# Quick setup for Linux (Ubuntu/Debian):
+sudo apt-get install libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev gcc pkg-config
 
-# For older Ubuntu versions (before 24.04), use:
-# sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev gcc pkg-config
+# For older Ubuntu versions (before 24.04):
+# sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev gcc pkg-config
 ```
 
 ### Installation

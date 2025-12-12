@@ -222,6 +222,7 @@ jobs:
           sudo apt-get install -y \
             libgtk-3-dev \
             libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
             gcc \
             pkg-config \
             wget \
@@ -242,6 +243,7 @@ jobs:
           sudo apt-get install -y \
             libgtk-3-dev \
             libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
             gcc \
             pkg-config \
             wget \
@@ -264,8 +266,8 @@ jobs:
       - name: Install Windows dependencies (ARM64)
         if: steps.check_artifacts.outputs.skip_build == 'false' && matrix.platform == 'windows' && matrix.arch == 'arm64'
         run: |
-          choco install nsis -y
-          # Note: ARM64 Windows runner may already have necessary build tools
+          choco install mingw nsis -y
+          # MinGW is required for systray (CGO)
         shell: pwsh
 
       - name: Install Wails
@@ -284,6 +286,8 @@ jobs:
 
       - name: Build application (Linux)
         if: steps.check_artifacts.outputs.skip_build == 'false' && matrix.platform == 'linux'
+        env:
+          CGO_ENABLED: 1
         run: |
           wails build -clean -ldflags "-s -w" -platform ${{ matrix.platform }}/${{ matrix.arch }}
 
@@ -300,6 +304,8 @@ jobs:
       - name: Build application (Windows)
         if: steps.check_artifacts.outputs.skip_build == 'false' && matrix.platform == 'windows'
         shell: pwsh
+        env:
+          CGO_ENABLED: 1
         run: |
           wails build -clean -ldflags "-s -w" -platform ${{ matrix.platform }}/${{ matrix.arch }}
 
@@ -313,6 +319,8 @@ jobs:
 
       - name: Build application (macOS)
         if: steps.check_artifacts.outputs.skip_build == 'false' && matrix.platform == 'darwin'
+        env:
+          CGO_ENABLED: 1
         run: |
           # macOS runners can build universal binaries natively
           # Universal binaries include both Intel (amd64) and Apple Silicon (arm64)
