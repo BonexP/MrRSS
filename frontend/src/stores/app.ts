@@ -24,22 +24,22 @@ export interface AppState {
 }
 
 export interface AppActions {
-  setFilter: (filter: Filter) => void;
-  setFeed: (feedId: number) => void;
-  setCategory: (category: string) => void;
-  fetchArticles: (append?: boolean) => Promise<void>;
+  setFilter: (Filter) => void;
+  setFeed: (number) => void;
+  setCategory: (string) => void;
+  fetchArticles: (boolean?) => Promise<void>;
   loadMore: () => Promise<void>;
   fetchFeeds: () => Promise<void>;
   fetchUnreadCounts: () => Promise<void>;
-  markAllAsRead: (feedId?: number) => Promise<void>;
+  markAllAsRead: (number?) => Promise<void>;
   toggleTheme: () => void;
-  setTheme: (preference: ThemePreference) => void;
+  setTheme: (ThemePreference) => void;
   applyTheme: () => void;
   initTheme: () => void;
   refreshFeeds: () => Promise<void>;
   pollProgress: () => void;
   checkForAppUpdates: () => Promise<void>;
-  startAutoRefresh: (minutes: number) => void;
+  startAutoRefresh: (number) => void;
 }
 
 export const useAppStore = defineStore('app', () => {
@@ -123,8 +123,8 @@ export const useAppStore = defineStore('app', () => {
       } else {
         articles.value = data;
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // Error handled silently
     } finally {
       isLoading.value = false;
     }
@@ -144,8 +144,7 @@ export const useAppStore = defineStore('app', () => {
       feeds.value = data;
       // Fetch unread counts after fetching feeds
       await fetchUnreadCounts();
-    } catch (e) {
-      console.error(e);
+    } catch {
       feeds.value = [];
     }
   }
@@ -158,8 +157,7 @@ export const useAppStore = defineStore('app', () => {
         total: data.total || 0,
         feedCounts: data.feed_counts || {},
       };
-    } catch (e) {
-      console.error(e);
+    } catch {
       unreadCounts.value = { total: 0, feedCounts: {} };
     }
   }
@@ -173,8 +171,8 @@ export const useAppStore = defineStore('app', () => {
       // Refresh articles and unread counts
       await fetchArticles();
       await fetchUnreadCounts();
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // Error handled silently
     }
   }
 
@@ -234,8 +232,7 @@ export const useAppStore = defineStore('app', () => {
     try {
       await fetch('/api/refresh', { method: 'POST' });
       pollProgress();
-    } catch (e) {
-      console.error(e);
+    } catch {
       refreshProgress.value.isRunning = false;
     }
   }
@@ -267,7 +264,7 @@ export const useAppStore = defineStore('app', () => {
           // Check for app updates after initial refresh completes
           checkForAppUpdates();
         }
-      } catch (e) {
+      } catch {
         clearInterval(interval);
         refreshProgress.value.isRunning = false;
       }
@@ -291,8 +288,8 @@ export const useAppStore = defineStore('app', () => {
           autoDownloadAndInstall(data.download_url, data.asset_name);
         }
       }
-    } catch (e) {
-      console.error('Auto-update check failed:', e);
+    } catch {
+      console.error('Auto-update check failed');
       // Silently fail - don't disrupt user experience
     }
   }
@@ -341,8 +338,8 @@ export const useAppStore = defineStore('app', () => {
       if (installData.success && window.showToast) {
         window.showToast('Update installed. Restart to apply.', 'success');
       }
-    } catch (e) {
-      console.error('Auto-update failed:', e);
+    } catch {
+      console.error('Auto-update failed');
       // Silently fail - don't disrupt user experience
     }
   }

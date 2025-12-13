@@ -218,7 +218,7 @@ jobs:
         if: steps.check_artifacts.outputs.skip_build == 'false'
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.24'
 
       - name: Set up Node.js
         if: steps.check_artifacts.outputs.skip_build == 'false'
@@ -289,15 +289,6 @@ jobs:
         if: steps.check_artifacts.outputs.skip_build == 'false'
         working-directory: ./frontend
         run: npm ci
-
-      - name: Strip tray dependencies for macOS build
-        if: steps.check_artifacts.outputs.skip_build == 'false' && matrix.platform == 'darwin'
-        run: |
-          # Remove systray-specific sources (manager_stub.go provides no-op implementation for non-Windows/Linux platforms)
-          rm -f internal/tray/manager_systray.go
-
-          go mod edit -droprequire github.com/getlantern/systray
-          go mod tidy
 
       - name: Build frontend (required for embed)
         if: steps.check_artifacts.outputs.skip_build == 'false'

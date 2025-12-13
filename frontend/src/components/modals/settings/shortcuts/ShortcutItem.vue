@@ -54,7 +54,7 @@ function formatKey(key: string): string {
       <component :is="item.icon" :size="20" class="text-text-secondary shrink-0" />
       <span class="text-sm font-medium text-text-primary truncate">{{ item.label }}</span>
     </div>
-    <button @click="emit('edit')" :class="['shortcut-key', isEditing ? 'recording' : '']">
+    <button :class="['shortcut-key', isEditing ? 'recording' : '']" @click="emit('edit')">
       <span v-if="isEditing" class="text-accent animate-pulse text-xs sm:text-sm">
         {{ t('pressKey') }}
       </span>
@@ -64,6 +64,8 @@ function formatKey(key: string): string {
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .shortcut-row {
   @apply flex items-center justify-between gap-3 p-2 rounded-lg bg-bg-secondary border border-border;
 }

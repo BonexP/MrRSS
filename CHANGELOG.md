@@ -5,6 +5,16 @@ All notable changes to MrRSS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Updated all dependencies to latest versions for security and performance improvements.
+
+### Fixed
+
+- Fixed the issue where MacOS can not complile correctly for system tray support.
+
 ## [1.2.15] - 2025-12-13
 
 ### Changed

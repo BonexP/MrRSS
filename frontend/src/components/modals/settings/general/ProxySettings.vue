@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { PhShield, PhGlobe, PhPlug, PhLock, PhUser, PhKey } from '@phosphor-icons/vue';
 import type { SettingsData } from '@/types/settings';
@@ -9,7 +10,23 @@ interface Props {
   settings: SettingsData;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:settings': [settings: SettingsData];
+}>();
+
+// Create local reactive copy
+const localSettings = ref<SettingsData>({ ...props.settings });
+
+// Watch for changes and emit updates
+watch(
+  localSettings,
+  (newSettings) => {
+    emit('update:settings', { ...newSettings });
+  },
+  { deep: true }
+);
 </script>
 
 <template>
@@ -34,7 +51,12 @@ defineProps<Props>();
           </div>
         </div>
       </div>
-      <input type="checkbox" v-model="settings.proxy_enabled" class="toggle" />
+      <input
+        :checked="localSettings.proxy_enabled"
+        type="checkbox"
+        class="toggle"
+        @change="(e) => (localSettings.proxy_enabled = (e.target as HTMLInputElement).checked)"
+      />
     </div>
 
     <!-- Proxy Settings (shown when proxy is enabled) -->
@@ -55,7 +77,10 @@ defineProps<Props>();
             </div>
           </div>
         </div>
-        <select v-model="settings.proxy_type" class="input-field w-28 sm:w-32 text-xs sm:text-sm">
+        <select
+          v-model="localSettings.proxy_type"
+          class="input-field w-28 sm:w-32 text-xs sm:text-sm"
+        >
           <option value="http">{{ t('httpProxy') }}</option>
           <option value="https">{{ t('httpsProxy') }}</option>
           <option value="socks5">{{ t('socks5Proxy') }}</option>
@@ -76,12 +101,14 @@ defineProps<Props>();
           </div>
         </div>
         <input
+          v-model="localSettings.proxy_host"
           type="text"
-          v-model="settings.proxy_host"
           :placeholder="t('proxyHostPlaceholder')"
           :class="[
             'input-field w-36 sm:w-48 text-xs sm:text-sm',
-            settings.proxy_enabled && !settings.proxy_host?.trim() ? 'border-red-500' : '',
+            localSettings.proxy_enabled && !localSettings.proxy_host?.trim()
+              ? 'border-red-500'
+              : '',
           ]"
         />
       </div>
@@ -100,12 +127,14 @@ defineProps<Props>();
           </div>
         </div>
         <input
+          v-model="localSettings.proxy_port"
           type="text"
-          v-model="settings.proxy_port"
           :placeholder="t('proxyPortPlaceholder')"
           :class="[
             'input-field w-20 sm:w-24 text-center text-xs sm:text-sm',
-            settings.proxy_enabled && !settings.proxy_port?.trim() ? 'border-red-500' : '',
+            localSettings.proxy_enabled && !localSettings.proxy_port?.trim()
+              ? 'border-red-500'
+              : '',
           ]"
         />
       </div>
@@ -124,8 +153,8 @@ defineProps<Props>();
           </div>
         </div>
         <input
+          v-model="localSettings.proxy_username"
           type="text"
-          v-model="settings.proxy_username"
           :placeholder="t('proxyUsernamePlaceholder')"
           class="input-field w-28 sm:w-36 text-xs sm:text-sm"
         />
@@ -145,8 +174,8 @@ defineProps<Props>();
           </div>
         </div>
         <input
+          v-model="localSettings.proxy_password"
           type="password"
-          v-model="settings.proxy_password"
           :placeholder="t('proxyPasswordPlaceholder')"
           class="input-field w-28 sm:w-36 text-xs sm:text-sm"
         />
@@ -156,6 +185,8 @@ defineProps<Props>();
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .input-field {
   @apply p-1.5 sm:p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary focus:border-accent focus:outline-none transition-colors;
 }

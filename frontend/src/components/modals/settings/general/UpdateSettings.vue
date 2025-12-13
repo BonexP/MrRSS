@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
   PhArchiveTray,
@@ -17,6 +18,22 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:settings': [settings: SettingsData];
+}>();
+
+// Create local reactive copy
+const localSettings = ref<SettingsData>({ ...props.settings });
+
+// Watch for changes and emit updates
+watch(
+  localSettings,
+  (newSettings) => {
+    emit('update:settings', { ...newSettings });
+  },
+  { deep: true }
+);
 
 // Format last update time using shared utility
 function formatLastUpdate(timestamp: string): string {
@@ -51,7 +68,10 @@ function formatLastUpdate(timestamp: string): string {
           </div>
         </div>
       </div>
-      <select v-model="settings.refresh_mode" class="input-field w-32 sm:w-40 text-xs sm:text-sm">
+      <select
+        v-model="localSettings.refresh_mode"
+        class="input-field w-32 sm:w-40 text-xs sm:text-sm"
+      >
         <option value="fixed">{{ t('fixedInterval') }}</option>
         <option value="intelligent">{{ t('intelligentInterval') }}</option>
       </select>
@@ -75,8 +95,8 @@ function formatLastUpdate(timestamp: string): string {
           </div>
         </div>
         <input
+          v-model="localSettings.update_interval"
           type="number"
-          v-model="settings.update_interval"
           min="1"
           class="input-field w-16 sm:w-20 text-center text-xs sm:text-sm"
         />
@@ -95,7 +115,7 @@ function formatLastUpdate(timestamp: string): string {
           </div>
         </div>
       </div>
-      <input type="checkbox" v-model="settings.startup_on_boot" class="toggle" />
+      <input v-model="localSettings.startup_on_boot" type="checkbox" class="toggle" />
     </div>
 
     <div class="setting-item mt-2 sm:mt-3">
@@ -110,12 +130,14 @@ function formatLastUpdate(timestamp: string): string {
           </div>
         </div>
       </div>
-      <input type="checkbox" v-model="settings.close_to_tray" class="toggle" />
+      <input v-model="localSettings.close_to_tray" type="checkbox" class="toggle" />
     </div>
   </div>
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .input-field {
   @apply p-1.5 sm:p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary focus:border-accent focus:outline-none transition-colors;
 }

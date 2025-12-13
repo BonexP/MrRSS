@@ -94,8 +94,8 @@ function formatActions(rule: Rule): string {
         <input
           type="checkbox"
           :checked="rule.enabled"
-          @change="emit('toggle-enabled')"
           class="toggle mt-1"
+          @change="emit('toggle-enabled')"
         />
         <div class="flex-1 min-w-0">
           <div
@@ -121,18 +121,18 @@ function formatActions(rule: Rule): string {
       <!-- Action buttons -->
       <div class="flex items-center gap-1 sm:gap-2 shrink-0">
         <button
-          @click="emit('apply')"
           class="action-btn"
           :disabled="isApplying"
           :title="t('applyRuleNow')"
+          @click="emit('apply')"
         >
           <PhPlay v-if="!isApplying" :size="18" class="sm:w-5 sm:h-5" />
           <span v-else class="animate-spin text-sm">⟳</span>
         </button>
-        <button @click="emit('edit')" class="action-btn" :title="t('editRule')">
+        <button class="action-btn" :title="t('editRule')" @click="emit('edit')">
           <PhPencil :size="18" class="sm:w-5 sm:h-5" />
         </button>
-        <button @click="emit('delete')" class="action-btn danger" :title="t('deleteRule')">
+        <button class="action-btn danger" :title="t('deleteRule')" @click="emit('delete')">
           <PhTrash :size="18" class="sm:w-5 sm:h-5" />
         </button>
       </div>
@@ -141,6 +141,8 @@ function formatActions(rule: Rule): string {
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .rule-item {
   @apply p-2 sm:p-3 rounded-lg bg-bg-secondary border border-border;
 }

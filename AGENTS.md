@@ -33,6 +33,9 @@ MrRSS/
 ├── main.go                      # Application entry point
 ├── wails.json                   # Wails configuration
 ├── internal/                    # Backend Go code
+│   ├── cache/                   # Media cache management
+│   ├── config/                  # Configuration management
+│   ├── crypto/                  # Encryption utilities
 │   ├── database/                # SQLite operations
 │   ├── discovery/               # Feed discovery system
 │   ├── feed/                    # RSS/Atom parsing, script execution
@@ -41,15 +44,21 @@ MrRSS/
 │   │   ├── article/             # Article operations
 │   │   ├── feed/                # Feed management
 │   │   ├── discovery/           # Discovery endpoints
+│   │   ├── media/               # Media handling
+│   │   ├── opml/                # OPML import/export
+│   │   ├── rules/               # Filtering rules
 │   │   ├── script/              # Custom script execution
+│   │   ├── settings/            # Settings management
 │   │   ├── summary/             # Article summarization
 │   │   ├── translation/         # Translation services
-│   │   └── ...
+│   │   ├── update/              # Application updates
+│   │   └── window/              # Window management
 │   ├── models/                  # Core data structures
 │   ├── opml/                    # OPML import/export
 │   ├── rules/                   # Filtering rules engine
 │   ├── summary/                 # TF-IDF + TextRank algorithms
 │   ├── translation/             # Google Translate + DeepL + Baidu Translation + AI-based translation
+│   ├── tray/                    # System tray integration
 │   ├── utils/                   # Platform utilities
 │   └── version/                 # Version constant
 ├── frontend/src/

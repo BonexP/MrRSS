@@ -46,8 +46,8 @@ interface Rule {
 }
 
 interface Props {
-  show: boolean;
-  rule: Rule | null;
+  show?: boolean;
+  rule?: Rule | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -150,8 +150,8 @@ function handleClose(): void {
   <div
     v-if="show"
     class="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4"
-    @click.self="handleClose"
     data-modal-open="true"
+    @click.self="handleClose"
   >
     <div
       class="bg-bg-primary w-full max-w-2xl h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl shadow-2xl border-0 sm:border border-border overflow-hidden animate-fade-in"
@@ -163,8 +163,8 @@ function handleClose(): void {
           {{ rule ? t('editRule') : t('addRule') }}
         </h3>
         <span
-          @click="handleClose"
           class="text-2xl cursor-pointer text-text-secondary hover:text-text-primary"
+          @click="handleClose"
           >&times;</span
         >
       </div>
@@ -175,8 +175,8 @@ function handleClose(): void {
         <div class="space-y-2">
           <label class="block text-sm font-medium">{{ t('ruleName') }}</label>
           <input
-            type="text"
             v-model="ruleName"
+            type="text"
             :placeholder="t('ruleNamePlaceholder')"
             class="input-field w-full"
           />
@@ -232,8 +232,8 @@ function handleClose(): void {
 
           <!-- Add condition button -->
           <button
-            @click="addCondition"
             class="btn-secondary w-full flex items-center justify-center gap-2"
+            @click="addCondition"
           >
             <PhPlus :size="16" />
             {{ t('addCondition') }}
@@ -273,9 +273,9 @@ function handleClose(): void {
 
           <!-- Add action button -->
           <button
-            @click="addAction"
             class="btn-secondary w-full flex items-center justify-center gap-2"
             :disabled="actions.length >= actionOptions.length"
+            @click="addAction"
           >
             <PhPlus :size="16" />
             {{ t('addAction') }}
@@ -287,10 +287,10 @@ function handleClose(): void {
       <div
         class="p-4 sm:p-5 border-t border-border bg-bg-secondary flex justify-end gap-3 shrink-0"
       >
-        <button @click="handleClose" class="btn-secondary">
+        <button class="btn-secondary" @click="handleClose">
           {{ t('cancel') }}
         </button>
-        <button @click="handleSave" class="btn-primary" :disabled="!isValid">
+        <button class="btn-primary" :disabled="!isValid" @click="handleSave">
           {{ t('saveChanges') }}
         </button>
       </div>
@@ -299,6 +299,8 @@ function handleClose(): void {
 </template>
 
 <style scoped>
+@reference "../../../style.css";
+
 .input-field {
   @apply p-2 border border-border rounded-md bg-bg-primary text-text-primary text-sm focus:border-accent focus:outline-none transition-colors;
 }

@@ -1,0 +1,144 @@
+import js from '@eslint/js';
+import vue from 'eslint-plugin-vue';
+import typescript from '@typescript-eslint/eslint-plugin';
+import typescriptParser from '@typescript-eslint/parser';
+import prettierConfig from '@vue/eslint-config-prettier';
+
+export default [
+  js.configs.recommended,
+  ...vue.configs['flat/recommended'],
+  prettierConfig,
+  {
+    files: ['**/*.vue'],
+    languageOptions: {
+      parser: vue.parser,
+      parserOptions: {
+        parser: typescriptParser,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        extraFileExtensions: ['.vue'],
+      },
+      globals: {
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        fetch: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        CustomEvent: 'readonly',
+        Event: 'readonly',
+        MouseEvent: 'readonly',
+        KeyboardEvent: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLAnchorElement: 'readonly',
+        HTMLImageElement: 'readonly',
+        HTMLDivElement: 'readonly',
+        HTMLSelectElement: 'readonly',
+        HTMLAudioElement: 'readonly',
+        HTMLIFrameElement: 'readonly',
+        Node: 'readonly',
+        Text: 'readonly',
+        NodeFilter: 'readonly',
+        FileReader: 'readonly',
+        ProgressEvent: 'readonly',
+        IntersectionObserver: 'readonly',
+        Element: 'readonly',
+        EventListener: 'readonly',
+        WheelEvent: 'readonly',
+        localStorage: 'readonly',
+        File: 'readonly',
+        // Node.js globals (for config files)
+        process: 'readonly',
+        global: 'readonly',
+        NodeJS: 'readonly',
+        // Custom globals
+        ga: 'readonly', // Google Analytics
+        Capacitor: 'readonly',
+        chrome: 'readonly',
+        cordova: 'readonly',
+      },
+    },
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        fetch: 'readonly',
+        console: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        CustomEvent: 'readonly',
+        Event: 'readonly',
+        MouseEvent: 'readonly',
+        KeyboardEvent: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLAnchorElement: 'readonly',
+        HTMLImageElement: 'readonly',
+        Node: 'readonly',
+        Text: 'readonly',
+        NodeFilter: 'readonly',
+        FileReader: 'readonly',
+        ProgressEvent: 'readonly',
+        IntersectionObserver: 'readonly',
+        Element: 'readonly',
+        localStorage: 'readonly',
+        File: 'readonly',
+        // Node.js globals (for config files)
+        process: 'readonly',
+        global: 'readonly',
+        NodeJS: 'readonly',
+        // Custom globals
+        ga: 'readonly', // Google Analytics
+        Capacitor: 'readonly',
+        chrome: 'readonly',
+        cordova: 'readonly',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': typescript,
+    },
+    rules: {
+      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
+  {
+    ignores: [
+      'node_modules/',
+      'dist/',
+      'build/',
+      '.vite/',
+      '*.min.js',
+      '*.config.js',
+      '*.config.ts',
+      'wailsjs/',
+      'src/wailsjs/',
+    ],
+  },
+];

@@ -18,7 +18,11 @@ interface Props {
   settings: SettingsData;
 }
 
-const { settings } = defineProps<Props>();
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:settings': [settings: SettingsData];
+}>();
 
 const mediaCacheSize = ref<number>(0);
 const isCleaningCache = ref(false);
@@ -61,7 +65,7 @@ async function cleanMediaCache() {
 
 onMounted(() => {
   // Only fetch cache size if media cache is enabled
-  if (settings.media_cache_enabled) {
+  if (props.settings.media_cache_enabled) {
     fetchMediaCacheSize();
   }
 });
@@ -85,7 +89,18 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <input type="checkbox" v-model="settings.auto_cleanup_enabled" class="toggle" />
+      <input
+        :checked="props.settings.auto_cleanup_enabled"
+        type="checkbox"
+        class="toggle"
+        @change="
+          (e) =>
+            emit('update:settings', {
+              ...props.settings,
+              auto_cleanup_enabled: (e.target as HTMLInputElement).checked,
+            })
+        "
+      />
     </div>
 
     <div
@@ -104,11 +119,18 @@ onMounted(() => {
         </div>
         <div class="flex items-center gap-1 sm:gap-2 shrink-0">
           <input
+            :value="props.settings.max_cache_size_mb"
             type="number"
-            v-model="settings.max_cache_size_mb"
             min="1"
             max="1000"
             class="input-field w-14 sm:w-20 text-center text-xs sm:text-sm"
+            @input="
+              (e) =>
+                emit('update:settings', {
+                  ...props.settings,
+                  max_cache_size_mb: parseInt((e.target as HTMLInputElement).value) || 100,
+                })
+            "
           />
           <span class="text-xs sm:text-sm text-text-secondary">MB</span>
         </div>
@@ -126,11 +148,18 @@ onMounted(() => {
         </div>
         <div class="flex items-center gap-1 sm:gap-2 shrink-0">
           <input
+            :value="props.settings.max_article_age_days"
             type="number"
-            v-model="settings.max_article_age_days"
             min="1"
             max="365"
             class="input-field w-14 sm:w-20 text-center text-xs sm:text-sm"
+            @input="
+              (e) =>
+                emit('update:settings', {
+                  ...props.settings,
+                  max_article_age_days: parseInt((e.target as HTMLInputElement).value) || 30,
+                })
+            "
           />
           <span class="text-xs sm:text-sm text-text-secondary">{{ t('days') }}</span>
         </div>
@@ -149,7 +178,18 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <input type="checkbox" v-model="settings.show_hidden_articles" class="toggle" />
+      <input
+        :checked="props.settings.show_hidden_articles"
+        type="checkbox"
+        class="toggle"
+        @change="
+          (e) =>
+            emit('update:settings', {
+              ...props.settings,
+              show_hidden_articles: (e.target as HTMLInputElement).checked,
+            })
+        "
+      />
     </div>
 
     <div class="setting-item">
@@ -164,11 +204,22 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <input type="checkbox" v-model="settings.media_cache_enabled" class="toggle" />
+      <input
+        :checked="props.settings.media_cache_enabled"
+        type="checkbox"
+        class="toggle"
+        @change="
+          (e) =>
+            emit('update:settings', {
+              ...props.settings,
+              media_cache_enabled: (e.target as HTMLInputElement).checked,
+            })
+        "
+      />
     </div>
 
     <div
-      v-if="settings.media_cache_enabled"
+      v-if="props.settings.media_cache_enabled"
       class="ml-2 sm:ml-4 mt-2 sm:mt-3 space-y-2 sm:space-y-3 border-l-2 border-border pl-2 sm:pl-4"
     >
       <div class="sub-setting-item">
@@ -183,11 +234,18 @@ onMounted(() => {
         </div>
         <div class="flex items-center gap-1 sm:gap-2 shrink-0">
           <input
+            :value="props.settings.media_cache_max_size_mb"
             type="number"
-            v-model="settings.media_cache_max_size_mb"
             min="10"
             max="1000"
             class="input-field w-14 sm:w-20 text-center text-xs sm:text-sm"
+            @input="
+              (e) =>
+                emit('update:settings', {
+                  ...props.settings,
+                  media_cache_max_size_mb: parseInt((e.target as HTMLInputElement).value) || 100,
+                })
+            "
           />
           <span class="text-xs sm:text-sm text-text-secondary">MB</span>
         </div>
@@ -205,11 +263,18 @@ onMounted(() => {
         </div>
         <div class="flex items-center gap-1 sm:gap-2 shrink-0">
           <input
+            :value="props.settings.media_cache_max_age_days"
             type="number"
-            v-model="settings.media_cache_max_age_days"
             min="1"
             max="90"
             class="input-field w-14 sm:w-20 text-center text-xs sm:text-sm"
+            @input="
+              (e) =>
+                emit('update:settings', {
+                  ...props.settings,
+                  media_cache_max_age_days: parseInt((e.target as HTMLInputElement).value) || 7,
+                })
+            "
           />
           <span class="text-xs sm:text-sm text-text-secondary">{{ t('days') }}</span>
         </div>
@@ -229,9 +294,9 @@ onMounted(() => {
           </div>
         </div>
         <button
-          @click="cleanMediaCache"
           :disabled="isCleaningCache"
           class="btn-secondary text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5"
+          @click="cleanMediaCache"
         >
           {{ isCleaningCache ? t('cleaning') : t('cleanupMediaCache') }}
         </button>
@@ -241,6 +306,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .input-field {
   @apply p-1.5 sm:p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary focus:border-accent focus:outline-none transition-colors;
 }

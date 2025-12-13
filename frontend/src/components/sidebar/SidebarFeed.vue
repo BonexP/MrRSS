@@ -29,9 +29,9 @@ function getFavicon(url: string): string {
 
 <template>
   <div
+    :class="['feed-item', isActive ? 'active' : '']"
     @click="emit('click')"
     @contextmenu="(e) => emit('contextmenu', e)"
-    :class="['feed-item', isActive ? 'active' : '']"
   >
     <div class="w-4 h-4 flex items-center justify-center shrink-0">
       <img
@@ -58,6 +58,8 @@ function getFavicon(url: string): string {
 </template>
 
 <style scoped>
+@reference "../../style.css";
+
 .feed-item {
   @apply px-2 sm:px-3 py-1.5 sm:py-2 cursor-pointer rounded-md text-xs sm:text-sm text-text-primary flex items-center gap-1.5 sm:gap-2.5 hover:bg-bg-tertiary transition-colors;
 }

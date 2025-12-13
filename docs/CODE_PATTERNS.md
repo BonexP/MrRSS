@@ -1166,6 +1166,15 @@ func (h *Handler) HandleGetArticles(w http.ResponseWriter, r *http.Request) {
 - `POST /api/discovery/batch` - Batch discovery
 - `GET /api/discovery/progress` - Get discovery progress
 
+#### Media
+
+- `GET /api/media/proxy` - Proxy cached media content
+
+#### Window
+
+- `GET /api/window/state` - Get saved window state
+- `POST /api/window/state` - Save window state
+
 #### Summary
 
 - `POST /api/summary` - Generate article summary

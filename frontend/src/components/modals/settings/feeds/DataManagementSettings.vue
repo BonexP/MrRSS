@@ -51,31 +51,31 @@ function handleDiscoverAll() {
     </label>
     <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-2 sm:mb-3">
       <button
-        @click="clickFileInput"
         class="btn-secondary flex-1 justify-center text-sm sm:text-base"
+        @click="clickFileInput"
       >
         <PhUpload :size="18" class="sm:w-5 sm:h-5" /> {{ t('importOPML') }}
       </button>
-      <input type="file" ref="opmlInput" class="hidden" @change="handleImportOPML" />
+      <input ref="opmlInput" type="file" class="hidden" @change="handleImportOPML" />
       <button
-        @click="handleExportOPML"
         class="btn-secondary flex-1 justify-center text-sm sm:text-base"
+        @click="handleExportOPML"
       >
         <PhDownload :size="18" class="sm:w-5 sm:h-5" /> {{ t('exportOPML') }}
       </button>
     </div>
     <div class="flex mb-2 sm:mb-3">
       <button
-        @click="handleCleanupDatabase"
         class="btn-danger flex-1 justify-center text-sm sm:text-base"
+        @click="handleCleanupDatabase"
       >
         <PhBroom :size="18" class="sm:w-5 sm:h-5" /> {{ t('cleanDatabase') }}
       </button>
     </div>
     <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-2 sm:mb-3">
       <button
-        @click="handleDiscoverAll"
         class="btn-primary flex-1 justify-center text-sm sm:text-base"
+        @click="handleDiscoverAll"
       >
         <PhMagnifyingGlass :size="18" class="sm:w-5 sm:h-5" />
         {{ t('discoverAllFeeds') }}
@@ -88,6 +88,8 @@ function handleDiscoverAll() {
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .btn-primary {
   @apply bg-accent text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-semibold hover:bg-accent-hover transition-colors shadow-sm;
 }

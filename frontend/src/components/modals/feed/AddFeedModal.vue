@@ -216,8 +216,8 @@ async function openScriptsFolder() {
 <template>
   <div
     class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 sm:p-4"
-    @click.self="close"
     data-modal-open="true"
+    @click.self="close"
   >
     <div
       class="bg-bg-primary w-full max-w-md h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl shadow-2xl border border-border overflow-hidden animate-fade-in"
@@ -225,8 +225,8 @@ async function openScriptsFolder() {
       <div class="p-3 sm:p-5 border-b border-border flex justify-between items-center shrink-0">
         <h3 class="text-base sm:text-lg font-semibold m-0">{{ t('addNewFeed') }}</h3>
         <span
-          @click="close"
           class="text-2xl cursor-pointer text-text-secondary hover:text-text-primary"
+          @click="close"
           >&times;</span
         >
       </div>
@@ -258,8 +258,8 @@ async function openScriptsFolder() {
           <div class="mt-2">
             <button
               type="button"
-              @click="feedType = 'script'"
               class="text-xs sm:text-sm text-accent hover:underline"
+              @click="feedType = 'script'"
             >
               {{ t('useCustomScript') }}
             </button>
@@ -291,8 +291,8 @@ async function openScriptsFolder() {
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 gap-2">
             <button
               type="button"
-              @click="feedType = 'url'"
               class="text-xs sm:text-sm text-accent hover:underline"
+              @click="feedType = 'url'"
             >
               {{ t('useRssUrl') }}
             </button>
@@ -308,8 +308,8 @@ async function openScriptsFolder() {
               </a>
               <button
                 type="button"
-                @click="openScriptsFolder"
                 class="text-xs sm:text-sm text-accent hover:underline flex items-center gap-1"
+                @click="openScriptsFolder"
               >
                 <PhCode :size="14" />
                 {{ t('openScriptsFolder') }}
@@ -326,8 +326,8 @@ async function openScriptsFolder() {
           <select
             v-if="!showCustomCategory"
             v-model="categorySelection"
-            @change="handleCategoryChange"
             class="input-field w-full"
+            @change="handleCategoryChange"
           >
             <option value="">{{ t('uncategorized') }}</option>
             <option v-for="cat in existingCategories" :key="cat" :value="cat">{{ cat }}</option>
@@ -343,11 +343,11 @@ async function openScriptsFolder() {
             />
             <button
               type="button"
+              class="px-3 py-2 text-xs sm:text-sm text-text-secondary hover:text-text-primary border border-border rounded-md hover:bg-bg-tertiary transition-colors"
               @click="
                 showCustomCategory = false;
                 categorySelection = '';
               "
-              class="px-3 py-2 text-xs sm:text-sm text-text-secondary hover:text-text-primary border border-border rounded-md hover:bg-bg-tertiary transition-colors"
             >
               {{ t('cancel') }}
             </button>
@@ -358,8 +358,8 @@ async function openScriptsFolder() {
         <div class="mb-3 sm:mb-4">
           <button
             type="button"
-            @click="showAdvancedSettings = !showAdvancedSettings"
             class="flex items-center gap-1 text-xs sm:text-sm text-accent hover:text-accent-hover transition-colors"
+            @click="showAdvancedSettings = !showAdvancedSettings"
           >
             <PhCaretRight
               v-if="!showAdvancedSettings"
@@ -386,7 +386,7 @@ async function openScriptsFolder() {
                   {{ t('hideFromTimelineDesc') }}
                 </p>
               </div>
-              <input type="checkbox" v-model="hideFromTimeline" class="toggle" />
+              <input v-model="hideFromTimeline" type="checkbox" class="toggle" />
             </label>
           </div>
 
@@ -521,9 +521,9 @@ async function openScriptsFolder() {
       </div>
       <div class="p-3 sm:p-5 border-t border-border bg-bg-secondary text-right shrink-0">
         <button
-          @click="addFeed"
           :disabled="isSubmitting || !isFormValid"
           class="btn-primary text-sm sm:text-base"
+          @click="addFeed"
         >
           {{ isSubmitting ? t('adding') : t('addSubscription') }}
         </button>
@@ -533,6 +533,8 @@ async function openScriptsFolder() {
 </template>
 
 <style scoped>
+@reference "../../../style.css";
+
 .input-field {
   @apply w-full p-2 sm:p-2.5 border border-border rounded-md bg-bg-tertiary text-text-primary text-xs sm:text-sm focus:border-accent focus:outline-none transition-colors;
 }

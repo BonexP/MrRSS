@@ -21,9 +21,9 @@ export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 declare global {
   interface Window {
-    showConfirm: (options: ConfirmDialogOptions) => Promise<boolean>;
-    showInput: (options: InputDialogOptions) => Promise<string | null>;
-    showToast: (message: string, type?: ToastType, duration?: number) => void;
+    showConfirm: (ConfirmDialogOptions) => Promise<boolean>;
+    showInput: (InputDialogOptions) => Promise<string | null>;
+    showToast: (string, ToastType?, number?) => void;
   }
 }
 

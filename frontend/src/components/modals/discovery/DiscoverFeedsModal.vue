@@ -81,8 +81,8 @@ onUnmounted(() => {
   <div
     v-if="show"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 sm:p-4"
-    @click.self="close"
     data-modal-open="true"
+    @click.self="close"
   >
     <div
       class="bg-bg-primary w-full max-w-4xl h-full sm:h-auto sm:max-h-[90vh] rounded-none sm:rounded-2xl shadow-2xl border border-border flex flex-col"
@@ -98,8 +98,8 @@ onUnmounted(() => {
           </p>
         </div>
         <button
-          @click="close"
           class="p-1.5 sm:p-2 hover:bg-bg-tertiary rounded-lg transition-colors shrink-0 ml-2"
+          @click="close"
         >
           <PhX :size="20" class="sm:w-6 sm:h-6 text-text-secondary" />
         </button>
@@ -132,8 +132,8 @@ onUnmounted(() => {
               {{ t('foundFeeds', { count: discoveredFeeds.length }) }}
             </p>
             <button
-              @click="selectAll"
               class="text-xs sm:text-sm text-accent hover:text-accent-hover font-medium px-2 sm:px-3 py-1 rounded hover:bg-accent/10 transition-colors"
+              @click="selectAll"
             >
               {{ allSelected ? t('deselectAll') : t('selectAll') }}
             </button>
@@ -141,9 +141,9 @@ onUnmounted(() => {
 
           <div class="space-y-2 sm:space-y-3">
             <DiscoveredFeedItem
-              v-for="(feed, index) in discoveredFeeds"
+              v-for="(discoveredFeed, index) in discoveredFeeds"
               :key="index"
-              :feed="feed"
+              :feed="discoveredFeed"
               :is-selected="selectedFeeds.has(index)"
               @toggle="toggleFeedSelection(index)"
             />
@@ -163,16 +163,16 @@ onUnmounted(() => {
       <div
         class="flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-center gap-2 sm:gap-3 p-4 sm:p-6 border-t border-border bg-bg-secondary/50 shrink-0"
       >
-        <button @click="close" class="btn-secondary text-sm sm:text-base" :disabled="isSubscribing">
+        <button class="btn-secondary text-sm sm:text-base" :disabled="isSubscribing" @click="close">
           {{ t('cancel') }}
         </button>
         <button
-          @click="subscribeSelected"
           :disabled="!hasSelection || isSubscribing"
           :class="[
             'btn-primary flex items-center justify-center gap-2 text-sm sm:text-base',
             (!hasSelection || isSubscribing) && 'opacity-50 cursor-not-allowed',
           ]"
+          @click="subscribeSelected"
         >
           <div
             v-if="isSubscribing"
@@ -191,6 +191,8 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+@reference "../../../style.css";
+
 .btn-primary {
   @apply px-4 sm:px-6 py-2 sm:py-2.5 bg-accent text-white rounded-lg hover:bg-accent-hover transition-all font-medium shadow-sm hover:shadow-md;
 }

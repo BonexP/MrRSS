@@ -101,28 +101,6 @@ function getMultiSelectDisplayText(): string {
   return `${firstItem} ${t('andNMore', { count: remaining })}`;
 }
 
-function onFieldChange(): void {
-  const condition = { ...props.condition };
-  if (isDateField(condition.field)) {
-    condition.operator = null;
-    condition.value = '';
-    condition.values = [];
-  } else if (isMultiSelectField(condition.field)) {
-    condition.operator = 'contains';
-    condition.value = '';
-    condition.values = [];
-  } else if (isBooleanField(condition.field)) {
-    condition.operator = null;
-    condition.value = 'true';
-    condition.values = [];
-  } else {
-    condition.operator = 'contains';
-    condition.value = '';
-    condition.values = [];
-  }
-  emit('update', condition);
-}
-
 function updateValue(value: string): void {
   const condition = { ...props.condition, value };
   emit('update', condition);
@@ -139,9 +117,9 @@ function updateOperator(operator: string): void {
     <div class="flex items-start gap-2">
       <!-- Negate button -->
       <button
-        @click="emit('toggleNegate')"
         :class="['negate-btn', condition.negate ? 'active' : '']"
         :title="t('notCondition')"
+        @click="emit('toggleNegate')"
       >
         <PhProhibit :size="16" />
       </button>
@@ -149,13 +127,31 @@ function updateOperator(operator: string): void {
       <!-- Field selector -->
       <select
         :value="condition.field"
+        class="input-field"
         @change="
           (e) => {
-            condition.field = (e.target as HTMLSelectElement).value;
-            onFieldChange();
+            const newField = (e.target as HTMLSelectElement).value;
+            const newCondition = { ...condition, field: newField };
+            if (isDateField(newField)) {
+              newCondition.operator = null;
+              newCondition.value = '';
+              newCondition.values = [];
+            } else if (isMultiSelectField(newField)) {
+              newCondition.operator = 'contains';
+              newCondition.value = '';
+              newCondition.values = [];
+            } else if (isBooleanField(newField)) {
+              newCondition.operator = null;
+              newCondition.value = 'true';
+              newCondition.values = [];
+            } else {
+              newCondition.operator = 'contains';
+              newCondition.value = '';
+              newCondition.values = [];
+            }
+            emit('update', newCondition);
           }
         "
-        class="input-field"
       >
         <option v-for="opt in fieldOptions" :key="opt.value" :value="opt.value">
           {{ t(opt.labelKey) }}
@@ -166,8 +162,8 @@ function updateOperator(operator: string): void {
       <select
         v-if="needsOperator(condition.field)"
         :value="condition.operator"
-        @change="(e) => updateOperator((e.target as HTMLSelectElement).value)"
         class="input-field"
+        @change="(e) => updateOperator((e.target as HTMLSelectElement).value)"
       >
         <option v-for="opt in textOperatorOptions" :key="opt.value" :value="opt.value">
           {{ t(opt.labelKey) }}
@@ -176,7 +172,7 @@ function updateOperator(operator: string): void {
 
       <!-- Value input: Multi-select dropdown -->
       <div v-if="isMultiSelectField(condition.field)" class="multi-select-container">
-        <button @click="openDropdown = !openDropdown" class="multi-select-btn">
+        <button class="multi-select-btn" @click="openDropdown = !openDropdown">
           <span class="flex-1 text-left">{{ getMultiSelectDisplayText() }}</span>
           <span class="text-text-secondary text-xs ml-2">▼</span>
         </button>
@@ -186,8 +182,8 @@ function updateOperator(operator: string): void {
               <input
                 type="checkbox"
                 :checked="condition.values.includes(val)"
-                @change="toggleMultiSelectValue(val)"
                 class="checkbox"
+                @change="toggleMultiSelectValue(val)"
               />
               {{ val }}
             </label>
@@ -200,16 +196,16 @@ function updateOperator(operator: string): void {
         v-else-if="isDateField(condition.field)"
         type="date"
         :value="condition.value"
-        @input="(e) => updateValue((e.target as HTMLInputElement).value)"
         class="input-field"
+        @input="(e) => updateValue((e.target as HTMLInputElement).value)"
       />
 
       <!-- Value input: Boolean -->
       <select
         v-else-if="isBooleanField(condition.field)"
         :value="condition.value"
-        @change="(e) => updateValue((e.target as HTMLSelectElement).value)"
         class="input-field"
+        @change="(e) => updateValue((e.target as HTMLSelectElement).value)"
       >
         <option v-for="opt in booleanOptions" :key="opt.value" :value="opt.value">
           {{ t(opt.labelKey) }}
@@ -221,13 +217,13 @@ function updateOperator(operator: string): void {
         v-else
         type="text"
         :value="condition.value"
-        @input="(e) => updateValue((e.target as HTMLInputElement).value)"
         :placeholder="t('inputValue')"
         class="input-field"
+        @input="(e) => updateValue((e.target as HTMLInputElement).value)"
       />
 
       <!-- Delete button -->
-      <button @click="emit('remove')" class="delete-btn" :title="t('delete')">
+      <button class="delete-btn" :title="t('delete')" @click="emit('remove')">
         <PhX :size="18" />
       </button>
     </div>
@@ -235,6 +231,8 @@ function updateOperator(operator: string): void {
 </template>
 
 <style scoped>
+@reference "../../../style.css";
+
 .condition-card {
   @apply p-2 sm:p-3 rounded-lg bg-bg-secondary border border-border;
 }

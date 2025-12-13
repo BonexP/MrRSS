@@ -41,18 +41,20 @@ function handleUpdate(event: Event): void {
 <template>
   <div class="action-row">
     <span class="text-xs text-text-secondary">{{ index + 1 }}.</span>
-    <select :value="action" @change="handleUpdate" class="select-field flex-1">
+    <select :value="action" class="select-field flex-1" @change="handleUpdate">
       <option v-for="opt in availableActions" :key="opt.value" :value="opt.value">
         {{ t(opt.labelKey) }}
       </option>
     </select>
-    <button @click="emit('remove')" class="btn-danger-icon" :title="t('removeAction')">
+    <button class="btn-danger-icon" :title="t('removeAction')" @click="emit('remove')">
       <PhTrash :size="16" />
     </button>
   </div>
 </template>
 
 <style scoped>
+@reference "../../../style.css";
+
 .action-row {
   @apply flex items-center gap-2 p-2 bg-bg-secondary border border-border rounded-lg;
 }

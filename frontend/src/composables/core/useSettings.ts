@@ -75,6 +75,7 @@ export function useSettings() {
         max_article_age_days:
           parseInt(data.max_article_age_days) || settingsDefaults.max_article_age_days,
         language: data.language || locale.value || settingsDefaults.language,
+
         theme: data.theme || settingsDefaults.theme,
         last_article_update: data.last_article_update || settingsDefaults.last_article_update,
         show_hidden_articles: data.show_hidden_articles === 'true',
@@ -123,7 +124,8 @@ export function useSettings() {
   /**
    * Apply fetched settings to the app
    */
-  function applySettings(data: SettingsData, setTheme: (theme: ThemePreference) => void) {
+
+  function applySettings(data: SettingsData, setTheme: (ThemePreference) => void) {
     // Apply the saved language
     if (data.language) {
       locale.value = data.language;

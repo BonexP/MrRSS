@@ -133,7 +133,6 @@ const menuStyle = computed(() => ({
       <div v-if="item.separator" class="h-px bg-border my-1"></div>
       <div
         v-else
-        @click="handleAction(item)"
         class="px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-bg-tertiary text-sm transition-colors"
         :class="[
           item.disabled ? 'opacity-50 cursor-not-allowed' : '',
@@ -141,10 +140,11 @@ const menuStyle = computed(() => ({
             ? 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
             : 'text-text-primary',
         ]"
+        @click="handleAction(item)"
       >
         <component
-          v-if="item.icon && getIconComponent(item.icon)"
           :is="getIconComponent(item.icon)"
+          v-if="item.icon && getIconComponent(item.icon)"
           :size="20"
           :weight="item.iconWeight || 'regular'"
           :class="

@@ -53,10 +53,8 @@ onMounted(async () => {
 
 <template>
   <div
-    :data-article-id="article.id"
     :ref="(el) => emit('observeElement', el as Element | null)"
-    @click="emit('click')"
-    @contextmenu="emit('contextmenu', $event)"
+    :data-article-id="article.id"
     :class="[
       'article-card',
       article.is_read ? 'read' : '',
@@ -65,6 +63,8 @@ onMounted(async () => {
       article.is_read_later ? 'read-later' : '',
       isActive ? 'active' : '',
     ]"
+    @click="emit('click')"
+    @contextmenu="emit('contextmenu', $event)"
   >
     <img
       v-if="shouldShowImage"
@@ -126,6 +126,8 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+@reference "../../style.css";
+
 .article-card {
   @apply p-2 sm:p-3 border-b border-border cursor-pointer transition-colors flex gap-2 sm:gap-3 relative;
 }

@@ -37,7 +37,7 @@ const emit = defineEmits<{
     class="header-bar bg-bg-primary border-b border-border p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-4"
   >
     <!-- Left: Back button -->
-    <button @click="emit('close')" class="btn-icon" :title="t('back')">
+    <button class="btn-icon" :title="t('back')" @click="emit('close')">
       <PhArrowLeft :size="20" class="sm:w-6 sm:h-6" />
     </button>
 
@@ -51,17 +51,17 @@ const emit = defineEmits<{
     <!-- Right: Actions -->
     <div class="flex items-center gap-1 sm:gap-2">
       <button
-        @click="emit('toggle-read')"
         class="btn-icon"
         :title="article.is_read ? t('markUnread') : t('markRead')"
+        @click="emit('toggle-read')"
       >
         <PhEnvelopeOpen v-if="article.is_read" :size="20" class="sm:w-6 sm:h-6" />
         <PhEnvelope v-else :size="20" class="sm:w-6 sm:h-6" />
       </button>
       <button
-        @click="emit('toggle-favorite')"
         class="btn-icon"
         :title="article.is_favorite ? t('removeFromFavorite') : t('addToFavorite')"
+        @click="emit('toggle-favorite')"
       >
         <PhStar
           :size="20"
@@ -71,9 +71,9 @@ const emit = defineEmits<{
         />
       </button>
       <button
-        @click="emit('toggle-read-later')"
         class="btn-icon"
         :title="article.is_read_later ? t('removeFromReadLater') : t('addToReadLater')"
+        @click="emit('toggle-read-later')"
       >
         <PhClockCountdown
           :size="20"
@@ -83,14 +83,14 @@ const emit = defineEmits<{
         />
       </button>
       <button
-        @click="emit('toggle-content')"
         class="btn-icon"
         :title="showContent ? t('showOriginal') : t('showRendered')"
+        @click="emit('toggle-content')"
       >
         <PhArticle v-if="showContent" :size="20" class="sm:w-6 sm:h-6" />
         <PhGlobe v-else :size="20" class="sm:w-6 sm:h-6" />
       </button>
-      <button @click="emit('open-original')" class="btn-primary" :title="t('openOriginal')">
+      <button class="btn-primary" :title="t('openOriginal')" @click="emit('open-original')">
         <PhArrowSquareOut :size="20" class="sm:w-6 sm:h-6" />
         <span class="hidden sm:inline">{{ t('openOriginal') }}</span>
       </button>
@@ -99,6 +99,8 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
+@reference "../../style.css";
+
 .btn-icon {
   @apply p-2 sm:p-2.5 rounded-lg bg-transparent border-none cursor-pointer text-text-secondary hover:bg-bg-tertiary hover:text-text-primary transition-colors;
 }

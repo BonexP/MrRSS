@@ -43,7 +43,7 @@ const iconWeight = computed(() => {
 </script>
 
 <template>
-  <button @click="emit('click')" :class="['nav-item', isActive ? 'active' : '']">
+  <button :class="['nav-item', isActive ? 'active' : '']" @click="emit('click')">
     <component :is="currentIcon" :size="20" :weight="iconWeight" />
     <span class="flex-1 text-left">{{ label }}</span>
     <span v-if="unreadCount && unreadCount > 0" class="unread-badge">{{ unreadCount }}</span>
@@ -51,6 +51,8 @@ const iconWeight = computed(() => {
 </template>
 
 <style scoped>
+@reference "../../style.css";
+
 .nav-item {
   @apply flex items-center gap-2 sm:gap-3 w-full px-2 sm:px-3 py-2 sm:py-2.5 text-text-secondary rounded-lg font-medium transition-colors hover:bg-bg-tertiary hover:text-text-primary text-left text-sm sm:text-base;
 }

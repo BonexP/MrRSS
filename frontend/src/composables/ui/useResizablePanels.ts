@@ -7,7 +7,7 @@ export function useResizablePanels() {
   const isResizingArticleList = ref<boolean>(false);
 
   // Sidebar resize handlers
-  function startResizeSidebar(_: MouseEvent): void {
+  function startResizeSidebar(): void {
     isResizingSidebar.value = true;
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
@@ -32,7 +32,7 @@ export function useResizablePanels() {
   }
 
   // Article list resize handlers
-  function startResizeArticleList(_: MouseEvent): void {
+  function startResizeArticleList(): void {
     isResizingArticleList.value = true;
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';

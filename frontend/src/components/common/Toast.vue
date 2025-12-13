@@ -44,7 +44,7 @@ function handleClose() {
       <PhWarning v-else-if="type === 'warning'" :size="20" />
       <PhInfo v-else :size="20" />
       <span class="flex-1">{{ message }}</span>
-      <button @click="handleClose" class="text-xl opacity-70 hover:opacity-100 transition-opacity">
+      <button class="text-xl opacity-70 hover:opacity-100 transition-opacity" @click="handleClose">
         <PhX :size="20" />
       </button>
     </div>
@@ -52,6 +52,8 @@ function handleClose() {
 </template>
 
 <style scoped>
+@reference "../../style.css";
+
 .toast {
   @apply z-[60] px-5 py-3 rounded-lg shadow-lg border min-w-[300px] max-w-md;
 }

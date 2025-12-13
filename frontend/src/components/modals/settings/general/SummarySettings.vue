@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { PhTextAlignLeft, PhTextT, PhPackage, PhKey, PhLink, PhRobot } from '@phosphor-icons/vue';
 import type { SettingsData } from '@/types/settings';
@@ -9,7 +10,23 @@ interface Props {
   settings: SettingsData;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:settings': [settings: SettingsData];
+}>();
+
+// Create local reactive copy
+const localSettings = ref<SettingsData>({ ...props.settings });
+
+// Watch for changes and emit updates
+watch(
+  localSettings,
+  (newSettings) => {
+    emit('update:settings', { ...newSettings });
+  },
+  { deep: true }
+);
 </script>
 
 <template>
@@ -32,7 +49,7 @@ defineProps<Props>();
           </div>
         </div>
       </div>
-      <input type="checkbox" v-model="settings.summary_enabled" class="toggle" />
+      <input v-model="localSettings.summary_enabled" type="checkbox" class="toggle" />
     </div>
 
     <div
@@ -50,7 +67,7 @@ defineProps<Props>();
           </div>
         </div>
         <select
-          v-model="settings.summary_provider"
+          v-model="localSettings.summary_provider"
           class="input-field w-32 sm:w-48 text-xs sm:text-sm"
         >
           <option value="local">{{ t('localAlgorithm') }}</option>
@@ -73,8 +90,8 @@ defineProps<Props>();
             </div>
           </div>
           <input
+            v-model="localSettings.summary_ai_api_key"
             type="password"
-            v-model="settings.summary_ai_api_key"
             :placeholder="t('summaryAiApiKeyPlaceholder')"
             :class="[
               'input-field w-32 sm:w-48 text-xs sm:text-sm',
@@ -97,8 +114,8 @@ defineProps<Props>();
             </div>
           </div>
           <input
+            v-model="localSettings.summary_ai_endpoint"
             type="text"
-            v-model="settings.summary_ai_endpoint"
             :placeholder="t('summaryAiEndpointPlaceholder')"
             class="input-field w-32 sm:w-48 text-xs sm:text-sm"
           />
@@ -114,8 +131,8 @@ defineProps<Props>();
             </div>
           </div>
           <input
+            v-model="localSettings.summary_ai_model"
             type="text"
-            v-model="settings.summary_ai_model"
             :placeholder="t('summaryAiModelPlaceholder')"
             class="input-field w-32 sm:w-48 text-xs sm:text-sm"
           />
@@ -131,7 +148,7 @@ defineProps<Props>();
             </div>
           </div>
           <textarea
-            v-model="settings.summary_ai_system_prompt"
+            v-model="localSettings.summary_ai_system_prompt"
             class="input-field w-full text-xs sm:text-sm resize-none"
             rows="3"
           />
@@ -149,7 +166,7 @@ defineProps<Props>();
           </div>
         </div>
         <select
-          v-model="settings.summary_length"
+          v-model="localSettings.summary_length"
           class="input-field w-24 sm:w-48 text-xs sm:text-sm"
         >
           <option value="short">{{ t('summaryLengthShort') }}</option>
@@ -162,6 +179,8 @@ defineProps<Props>();
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .input-field {
   @apply p-1.5 sm:p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary focus:border-accent focus:outline-none transition-colors;
 }

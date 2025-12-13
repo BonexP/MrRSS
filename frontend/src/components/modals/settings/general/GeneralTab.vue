@@ -19,6 +19,10 @@ interface Props {
 const props = defineProps<Props>();
 const { t } = useI18n();
 
+const emit = defineEmits<{
+  'update:settings': [settings: SettingsData];
+}>();
+
 // Use composable for auto-save with reactivity
 const settingsRef = toRef(props, 'settings');
 useSettingsAutoSave(settingsRef);
@@ -56,21 +60,23 @@ const { isValid, isTranslationValid, isSummaryValid, isProxyValid } =
       </div>
     </div>
 
-    <AppearanceSettings :settings="settings" />
+    <AppearanceSettings :settings="settings" @update:settings="emit('update:settings', $event)" />
 
-    <UpdateSettings :settings="settings" />
+    <UpdateSettings :settings="settings" @update:settings="emit('update:settings', $event)" />
 
-    <ProxySettings :settings="settings" />
+    <ProxySettings :settings="settings" @update:settings="emit('update:settings', $event)" />
 
-    <DatabaseSettings :settings="settings" />
+    <DatabaseSettings :settings="settings" @update:settings="emit('update:settings', $event)" />
 
-    <TranslationSettings :settings="settings" />
+    <TranslationSettings :settings="settings" @update:settings="emit('update:settings', $event)" />
 
-    <SummarySettings :settings="settings" />
+    <SummarySettings :settings="settings" @update:settings="emit('update:settings', $event)" />
   </div>
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .input-field {
   @apply p-1.5 sm:p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary focus:border-accent focus:outline-none transition-colors;
 }
