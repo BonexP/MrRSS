@@ -11,8 +11,8 @@ import { useModalClose } from '@/composables/ui/useModalClose';
 const { t } = useI18n();
 
 interface Props {
-  show: boolean;
-  currentFilters: FilterCondition[];
+  show?: boolean;
+  currentFilters?: FilterCondition[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -86,8 +86,8 @@ function close() {
   <div
     v-if="show"
     class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4"
-    @click.self="close"
     data-modal-open="true"
+    @click.self="close"
   >
     <div
       class="bg-bg-primary w-full max-w-2xl h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl shadow-2xl border-0 sm:border border-border overflow-hidden animate-fade-in"
@@ -99,8 +99,8 @@ function close() {
           {{ t('filterArticles') }}
         </h3>
         <span
-          @click="close"
           class="text-2xl cursor-pointer text-text-secondary hover:text-text-primary"
+          @click="close"
           >&times;</span
         >
       </div>
@@ -123,8 +123,8 @@ function close() {
                 <button
                   v-for="opt in logicOptions"
                   :key="opt.value"
-                  @click="(condition.logic as 'and' | 'or' | null) = opt.value"
                   :class="['logic-btn', condition.logic === opt.value ? 'active' : '']"
+                  @click="(condition.logic as 'and' | 'or' | null) = opt.value"
                 >
                   {{ t(opt.labelKey) }}
                 </button>
@@ -155,8 +155,8 @@ function close() {
 
         <!-- Add condition button -->
         <button
-          @click="addCondition"
           class="btn-secondary w-full mt-4 flex items-center justify-center gap-2"
+          @click="addCondition"
         >
           <PhPlus :size="18" />
           {{ t('addCondition') }}
@@ -167,10 +167,10 @@ function close() {
       <div
         class="p-4 sm:p-5 border-t border-border bg-bg-secondary flex justify-between gap-3 shrink-0"
       >
-        <button @click="clearFilters" class="btn-secondary" :disabled="conditions.length === 0">
+        <button class="btn-secondary" :disabled="conditions.length === 0" @click="clearFilters">
           {{ t('clearFilters') }}
         </button>
-        <button @click="applyFilters" class="btn-primary">
+        <button class="btn-primary" @click="applyFilters">
           {{ t('applyFilters') }}
         </button>
       </div>
@@ -179,6 +179,8 @@ function close() {
 </template>
 
 <style scoped>
+@reference "../../../style.css";
+
 .btn-primary {
   @apply bg-accent text-white border-none px-5 py-2.5 rounded-lg cursor-pointer font-semibold hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
 }

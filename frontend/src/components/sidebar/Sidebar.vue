@@ -90,9 +90,9 @@ const emitShowSettings = () => window.dispatchEvent(new CustomEvent('show-settin
           />
           <button
             v-if="searchQuery"
-            @click="searchQuery = ''"
             class="ml-2 p-0.5 text-text-secondary hover:text-text-primary hover:bg-bg-tertiary rounded transition-colors flex-shrink-0"
             :title="t('clear')"
+            @click="searchQuery = ''"
           >
             <PhX :size="16" />
           </button>
@@ -138,19 +138,21 @@ const emitShowSettings = () => window.dispatchEvent(new CustomEvent('show-settin
     </div>
 
     <div class="p-2 sm:p-4 border-t border-border flex gap-1.5 sm:gap-2">
-      <button @click="emitShowAddFeed" class="footer-btn" :title="t('addFeed')">
+      <button class="footer-btn" :title="t('addFeed')" @click="emitShowAddFeed">
         <PhPlus :size="18" class="sm:w-5 sm:h-5" />
       </button>
-      <button @click="emitShowSettings" class="footer-btn" :title="t('settings')">
+      <button class="footer-btn" :title="t('settings')" @click="emitShowSettings">
         <PhGear :size="18" class="sm:w-5 sm:h-5" />
       </button>
     </div>
   </aside>
   <!-- Overlay for mobile -->
-  <div v-if="isOpen" @click="emit('toggle')" class="fixed inset-0 bg-black/50 z-10 md:hidden"></div>
+  <div v-if="isOpen" class="fixed inset-0 bg-black/50 z-10 md:hidden" @click="emit('toggle')"></div>
 </template>
 
 <style scoped>
+@reference "../../style.css";
+
 .sidebar {
   width: 16rem;
 }

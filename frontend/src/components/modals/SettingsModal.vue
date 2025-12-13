@@ -68,8 +68,8 @@ function handleDiscoverAll() {
 <template>
   <div
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 sm:p-4"
-    @click.self="emit('close')"
     data-modal-open="true"
+    @click.self="emit('close')"
   >
     <div
       class="bg-bg-primary w-full max-w-4xl h-full sm:h-[700px] sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl shadow-2xl border border-border overflow-hidden animate-fade-in"
@@ -80,8 +80,8 @@ function handleDiscoverAll() {
           {{ t('settingsTitle') }}
         </h3>
         <span
-          @click="emit('close')"
           class="text-2xl cursor-pointer text-text-secondary hover:text-text-primary"
+          @click="emit('close')"
           >&times;</span
         >
       </div>
@@ -90,32 +90,32 @@ function handleDiscoverAll() {
         class="flex border-b border-border bg-bg-secondary shrink-0 overflow-x-auto scrollbar-hide"
       >
         <button
-          @click="activeTab = 'general'"
           :class="['tab-btn', activeTab === 'general' ? 'active' : '']"
+          @click="activeTab = 'general'"
         >
           {{ t('general') }}
         </button>
         <button
-          @click="activeTab = 'feeds'"
           :class="['tab-btn', activeTab === 'feeds' ? 'active' : '']"
+          @click="activeTab = 'feeds'"
         >
           {{ t('feeds') }}
         </button>
         <button
-          @click="activeTab = 'rules'"
           :class="['tab-btn', activeTab === 'rules' ? 'active' : '']"
+          @click="activeTab = 'rules'"
         >
           {{ t('rules') }}
         </button>
         <button
-          @click="activeTab = 'shortcuts'"
           :class="['tab-btn', activeTab === 'shortcuts' ? 'active' : '']"
+          @click="activeTab = 'shortcuts'"
         >
           {{ t('shortcuts') }}
         </button>
         <button
-          @click="activeTab = 'about'"
           :class="['tab-btn', activeTab === 'about' ? 'active' : '']"
+          @click="activeTab = 'about'"
         >
           {{ t('about') }}
         </button>
@@ -137,9 +137,17 @@ function handleDiscoverAll() {
           @discover-all="handleDiscoverAll"
         />
 
-        <RulesTab v-if="activeTab === 'rules'" :settings="settings" />
+        <RulesTab
+          v-if="activeTab === 'rules'"
+          :settings="settings"
+          @update:settings="settings = $event"
+        />
 
-        <ShortcutsTab v-if="activeTab === 'shortcuts'" :settings="settings" />
+        <ShortcutsTab
+          v-if="activeTab === 'shortcuts'"
+          :settings="settings"
+          @update:settings="settings = $event"
+        />
 
         <AboutTab
           v-if="activeTab === 'about'"
@@ -160,6 +168,8 @@ function handleDiscoverAll() {
 </template>
 
 <style scoped>
+@reference "../../style.css";
+
 .tab-btn {
   @apply px-3 sm:px-5 py-2 sm:py-3 bg-transparent border-b-2 border-transparent text-text-secondary font-semibold cursor-pointer hover:text-text-primary transition-all relative whitespace-nowrap text-sm sm:text-base;
 }

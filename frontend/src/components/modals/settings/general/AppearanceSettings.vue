@@ -10,6 +10,10 @@ interface Props {
 }
 
 defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:settings': [settings: SettingsData];
+}>();
 </script>
 
 <template>
@@ -28,7 +32,14 @@ defineProps<Props>();
           <div class="text-xs text-text-secondary hidden sm:block">{{ t('themeDesc') }}</div>
         </div>
       </div>
-      <select v-model="settings.theme" class="input-field w-24 sm:w-48 text-xs sm:text-sm">
+      <select
+        :value="settings.theme"
+        class="input-field w-24 sm:w-48 text-xs sm:text-sm"
+        @change="
+          (e) =>
+            emit('update:settings', { ...settings, theme: (e.target as HTMLSelectElement).value })
+        "
+      >
         <option value="light">{{ t('light') }}</option>
         <option value="dark">{{ t('dark') }}</option>
         <option value="auto">{{ t('auto') }}</option>
@@ -42,7 +53,17 @@ defineProps<Props>();
           <div class="text-xs text-text-secondary hidden sm:block">{{ t('languageDesc') }}</div>
         </div>
       </div>
-      <select v-model="settings.language" class="input-field w-24 sm:w-48 text-xs sm:text-sm">
+      <select
+        :value="settings.language"
+        class="input-field w-24 sm:w-48 text-xs sm:text-sm"
+        @change="
+          (e) =>
+            emit('update:settings', {
+              ...settings,
+              language: (e.target as HTMLSelectElement).value,
+            })
+        "
+      >
         <option value="en-US">{{ t('english') }}</option>
         <option value="zh-CN">{{ t('chinese') }}</option>
       </select>
@@ -60,8 +81,15 @@ defineProps<Props>();
         </div>
       </div>
       <select
-        v-model="settings.default_view_mode"
+        :value="settings.default_view_mode"
         class="input-field w-24 sm:w-48 text-xs sm:text-sm"
+        @change="
+          (e) =>
+            emit('update:settings', {
+              ...settings,
+              default_view_mode: (e.target as HTMLSelectElement).value,
+            })
+        "
       >
         <option value="original">{{ t('viewModeOriginal') }}</option>
         <option value="rendered">{{ t('viewModeRendered') }}</option>
@@ -79,12 +107,25 @@ defineProps<Props>();
           </div>
         </div>
       </div>
-      <input type="checkbox" v-model="settings.show_article_preview_images" class="toggle" />
+      <input
+        :checked="settings.show_article_preview_images"
+        type="checkbox"
+        class="toggle"
+        @change="
+          (e) =>
+            emit('update:settings', {
+              ...settings,
+              show_article_preview_images: (e.target as HTMLInputElement).checked,
+            })
+        "
+      />
     </div>
   </div>
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .input-field {
   @apply p-1.5 sm:p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary focus:border-accent focus:outline-none transition-colors;
 }

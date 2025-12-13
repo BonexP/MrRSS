@@ -179,11 +179,11 @@ function onFeedUpdated(): void {
       '--article-list-width': articleListWidth + 'px',
     }"
   >
-    <Sidebar :isOpen="isSidebarOpen" @toggle="toggleSidebar" />
+    <Sidebar :is-open="isSidebarOpen" @toggle="toggleSidebar" />
 
     <div class="resizer hidden md:block" @mousedown="startResizeSidebar"></div>
 
-    <ArticleList :isSidebarOpen="isSidebarOpen" @toggleSidebar="toggleSidebar" />
+    <ArticleList :is-sidebar-open="isSidebarOpen" @toggle-sidebar="toggleSidebar" />
 
     <div class="resizer hidden md:block" @mousedown="startResizeArticleList"></div>
 
@@ -218,9 +218,9 @@ function onFeedUpdated(): void {
       v-if="confirmDialog"
       :title="confirmDialog.title"
       :message="confirmDialog.message"
-      :confirmText="confirmDialog.confirmText"
-      :cancelText="confirmDialog.cancelText"
-      :isDanger="confirmDialog.isDanger"
+      :confirm-text="confirmDialog.confirmText"
+      :cancel-text="confirmDialog.cancelText"
+      :is-danger="confirmDialog.isDanger"
       @confirm="confirmDialog.onConfirm"
       @cancel="confirmDialog.onCancel"
       @close="confirmDialog = null"
@@ -231,9 +231,9 @@ function onFeedUpdated(): void {
       :title="inputDialog.title"
       :message="inputDialog.message"
       :placeholder="inputDialog.placeholder"
-      :defaultValue="inputDialog.defaultValue"
-      :confirmText="inputDialog.confirmText"
-      :cancelText="inputDialog.cancelText"
+      :default-value="inputDialog.defaultValue"
+      :confirm-text="inputDialog.confirmText"
+      :cancel-text="inputDialog.cancelText"
       @confirm="inputDialog.onConfirm"
       @cancel="inputDialog.onCancel"
       @close="inputDialog = null"

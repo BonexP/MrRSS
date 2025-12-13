@@ -133,21 +133,21 @@ const downloadFilename = computed(() => {
     <audio
       ref="audioRef"
       :src="audioUrl"
+      preload="metadata"
       @play="onPlay"
       @pause="onPause"
       @timeupdate="onTimeUpdate"
       @loadedmetadata="onLoadedMetadata"
       @ended="onEnded"
-      preload="metadata"
     />
 
     <!-- Custom audio controls -->
     <div class="flex items-center gap-3">
       <!-- Play/Pause button -->
       <button
-        @click="togglePlay"
         class="flex items-center justify-center w-10 h-10 rounded-full bg-accent hover:bg-accent/90 transition-colors flex-shrink-0"
         :title="isPlaying ? t('pause') : t('play')"
+        @click="togglePlay"
       >
         <PhPlay v-if="!isPlaying" :size="20" class="text-white ml-0.5" />
         <PhPause v-else :size="20" class="text-white" />

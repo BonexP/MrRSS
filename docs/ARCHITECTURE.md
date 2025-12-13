@@ -21,13 +21,15 @@ handlers/
 ├── article/       # Article CRUD and filtering
 ├── feed/          # Feed management
 ├── discovery/     # Feed discovery
+├── media/         # Media handling (images, audio, video)
 ├── opml/          # OPML import/export
 ├── rules/         # Filtering rules
 ├── script/        # Custom script execution
 ├── settings/      # Settings management
 ├── summary/       # Article summarization
 ├── translation/   # Translation services
-└── update/        # Application updates
+├── update/        # Application updates
+└── window/        # Window management
 ```
 
 ### Core Components
@@ -51,6 +53,12 @@ handlers/
 
 - `fetcher.go` - RSS/Atom parsing with `gofeed`, concurrent fetching
 - `script_executor.go` - Custom script execution for non-standard feeds
+- `article_processor.go` - Article content processing and extraction
+- `content_extraction.go` - HTML content extraction utilities
+- `http_client.go` - HTTP client with timeout and retry logic
+- `intelligent_refresh.go` - Smart feed refresh scheduling
+- `progress.go` - Progress tracking for feed operations
+- `subscription.go` - Feed subscription management
 
 **Supported Scripts**:
 
@@ -80,6 +88,8 @@ handlers/
 - `ai_summarizer.go` - AI-based summarization using OpenAI-compatible APIs
 - `scoring.go` - Sentence scoring algorithms
 - `text_utils.go` - Text processing utilities
+- `types.go` - Type definitions for summarization
+- `utils.go` - Utility functions for summarization
 
 **Local Algorithms**:
 
@@ -101,6 +111,7 @@ handlers/
 - `deepl.go` - DeepL API integration
 - `baidu.go` - Baidu Translation API integration
 - `ai.go` - AI-based translation integration
+- `dynamic.go` - Dynamic translation service selection
 
 ## Frontend Architecture
 
@@ -115,12 +126,15 @@ components/
 │   ├── ArticleItem.vue
 │   ├── ArticleDetail.vue
 │   ├── ArticleContent.vue
+│   ├── ArticleDetailToolbar.vue
 │   ├── ArticleToolbar.vue
 │   └── parts/     # Content rendering parts
 │       ├── ArticleTitle.vue
 │       ├── ArticleSummary.vue
 │       ├── ArticleBody.vue
-│       └── ArticleLoading.vue
+│       ├── ArticleLoading.vue
+│       ├── AudioPlayer.vue
+│       └── VideoPlayer.vue
 ├── sidebar/       # Feed list sidebar
 │   ├── Sidebar.vue
 │   ├── SidebarFeed.vue
@@ -184,8 +198,8 @@ Pinia store (`frontend/src/stores/app.ts`) manages global state:
 Enhanced content rendering (`ArticleContent.vue` + `ArticleContent.css`):
 
 - **Images**: Clickable for viewer, right-click context menu, download support
-- **Audio**: Full-width player with podcast container styling
-- **Video**: Responsive player with proper aspect ratio
+- **Audio**: Full-width player with podcast container styling (`AudioPlayer.vue`)
+- **Video**: Responsive player with proper aspect ratio (`VideoPlayer.vue`)
 - **Iframes**: 16:9 aspect ratio for YouTube/Vimeo embeds
 - **Rich Text**: Tables, blockquotes, code blocks, definition lists
 

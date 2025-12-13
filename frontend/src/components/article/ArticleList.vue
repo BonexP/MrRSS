@@ -280,25 +280,25 @@ async function clearReadLater(): Promise<void> {
           <!-- Clear Read Later button - only shown when viewing Read Later list -->
           <button
             v-if="store.currentFilter === 'readLater'"
-            @click="clearReadLater"
             class="text-text-secondary hover:text-red-500 hover:bg-bg-tertiary p-1 sm:p-1.5 rounded transition-colors"
             :title="t('clearReadLater')"
+            @click="clearReadLater"
           >
             <PhTrash :size="20" class="sm:w-6 sm:h-6" />
           </button>
           <button
-            @click="markAllAsRead"
             class="text-text-secondary hover:text-text-primary hover:bg-bg-tertiary p-1 sm:p-1.5 rounded transition-colors"
             :title="t('markAllRead')"
+            @click="markAllAsRead"
           >
             <PhCheckCircle :size="20" class="sm:w-6 sm:h-6" />
           </button>
           <div class="relative">
             <button
-              @click="showFilterModal = true"
               class="text-text-secondary hover:text-text-primary hover:bg-bg-tertiary p-1 sm:p-1.5 rounded transition-colors"
               :class="activeFilters.length > 0 ? 'filter-active' : ''"
               :title="t('filter')"
+              @click="showFilterModal = true"
             >
               <PhFunnel :size="18" class="sm:w-5 sm:h-5" />
             </button>
@@ -311,9 +311,9 @@ async function clearReadLater(): Promise<void> {
           </div>
           <div class="relative">
             <button
-              @click="refreshArticles"
               class="text-text-secondary hover:text-text-primary hover:bg-bg-tertiary p-1 sm:p-1.5 rounded transition-colors"
               :title="t('refresh')"
+              @click="refreshArticles"
             >
               <PhArrowClockwise
                 :size="20"
@@ -331,14 +331,14 @@ async function clearReadLater(): Promise<void> {
               {{ store.refreshProgress.total - store.refreshProgress.current }}
             </div>
           </div>
-          <button @click="emit('toggleSidebar')" class="md:hidden text-xl sm:text-2xl p-1">
+          <button class="md:hidden text-xl sm:text-2xl p-1" @click="emit('toggleSidebar')">
             <PhList :size="20" class="sm:w-6 sm:h-6" />
           </button>
         </div>
       </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto" @scroll="handleScroll" ref="listRef">
+    <div ref="listRef" class="flex-1 overflow-y-auto" @scroll="handleScroll">
       <div
         v-if="filteredArticles.length === 0 && !store.isLoading && !isFilterLoading"
         class="p-4 sm:p-5 text-center text-text-secondary text-sm sm:text-base"
@@ -350,10 +350,10 @@ async function clearReadLater(): Promise<void> {
         v-for="article in filteredArticles"
         :key="article.id"
         :article="article"
-        :isActive="store.currentArticleId === article.id"
+        :is-active="store.currentArticleId === article.id"
         @click="selectArticle(article)"
         @contextmenu="(e) => showArticleContextMenu(e, article)"
-        @observeElement="observeArticle"
+        @observe-element="observeArticle"
       />
 
       <div
@@ -367,7 +367,7 @@ async function clearReadLater(): Promise<void> {
     <!-- Filter Modal -->
     <ArticleFilterModal
       :show="showFilterModal"
-      :currentFilters="activeFilters"
+      :current-filters="activeFilters"
       @close="showFilterModal = false"
       @apply="handleApplyFilters"
     />
@@ -375,6 +375,8 @@ async function clearReadLater(): Promise<void> {
 </template>
 
 <style scoped>
+@reference "../../style.css";
+
 @media (min-width: 768px) {
   .article-list {
     width: var(--article-list-width, 400px);

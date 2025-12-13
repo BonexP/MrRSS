@@ -1,4 +1,4 @@
-//go:build windows || linux
+//go:build windows || linux || darwin
 
 package tray
 
@@ -7,7 +7,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/getlantern/systray"
+	"fyne.io/systray"
 
 	"MrRSS/internal/handlers/core"
 )

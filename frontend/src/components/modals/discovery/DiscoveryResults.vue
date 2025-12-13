@@ -33,8 +33,8 @@ function selectAll() {
       {{ t('foundFeeds', { count: discoveredFeeds.length }) }}
     </p>
     <button
-      @click="selectAll"
       class="text-sm text-accent hover:text-accent-hover font-medium px-3 py-1 rounded hover:bg-accent/10 transition-colors"
+      @click="selectAll"
     >
       {{ allSelected ? t('deselectAll') : t('selectAll') }}
     </button>

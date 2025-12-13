@@ -14,7 +14,7 @@ export interface ConfirmDialogState extends ConfirmDialogOptions {
 }
 
 export interface InputDialogState extends InputDialogOptions {
-  onConfirm: (value: string) => void;
+  onConfirm: (string) => void;
   onCancel: () => void;
 }
 

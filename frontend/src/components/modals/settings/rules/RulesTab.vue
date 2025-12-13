@@ -29,6 +29,10 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+  'update:settings': [settings: SettingsData];
+}>();
+
 // Rules list
 const rules: Ref<Rule[]> = ref([]);
 
@@ -69,11 +73,12 @@ watch(
 // Save rules to settings
 async function saveRules() {
   try {
-    props.settings.rules = JSON.stringify(rules.value);
+    const updatedSettings = { ...props.settings, rules: JSON.stringify(rules.value) };
+    emit('update:settings', updatedSettings);
     await fetch('/api/settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rules: props.settings.rules }),
+      body: JSON.stringify({ rules: updatedSettings.rules }),
     });
   } catch (e) {
     console.error('Error saving rules:', e);
@@ -190,7 +195,7 @@ async function applyRule(rule: Rule): Promise<void> {
             <div class="text-xs text-text-secondary hidden sm:block">{{ t('rulesDesc') }}</div>
           </div>
         </div>
-        <button @click="addRule" class="btn-primary">
+        <button class="btn-primary" @click="addRule">
           <PhPlus :size="16" class="sm:w-5 sm:h-5" />
           <span class="hidden sm:inline">{{ t('addRule') }}</span>
         </button>
@@ -230,6 +235,8 @@ async function applyRule(rule: Rule): Promise<void> {
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .setting-item {
   @apply flex items-center sm:items-start justify-between gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-bg-secondary border border-border;
 }

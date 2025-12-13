@@ -45,7 +45,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.24'
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -113,15 +113,6 @@ jobs:
       - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm ci
-
-      - name: Strip tray dependencies for macOS build
-        if: matrix.platform == 'darwin'
-        run: |
-          # Remove systray-specific sources (manager_stub.go provides no-op implementation for non-Windows/Linux platforms)
-          rm -f internal/tray/manager_systray.go
-
-          go mod edit -droprequire github.com/getlantern/systray
-          go mod tidy
 
       - name: Build frontend (required for embed)
         working-directory: ./frontend
@@ -226,6 +217,14 @@ jobs:
         run: |
           # Clean up any cached appimagetool to ensure correct architecture is downloaded
           rm -f build/appimagetool-*.AppImage
+
+          # Debug: Show system architecture info
+          echo "System architecture: $(uname -m)"
+          echo "Target architecture: ${{ matrix.arch }}"
+
+          # Debug: Verify binary architecture
+          echo "Binary architecture check:"
+          file build/bin/MrRSS || true
 
           chmod +x build/linux/create-appimage.sh
           ARCH=${{ matrix.arch }} ./build/linux/create-appimage.sh || echo "AppImage creation failed, will use tar.gz"

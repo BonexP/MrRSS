@@ -136,24 +136,24 @@ async function openScriptsFolder() {
     </label>
 
     <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-2 text-xs sm:text-sm">
-      <button @click="handleAddFeed" class="btn-secondary py-1.5 px-2.5 sm:px-3">
+      <button class="btn-secondary py-1.5 px-2.5 sm:px-3" @click="handleAddFeed">
         <PhPlus :size="14" class="sm:w-4 sm:h-4" />
         <span class="hidden sm:inline">{{ t('addFeed') }}</span
         ><span class="sm:hidden">{{ t('addFeed').split(' ')[0] }}</span>
       </button>
       <button
-        @click="handleBatchDelete"
         class="btn-danger py-1.5 px-2.5 sm:px-3"
         :disabled="selectedFeeds.length === 0"
+        @click="handleBatchDelete"
       >
         <PhTrash :size="14" class="sm:w-4 sm:h-4" />
         <span class="hidden sm:inline">{{ t('deleteSelected') }}</span
         ><span class="sm:hidden">{{ t('delete') }}</span>
       </button>
       <button
-        @click="handleBatchMove"
         class="btn-secondary py-1.5 px-2.5 sm:px-3"
         :disabled="selectedFeeds.length === 0"
+        @click="handleBatchMove"
       >
         <PhFolder :size="14" class="sm:w-4 sm:h-4" />
         <span class="hidden sm:inline">{{ t('moveSelected') }}</span
@@ -170,45 +170,45 @@ async function openScriptsFolder() {
           <input
             type="checkbox"
             :checked="isAllSelected"
-            @change="toggleSelectAll"
             class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded border-border text-accent focus:ring-2 focus:ring-accent cursor-pointer"
+            @change="toggleSelectAll"
           />
           <span class="hidden sm:inline text-xs sm:text-sm">{{ t('selectAll') }}</span>
         </label>
         <div class="flex items-center gap-1">
           <PhSortAscending :size="12" class="text-text-secondary" />
           <button
-            @click="toggleSort('name')"
             :class="[
               'px-1.5 py-0.5 text-xs rounded transition-colors',
               sortField === 'name'
                 ? 'bg-accent text-white'
                 : 'bg-bg-secondary text-text-primary hover:bg-bg-primary',
             ]"
+            @click="toggleSort('name')"
           >
             {{ t('sortByName') }}
             <span v-if="sortField === 'name'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
           </button>
           <button
-            @click="toggleSort('date')"
             :class="[
               'px-1.5 py-0.5 text-xs rounded transition-colors',
               sortField === 'date'
                 ? 'bg-accent text-white'
                 : 'bg-bg-secondary text-text-primary hover:bg-bg-primary',
             ]"
+            @click="toggleSort('date')"
           >
             {{ t('sortByDate') }}
             <span v-if="sortField === 'date'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
           </button>
           <button
-            @click="toggleSort('category')"
             :class="[
               'px-1.5 py-0.5 text-xs rounded transition-colors',
               sortField === 'category'
                 ? 'bg-accent text-white'
                 : 'bg-bg-secondary text-text-primary hover:bg-bg-primary',
             ]"
+            @click="toggleSort('category')"
           >
             {{ t('sortByCategory') }}
             <span v-if="sortField === 'category'">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
@@ -225,9 +225,9 @@ async function openScriptsFolder() {
           class="flex items-center p-1.5 sm:p-2 border-b border-border last:border-0 bg-bg-primary hover:bg-bg-secondary gap-1.5 sm:gap-2"
         >
           <input
+            v-model="selectedFeeds"
             type="checkbox"
             :value="feed.id"
-            v-model="selectedFeeds"
             class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 rounded border-border text-accent focus:ring-2 focus:ring-accent cursor-pointer"
           />
           <div class="w-4 h-4 flex items-center justify-center shrink-0">
@@ -261,9 +261,9 @@ async function openScriptsFolder() {
               <span v-if="isScriptFeed(feed)" class="inline-flex items-center gap-1">
                 <PhCode :size="10" class="inline" />
                 <button
-                  @click.stop="openScriptsFolder"
                   class="text-accent hover:underline"
                   :title="t('openScriptsFolder')"
+                  @click.stop="openScriptsFolder"
                 >
                   {{ feed.script_path }}
                 </button>
@@ -273,16 +273,16 @@ async function openScriptsFolder() {
           </div>
           <div class="flex gap-0.5 sm:gap-1 shrink-0">
             <button
-              @click="handleEditFeed(feed)"
               class="text-accent hover:bg-bg-tertiary p-1 rounded text-sm"
               :title="t('edit')"
+              @click="handleEditFeed(feed)"
             >
               <PhPencil :size="14" class="sm:w-4 sm:h-4" />
             </button>
             <button
-              @click="handleDeleteFeed(feed.id)"
               class="text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 p-1 rounded text-sm"
               :title="t('delete')"
+              @click="handleDeleteFeed(feed.id)"
             >
               <PhTrash :size="14" class="sm:w-4 sm:h-4" />
             </button>
@@ -294,6 +294,8 @@ async function openScriptsFolder() {
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .btn-primary {
   @apply bg-accent text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-semibold hover:bg-accent-hover transition-colors shadow-sm;
 }

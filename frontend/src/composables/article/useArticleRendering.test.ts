@@ -4,7 +4,7 @@ import { useArticleRendering } from './useArticleRendering';
 // Mock KaTeX
 vi.mock('katex', () => ({
   default: {
-    render: vi.fn((formula, element, _options) => {
+    render: vi.fn((formula, element) => {
       element.innerHTML = `<span class="katex">${formula}</span>`;
     }),
   },

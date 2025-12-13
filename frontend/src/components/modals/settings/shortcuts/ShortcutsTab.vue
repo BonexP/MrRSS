@@ -39,6 +39,10 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+  'update:settings': [settings: SettingsData];
+}>();
+
 interface Shortcuts {
   nextArticle: string;
   previousArticle: string;
@@ -230,7 +234,8 @@ function handleKeyRecord(e: KeyboardEvent) {
 async function saveShortcuts() {
   try {
     // Update props.settings.shortcuts
-    props.settings.shortcuts = JSON.stringify(shortcuts.value);
+    const updatedSettings = { ...props.settings, shortcuts: JSON.stringify(shortcuts.value) };
+    emit('update:settings', updatedSettings);
 
     // The parent component will handle auto-save via the watcher
     // But we also dispatch an event to notify the app
@@ -279,8 +284,8 @@ watch(
         </div>
       </div>
       <button
-        @click="resetToDefaults"
         class="btn-secondary text-xs sm:text-sm py-1.5 px-2.5 sm:px-3"
+        @click="resetToDefaults"
       >
         <PhArrowCounterClockwise :size="16" class="sm:w-5 sm:h-5" />
         {{ t('resetToDefault') }}
@@ -315,6 +320,8 @@ watch(
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .btn-secondary {
   @apply bg-bg-tertiary border border-border text-text-primary rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-secondary transition-colors;
 }

@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'Noto Sans CJK SC', 'system-ui', 'sans-serif'],
       },
       colors: {
         bg: {

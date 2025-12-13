@@ -174,26 +174,26 @@ onUnmounted(() => {
     <!-- Controls -->
     <div class="absolute top-4 right-4 flex gap-2 z-10" @click.stop>
       <button
-        @click="zoomOut"
         class="control-btn"
         :disabled="scale <= MIN_SCALE"
         :title="t('zoomOut')"
+        @click="zoomOut"
       >
         <PhMagnifyingGlassMinus :size="20" />
       </button>
       <span class="control-btn pointer-events-none">{{ Math.round(scale * 100) }}%</span>
       <button
-        @click="zoomIn"
         class="control-btn"
         :disabled="scale >= MAX_SCALE"
         :title="t('zoomIn')"
+        @click="zoomIn"
       >
         <PhMagnifyingGlassPlus :size="20" />
       </button>
-      <button @click="downloadImage" class="control-btn" :title="t('downloadImage')">
+      <button class="control-btn" :title="t('downloadImage')" @click="downloadImage">
         <PhDownloadSimple :size="20" />
       </button>
-      <button @click="close" class="control-btn" :title="t('close')">
+      <button class="control-btn" :title="t('close')" @click="close">
         <PhX :size="20" />
       </button>
     </div>
@@ -213,9 +213,9 @@ onUnmounted(() => {
         :src="src"
         :alt="alt"
         :style="imageStyle"
-        @dragstart.prevent
         class="max-w-full max-h-full object-contain select-none"
         :class="[isDragging ? '' : 'transition-transform duration-150']"
+        @dragstart.prevent
       />
     </div>
 
@@ -227,6 +227,8 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+@reference "../../style.css";
+
 .control-btn {
   @apply px-3 py-2 rounded-lg transition-colors backdrop-blur-sm flex items-center justify-center min-w-[40px];
   background-color: rgba(255, 255, 255, 0.9);

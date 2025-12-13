@@ -38,13 +38,13 @@ function handleImageError(event: Event): void {
 
 <template>
   <div
-    @click="emit('toggle')"
     :class="[
       'border rounded-xl p-4 cursor-pointer transition-all duration-200',
       isSelected
         ? 'bg-accent/10 border-accent ring-2 ring-accent/20 shadow-md'
         : 'bg-bg-secondary hover:bg-bg-tertiary border-border hover:shadow-sm',
     ]"
+    @click="emit('toggle')"
   >
     <div class="flex items-start gap-4">
       <!-- Checkbox -->
@@ -78,8 +78,8 @@ function handleImageError(event: Event): void {
             <a
               :href="feed.homepage"
               target="_blank"
-              @click.stop
               class="text-xs text-accent hover:text-accent-hover flex items-center gap-1 mt-1 hover:underline"
+              @click.stop
             >
               <PhGlobe :size="14" />
               <span class="truncate">{{ feed.homepage }}</span>

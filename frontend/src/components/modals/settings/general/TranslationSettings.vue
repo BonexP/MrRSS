@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { PhGlobe, PhArticle, PhPackage, PhKey, PhLink, PhRobot } from '@phosphor-icons/vue';
 import type { SettingsData } from '@/types/settings';
@@ -9,7 +10,23 @@ interface Props {
   settings: SettingsData;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  'update:settings': [settings: SettingsData];
+}>();
+
+// Create local reactive copy
+const localSettings = ref<SettingsData>({ ...props.settings });
+
+// Watch for changes and emit updates
+watch(
+  localSettings,
+  (newSettings) => {
+    emit('update:settings', { ...newSettings });
+  },
+  { deep: true }
+);
 </script>
 
 <template>
@@ -32,7 +49,7 @@ defineProps<Props>();
           </div>
         </div>
       </div>
-      <input type="checkbox" v-model="settings.translation_enabled" class="toggle" />
+      <input v-model="localSettings.translation_enabled" type="checkbox" class="toggle" />
     </div>
 
     <div
@@ -50,7 +67,7 @@ defineProps<Props>();
           </div>
         </div>
         <select
-          v-model="settings.translation_provider"
+          v-model="localSettings.translation_provider"
           class="input-field w-32 sm:w-48 text-xs sm:text-sm"
         >
           <option value="google">{{ t('googleTranslate') }}</option>
@@ -72,7 +89,7 @@ defineProps<Props>();
           </div>
         </div>
         <select
-          v-model="settings.google_translate_endpoint"
+          v-model="localSettings.google_translate_endpoint"
           class="input-field w-32 sm:w-48 text-xs sm:text-sm"
         >
           <option value="translate.googleapis.com">
@@ -96,8 +113,8 @@ defineProps<Props>();
           </div>
         </div>
         <input
+          v-model="localSettings.deepl_api_key"
           type="password"
-          v-model="settings.deepl_api_key"
           :placeholder="t('deeplApiKeyPlaceholder')"
           :class="[
             'input-field w-32 sm:w-48 text-xs sm:text-sm',
@@ -125,8 +142,8 @@ defineProps<Props>();
             </div>
           </div>
           <input
+            v-model="localSettings.baidu_app_id"
             type="text"
-            v-model="settings.baidu_app_id"
             :placeholder="t('baiduAppIdPlaceholder')"
             :class="[
               'input-field w-32 sm:w-48 text-xs sm:text-sm',
@@ -151,8 +168,8 @@ defineProps<Props>();
             </div>
           </div>
           <input
+            v-model="localSettings.baidu_secret_key"
             type="password"
-            v-model="settings.baidu_secret_key"
             :placeholder="t('baiduSecretKeyPlaceholder')"
             :class="[
               'input-field w-32 sm:w-48 text-xs sm:text-sm',
@@ -181,8 +198,8 @@ defineProps<Props>();
             </div>
           </div>
           <input
+            v-model="localSettings.ai_api_key"
             type="password"
-            v-model="settings.ai_api_key"
             :placeholder="t('aiApiKeyPlaceholder')"
             :class="[
               'input-field w-32 sm:w-48 text-xs sm:text-sm',
@@ -205,8 +222,8 @@ defineProps<Props>();
             </div>
           </div>
           <input
+            v-model="localSettings.ai_endpoint"
             type="text"
-            v-model="settings.ai_endpoint"
             :placeholder="t('aiEndpointPlaceholder')"
             class="input-field w-32 sm:w-48 text-xs sm:text-sm"
           />
@@ -222,8 +239,8 @@ defineProps<Props>();
             </div>
           </div>
           <input
+            v-model="localSettings.ai_model"
             type="text"
-            v-model="settings.ai_model"
             :placeholder="t('aiModelPlaceholder')"
             class="input-field w-32 sm:w-48 text-xs sm:text-sm"
           />
@@ -239,7 +256,7 @@ defineProps<Props>();
             </div>
           </div>
           <textarea
-            v-model="settings.ai_system_prompt"
+            v-model="localSettings.ai_system_prompt"
             class="input-field w-full text-xs sm:text-sm resize-none"
             rows="3"
           />
@@ -257,7 +274,7 @@ defineProps<Props>();
           </div>
         </div>
         <select
-          v-model="settings.target_language"
+          v-model="localSettings.target_language"
           class="input-field w-24 sm:w-48 text-xs sm:text-sm"
         >
           <option value="en">{{ t('english') }}</option>
@@ -273,6 +290,8 @@ defineProps<Props>();
 </template>
 
 <style scoped>
+@reference "../../../../style.css";
+
 .input-field {
   @apply p-1.5 sm:p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary focus:border-accent focus:outline-none transition-colors;
 }

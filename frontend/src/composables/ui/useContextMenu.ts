@@ -13,7 +13,8 @@ export interface ContextMenuState {
   y: number;
   items: ContextMenuItem[];
   data: unknown;
-  callback?: (action: string, data: unknown) => void;
+
+  callback?: (string, unknown) => void;
 }
 
 export function useContextMenu() {

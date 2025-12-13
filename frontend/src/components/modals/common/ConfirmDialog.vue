@@ -39,8 +39,8 @@ function handleCancel() {
 <template>
   <div
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 sm:p-4"
-    @click.self="handleCancel"
     data-modal-open="true"
+    @click.self="handleCancel"
   >
     <div
       class="bg-bg-primary max-w-md w-full mx-2 sm:mx-4 rounded-xl shadow-2xl border border-border overflow-hidden animate-fade-in"
@@ -56,12 +56,12 @@ function handleCancel() {
       <div
         class="p-3 sm:p-5 border-t border-border bg-bg-secondary flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3"
       >
-        <button @click="handleCancel" class="btn-secondary text-sm sm:text-base">
+        <button class="btn-secondary text-sm sm:text-base" @click="handleCancel">
           {{ cancelText }}
         </button>
         <button
-          @click="handleConfirm"
           :class="[isDanger ? 'btn-danger' : 'btn-primary', 'text-sm sm:text-base']"
+          @click="handleConfirm"
         >
           {{ confirmText }}
         </button>
@@ -71,6 +71,8 @@ function handleCancel() {
 </template>
 
 <style scoped>
+@reference "../../../style.css";
+
 .btn-primary {
   @apply bg-accent text-white border-none px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg cursor-pointer font-semibold hover:bg-accent-hover transition-colors;
 }

@@ -18,6 +18,7 @@ withDefaults(defineProps<Props>(), {
 <template>
   <!-- Content display with inline translations -->
   <div v-if="articleContent">
+    <!-- eslint-disable-next-line vue/no-v-html -->
     <div
       class="prose prose-sm sm:prose-lg max-w-none text-text-primary prose-content"
       v-html="articleContent"

@@ -55,9 +55,9 @@ onUnmounted(() => {
         <span class="text-sm font-medium text-text-primary">{{ t('youtubeVideo') }}</span>
       </div>
       <button
-        @click="openInNewTab"
         class="text-xs text-accent hover:underline"
         :title="t('openInYouTube')"
+        @click="openInNewTab"
       >
         {{ t('openInYouTube') }}
       </button>

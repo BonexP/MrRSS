@@ -70,9 +70,9 @@ function getMultiSelectDisplayText(): string {
       <div class="flex-shrink-0">
         <label class="block text-[10px] sm:text-xs text-text-secondary mb-1">&nbsp;</label>
         <button
-          @click="emit('update:negate')"
           :class="['not-btn', condition.negate ? 'active' : '']"
           :title="t('not')"
+          @click="emit('update:negate')"
         >
           <PhProhibit :size="14" class="sm:w-4 sm:h-4" />
           <span class="text-[10px] sm:text-xs font-medium">{{ t('not') }}</span>
@@ -86,8 +86,8 @@ function getMultiSelectDisplayText(): string {
         }}</label>
         <select
           :value="condition.field"
-          @change="handleFieldChange"
           class="select-field w-full text-xs sm:text-sm"
+          @change="handleFieldChange"
         >
           <option v-for="opt in fieldOptions" :key="opt.value" :value="opt.value">
             {{ t(opt.labelKey) }}
@@ -102,8 +102,8 @@ function getMultiSelectDisplayText(): string {
         }}</label>
         <select
           :value="condition.operator"
-          @change="handleOperatorChange"
           class="select-field w-full text-xs sm:text-sm"
+          @change="handleOperatorChange"
         >
           <option v-for="opt in textOperatorOptions" :key="opt.value" :value="opt.value">
             {{ t(opt.labelKey) }}
@@ -122,16 +122,16 @@ function getMultiSelectDisplayText(): string {
           v-if="isDateField(condition.field)"
           type="date"
           :value="condition.value"
-          @input="handleValueChange"
           class="date-field w-full text-xs sm:text-sm"
+          @input="handleValueChange"
         />
 
         <!-- Boolean select -->
         <select
           v-else-if="isBooleanField(condition.field)"
           :value="condition.value"
-          @change="handleValueChange"
           class="select-field w-full text-xs sm:text-sm"
+          @change="handleValueChange"
         >
           <option v-for="opt in booleanOptions" :key="opt.value" :value="opt.value">
             {{ t(opt.labelKey) }}
@@ -142,8 +142,8 @@ function getMultiSelectDisplayText(): string {
         <div v-else-if="condition.field === 'feed_name'" class="dropdown-container">
           <button
             type="button"
-            @click="emit('toggle-dropdown')"
             class="dropdown-trigger text-xs sm:text-sm"
+            @click="emit('toggle-dropdown')"
           >
             <span class="dropdown-text truncate">{{ getMultiSelectDisplayText() }}</span>
             <span class="dropdown-arrow">▼</span>
@@ -152,11 +152,11 @@ function getMultiSelectDisplayText(): string {
             <div
               v-for="name in feedNames"
               :key="name"
-              @click.stop="handleToggleMultiSelectValue(name)"
               :class="[
                 'dropdown-option text-xs sm:text-sm',
                 condition.values.includes(name) ? 'selected' : '',
               ]"
+              @click.stop="handleToggleMultiSelectValue(name)"
             >
               <input
                 type="checkbox"
@@ -176,8 +176,8 @@ function getMultiSelectDisplayText(): string {
         <div v-else-if="condition.field === 'feed_category'" class="dropdown-container">
           <button
             type="button"
-            @click="emit('toggle-dropdown')"
             class="dropdown-trigger text-xs sm:text-sm"
+            @click="emit('toggle-dropdown')"
           >
             <span class="dropdown-text truncate">{{ getMultiSelectDisplayText() }}</span>
             <span class="dropdown-arrow">▼</span>
@@ -186,11 +186,11 @@ function getMultiSelectDisplayText(): string {
             <div
               v-for="cat in feedCategories"
               :key="cat"
-              @click.stop="handleToggleMultiSelectValue(cat as string)"
               :class="[
                 'dropdown-option text-xs sm:text-sm',
                 condition.values.includes(cat as string) ? 'selected' : '',
               ]"
+              @click.stop="handleToggleMultiSelectValue(cat as string)"
             >
               <input
                 type="checkbox"
@@ -214,16 +214,16 @@ function getMultiSelectDisplayText(): string {
           v-else
           type="text"
           :value="condition.value"
-          @input="handleValueChange"
           class="input-field w-full text-xs sm:text-sm"
           :placeholder="t('filterValue')"
+          @input="handleValueChange"
         />
       </div>
 
       <!-- Remove button -->
       <div class="flex-shrink-0">
         <label class="block text-[10px] sm:text-xs text-text-secondary mb-1">&nbsp;</label>
-        <button @click="emit('remove')" class="btn-danger-icon" :title="t('removeCondition')">
+        <button class="btn-danger-icon" :title="t('removeCondition')" @click="emit('remove')">
           <PhTrash :size="16" class="sm:w-[18px] sm:h-[18px]" />
         </button>
       </div>
@@ -232,6 +232,8 @@ function getMultiSelectDisplayText(): string {
 </template>
 
 <style scoped>
+@reference "../../../style.css";
+
 .input-field {
   @apply p-1.5 sm:p-2 border border-border rounded-md bg-bg-primary text-text-primary focus:border-accent focus:outline-none transition-colors;
 }
