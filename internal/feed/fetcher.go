@@ -74,12 +74,12 @@ func (f *Fetcher) getHTTPClient(feed models.Feed) (*http.Client, error) {
 		// Feed requests to use global proxy
 		proxyEnabled, _ := f.db.GetSetting("proxy_enabled")
 		if proxyEnabled == "true" {
-			// Build global proxy URL from settings
+			// Build global proxy URL from settings (use encrypted methods for credentials)
 			proxyType, _ := f.db.GetSetting("proxy_type")
 			proxyHost, _ := f.db.GetSetting("proxy_host")
 			proxyPort, _ := f.db.GetSetting("proxy_port")
-			proxyUsername, _ := f.db.GetSetting("proxy_username")
-			proxyPassword, _ := f.db.GetSetting("proxy_password")
+			proxyUsername, _ := f.db.GetEncryptedSetting("proxy_username")
+			proxyPassword, _ := f.db.GetEncryptedSetting("proxy_password")
 			proxyURL = BuildProxyURL(proxyType, proxyHost, proxyPort, proxyUsername, proxyPassword)
 		}
 	}
@@ -97,7 +97,7 @@ func (f *Fetcher) setupTranslator() {
 	var t translation.Translator
 	switch provider {
 	case "deepl":
-		apiKey, _ := f.db.GetSetting("deepl_api_key")
+		apiKey, _ := f.db.GetEncryptedSetting("deepl_api_key")
 		if apiKey != "" {
 			t = translation.NewDeepLTranslatorWithDB(apiKey, f.db)
 		} else {
@@ -105,14 +105,14 @@ func (f *Fetcher) setupTranslator() {
 		}
 	case "baidu":
 		appID, _ := f.db.GetSetting("baidu_app_id")
-		secretKey, _ := f.db.GetSetting("baidu_secret_key")
+		secretKey, _ := f.db.GetEncryptedSetting("baidu_secret_key")
 		if appID != "" && secretKey != "" {
 			t = translation.NewBaiduTranslatorWithDB(appID, secretKey, f.db)
 		} else {
 			t = translation.NewGoogleFreeTranslatorWithDB(f.db)
 		}
 	case "ai":
-		apiKey, _ := f.db.GetSetting("ai_api_key")
+		apiKey, _ := f.db.GetEncryptedSetting("ai_api_key")
 		endpoint, _ := f.db.GetSetting("ai_endpoint")
 		model, _ := f.db.GetSetting("ai_model")
 		if apiKey != "" {

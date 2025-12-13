@@ -8,6 +8,7 @@ import (
 // SettingsProvider is an interface for retrieving translation settings.
 type SettingsProvider interface {
 	GetSetting(key string) (string, error)
+	GetEncryptedSetting(key string) (string, error)
 }
 
 // DynamicTranslator is a translator that dynamically selects the translation provider
@@ -55,16 +56,16 @@ func (t *DynamicTranslator) getTranslator() (Translator, error) {
 		provider = "google" // Default to Google Free
 	}
 
-	// Get provider-specific settings
+	// Get provider-specific settings (use encrypted methods for sensitive credentials)
 	var apiKey, appID, secretKey, endpoint, model, systemPrompt string
 	switch provider {
 	case "deepl":
-		apiKey, _ = t.settings.GetSetting("deepl_api_key")
+		apiKey, _ = t.settings.GetEncryptedSetting("deepl_api_key")
 	case "baidu":
 		appID, _ = t.settings.GetSetting("baidu_app_id")
-		secretKey, _ = t.settings.GetSetting("baidu_secret_key")
+		secretKey, _ = t.settings.GetEncryptedSetting("baidu_secret_key")
 	case "ai":
-		apiKey, _ = t.settings.GetSetting("ai_api_key")
+		apiKey, _ = t.settings.GetEncryptedSetting("ai_api_key")
 		endpoint, _ = t.settings.GetSetting("ai_endpoint")
 		model, _ = t.settings.GetSetting("ai_model")
 		systemPrompt, _ = t.settings.GetSetting("ai_system_prompt")

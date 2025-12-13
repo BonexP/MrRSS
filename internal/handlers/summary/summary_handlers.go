@@ -70,8 +70,8 @@ func HandleSummarizeArticle(h *core.Handler, w http.ResponseWriter, r *http.Requ
 	var result summary.SummaryResult
 
 	if provider == "ai" {
-		// Use AI summarization
-		apiKey, err := h.DB.GetSetting("summary_ai_api_key")
+		// Use AI summarization (use encrypted method for API key)
+		apiKey, err := h.DB.GetEncryptedSetting("summary_ai_api_key")
 		if err != nil || apiKey == "" {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)

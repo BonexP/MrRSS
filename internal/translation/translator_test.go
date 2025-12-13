@@ -113,6 +113,11 @@ func (m *mockSettingsProvider) GetSetting(key string) (string, error) {
 	return m.settings[key], nil
 }
 
+func (m *mockSettingsProvider) GetEncryptedSetting(key string) (string, error) {
+	// In tests, just return the plain value (mock doesn't encrypt)
+	return m.settings[key], nil
+}
+
 func TestDynamicTranslator_DefaultsToGoogle(t *testing.T) {
 	provider := &mockSettingsProvider{
 		settings: map[string]string{},
