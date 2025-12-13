@@ -27,12 +27,12 @@ func HandleCheckUpdates(h *core.Handler, w http.ResponseWriter, r *http.Request)
 	var proxyURL string
 	proxyEnabled, _ := h.DB.GetSetting("proxy_enabled")
 	if proxyEnabled == "true" {
-		// Build proxy URL from global settings
+		// Build proxy URL from global settings (use encrypted methods for credentials)
 		proxyType, _ := h.DB.GetSetting("proxy_type")
 		proxyHost, _ := h.DB.GetSetting("proxy_host")
 		proxyPort, _ := h.DB.GetSetting("proxy_port")
-		proxyUsername, _ := h.DB.GetSetting("proxy_username")
-		proxyPassword, _ := h.DB.GetSetting("proxy_password")
+		proxyUsername, _ := h.DB.GetEncryptedSetting("proxy_username")
+		proxyPassword, _ := h.DB.GetEncryptedSetting("proxy_password")
 		proxyURL = utils.BuildProxyURL(proxyType, proxyHost, proxyPort, proxyUsername, proxyPassword)
 	}
 

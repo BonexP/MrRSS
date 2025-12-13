@@ -16,6 +16,7 @@ type Translator interface {
 // DBInterface defines the minimal database interface needed for proxy settings
 type DBInterface interface {
 	GetSetting(key string) (string, error)
+	GetEncryptedSetting(key string) (string, error)
 }
 
 // CreateHTTPClientWithProxy creates an HTTP client with global proxy settings if enabled
@@ -29,8 +30,8 @@ func CreateHTTPClientWithProxy(db DBInterface, timeout time.Duration) (*http.Cli
 		proxyType, _ := db.GetSetting("proxy_type")
 		proxyHost, _ := db.GetSetting("proxy_host")
 		proxyPort, _ := db.GetSetting("proxy_port")
-		proxyUsername, _ := db.GetSetting("proxy_username")
-		proxyPassword, _ := db.GetSetting("proxy_password")
+		proxyUsername, _ := db.GetEncryptedSetting("proxy_username")
+		proxyPassword, _ := db.GetEncryptedSetting("proxy_password")
 		proxyURL = utils.BuildProxyURL(proxyType, proxyHost, proxyPort, proxyUsername, proxyPassword)
 	}
 

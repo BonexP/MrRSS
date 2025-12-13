@@ -10,6 +10,7 @@ require (
 	github.com/go-ego/gse v1.0.0
 	github.com/mmcdole/gofeed v1.3.0
 	github.com/wailsapp/wails/v2 v2.11.0
+	golang.org/x/crypto v0.45.0
 	modernc.org/sqlite v1.40.1
 )
 
@@ -54,7 +55,6 @@ require (
 	github.com/vcaesar/cedar v0.20.2 // indirect
 	github.com/wailsapp/go-webview2 v1.0.23 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
-	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/exp v0.0.0-20251125195548-87e1e737ad39 // indirect
 	golang.org/x/net v0.47.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
