@@ -117,6 +117,9 @@ func TestIsEncrypted(t *testing.T) {
 		t.Fatalf("Encrypt() error = %v", err)
 	}
 
+	// Create a long base64 string that could be a legitimate API key (44+ chars)
+	longBase64APIKey := "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+
 	tests := []struct {
 		name     string
 		value    string
@@ -128,6 +131,7 @@ func TestIsEncrypted(t *testing.T) {
 		{"encrypted value", encrypted, true},
 		{"short base64", "YWJj", false},
 		{"not base64", "not-base64!", false},
+		{"long base64 api key", longBase64APIKey, false}, // Should NOT be detected as encrypted (no version marker)
 	}
 
 	for _, tt := range tests {

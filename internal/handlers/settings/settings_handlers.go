@@ -163,10 +163,22 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 			h.DB.SetSetting("translation_provider", req.TranslationProvider)
 		}
 		// Always update API keys as they might be cleared (use encrypted storage for sensitive credentials)
-		h.DB.SetEncryptedSetting("deepl_api_key", req.DeepLAPIKey)
+		if err := h.DB.SetEncryptedSetting("deepl_api_key", req.DeepLAPIKey); err != nil {
+			log.Printf("Failed to save DeepL API key: %v", err)
+			http.Error(w, "Failed to save DeepL API key", http.StatusInternalServerError)
+			return
+		}
 		h.DB.SetSetting("baidu_app_id", req.BaiduAppID)
-		h.DB.SetEncryptedSetting("baidu_secret_key", req.BaiduSecretKey)
-		h.DB.SetEncryptedSetting("ai_api_key", req.AIAPIKey)
+		if err := h.DB.SetEncryptedSetting("baidu_secret_key", req.BaiduSecretKey); err != nil {
+			log.Printf("Failed to save Baidu secret key: %v", err)
+			http.Error(w, "Failed to save Baidu secret key", http.StatusInternalServerError)
+			return
+		}
+		if err := h.DB.SetEncryptedSetting("ai_api_key", req.AIAPIKey); err != nil {
+			log.Printf("Failed to save AI API key: %v", err)
+			http.Error(w, "Failed to save AI API key", http.StatusInternalServerError)
+			return
+		}
 		h.DB.SetSetting("ai_endpoint", req.AIEndpoint)
 		h.DB.SetSetting("ai_model", req.AIModel)
 		h.DB.SetSetting("ai_system_prompt", req.AISystemPrompt)
@@ -234,7 +246,11 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Always update AI summary keys as they might be cleared (use encrypted storage for API key)
-		h.DB.SetEncryptedSetting("summary_ai_api_key", req.SummaryAIAPIKey)
+		if err := h.DB.SetEncryptedSetting("summary_ai_api_key", req.SummaryAIAPIKey); err != nil {
+			log.Printf("Failed to save summary AI API key: %v", err)
+			http.Error(w, "Failed to save summary AI API key", http.StatusInternalServerError)
+			return
+		}
 		h.DB.SetSetting("summary_ai_endpoint", req.SummaryAIEndpoint)
 		h.DB.SetSetting("summary_ai_model", req.SummaryAIModel)
 		h.DB.SetSetting("summary_ai_system_prompt", req.SummaryAISystemPrompt)
@@ -247,8 +263,16 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		h.DB.SetSetting("proxy_type", req.ProxyType)
 		h.DB.SetSetting("proxy_host", req.ProxyHost)
 		h.DB.SetSetting("proxy_port", req.ProxyPort)
-		h.DB.SetEncryptedSetting("proxy_username", req.ProxyUsername)
-		h.DB.SetEncryptedSetting("proxy_password", req.ProxyPassword)
+		if err := h.DB.SetEncryptedSetting("proxy_username", req.ProxyUsername); err != nil {
+			log.Printf("Failed to save proxy username: %v", err)
+			http.Error(w, "Failed to save proxy credentials", http.StatusInternalServerError)
+			return
+		}
+		if err := h.DB.SetEncryptedSetting("proxy_password", req.ProxyPassword); err != nil {
+			log.Printf("Failed to save proxy password: %v", err)
+			http.Error(w, "Failed to save proxy credentials", http.StatusInternalServerError)
+			return
+		}
 
 		// Always update google_translate_endpoint as it might be reset to default
 		h.DB.SetSetting("google_translate_endpoint", req.GoogleTranslateEndpoint)

@@ -52,21 +52,21 @@ func (db *DB) GetEncryptedSetting(key string) (string, error) {
 	}
 
 	// Value is plain text - migrate it to encrypted format
-	log.Printf("Migrating plain text setting to encrypted: %s", key)
+	log.Printf("Migrating plain text setting to encrypted storage")
 	
 	// Encrypt the plain text value
 	encrypted, err := crypto.Encrypt(storedValue)
 	if err != nil {
-		// If encryption fails, return the plain text value but log the error
-		log.Printf("Warning: Failed to encrypt setting %s during migration: %v", key, err)
-		return storedValue, nil
+		// If encryption fails, return an error to the caller
+		log.Printf("Warning: Failed to encrypt setting during migration: %v", err)
+		return "", fmt.Errorf("failed to encrypt setting during migration: %w", err)
 	}
 
 	// Store the encrypted value back
 	if err := db.SetSetting(key, encrypted); err != nil {
-		// If storage fails, return the plain text value but log the error
-		log.Printf("Warning: Failed to store encrypted setting %s: %v", key, err)
-		return storedValue, nil
+		// If storage fails, return an error to the caller
+		log.Printf("Warning: Failed to store encrypted setting: %v", err)
+		return "", fmt.Errorf("failed to store encrypted setting: %w", err)
 	}
 
 	// Return the original plain text value

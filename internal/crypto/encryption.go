@@ -11,17 +11,20 @@ import (
 	"io"
 	"os"
 	"runtime"
+	"strings"
 
 	"golang.org/x/crypto/pbkdf2"
 )
 
 const (
-	// Number of iterations for PBKDF2
-	pbkdf2Iterations = 100000
+	// Number of iterations for PBKDF2 (OWASP recommends 600,000+ for PBKDF2-HMAC-SHA256 as of 2023)
+	pbkdf2Iterations = 600000
 	// Key size for AES-256
 	keySize = 32
 	// Salt size for key derivation
 	saltSize = 16
+	// Version marker to identify encrypted values (prevents false positives in IsEncrypted)
+	versionMarker = "MrRSS-v1:"
 )
 
 var (
@@ -33,6 +36,7 @@ var (
 
 // GetMachineID generates a machine-specific identifier for key derivation.
 // This ensures that encrypted data is tied to the specific machine.
+// It combines multiple sources of entropy for better security.
 func GetMachineID() (string, error) {
 	// Use hostname as the primary identifier
 	hostname, err := os.Hostname()
@@ -40,8 +44,22 @@ func GetMachineID() (string, error) {
 		return "", fmt.Errorf("failed to get hostname: %w", err)
 	}
 
-	// Combine hostname with OS and architecture for uniqueness
-	machineID := fmt.Sprintf("%s-%s-%s", hostname, runtime.GOOS, runtime.GOARCH)
+	// Try to get machine-id from various system locations (Linux/BSD)
+	machineUUID := ""
+	possiblePaths := []string{
+		"/etc/machine-id",
+		"/var/lib/dbus/machine-id",
+	}
+	for _, path := range possiblePaths {
+		if data, err := os.ReadFile(path); err == nil {
+			machineUUID = string(data)
+			break
+		}
+	}
+
+	// Combine multiple sources: hostname, OS, architecture, and machine UUID
+	// This provides better entropy than hostname alone
+	machineID := fmt.Sprintf("%s-%s-%s-%s", hostname, runtime.GOOS, runtime.GOARCH, machineUUID)
 
 	return machineID, nil
 }
@@ -102,16 +120,23 @@ func Encrypt(plaintext string) (string, error) {
 	result = append(result, nonce...)
 	result = append(result, ciphertext...)
 
-	// Encode to base64 for safe storage
-	return base64.StdEncoding.EncodeToString(result), nil
+	// Encode to base64 and prepend version marker for safe storage
+	encoded := base64.StdEncoding.EncodeToString(result)
+	return versionMarker + encoded, nil
 }
 
 // Decrypt decrypts ciphertext that was encrypted with Encrypt.
-// The input must be base64-encoded and contain: [salt][nonce][ciphertext+tag]
+// The input must be version-prefixed base64-encoded and contain: [salt][nonce][ciphertext+tag]
 func Decrypt(ciphertextBase64 string) (string, error) {
 	if ciphertextBase64 == "" {
 		return "", nil
 	}
+
+	// Check and strip version marker
+	if !strings.HasPrefix(ciphertextBase64, versionMarker) {
+		return "", fmt.Errorf("missing or invalid version marker")
+	}
+	ciphertextBase64 = strings.TrimPrefix(ciphertextBase64, versionMarker)
 
 	// Decode from base64
 	data, err := base64.StdEncoding.DecodeString(ciphertextBase64)
@@ -166,20 +191,13 @@ func Decrypt(ciphertextBase64 string) (string, error) {
 	return string(plaintext), nil
 }
 
-// IsEncrypted checks if a value appears to be encrypted (base64 with correct length).
-// This is a heuristic check and may have false positives for very short values.
+// IsEncrypted checks if a value appears to be encrypted by checking for the version marker.
+// This definitively identifies encrypted values and prevents false positives.
 func IsEncrypted(value string) bool {
 	if value == "" {
 		return false
 	}
 
-	// Try to decode as base64
-	data, err := base64.StdEncoding.DecodeString(value)
-	if err != nil {
-		return false
-	}
-
-	// Check if it has at least the minimum length for encrypted data
-	// salt(16) + nonce(12) + tag(16) = 44 bytes minimum
-	return len(data) >= saltSize+12+16
+	// Check for version marker - this is definitive, not a heuristic
+	return strings.HasPrefix(value, versionMarker)
 }
