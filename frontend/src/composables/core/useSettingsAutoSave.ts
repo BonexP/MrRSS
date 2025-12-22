@@ -113,6 +113,9 @@ export function useSettingsAutoSave(settings: Ref<SettingsData> | (() => Setting
             settingsRef.value.ai_summary_prompt ?? settingsDefaults.ai_summary_prompt,
           ai_usage_tokens: settingsRef.value.ai_usage_tokens ?? settingsDefaults.ai_usage_tokens,
           ai_usage_limit: settingsRef.value.ai_usage_limit ?? settingsDefaults.ai_usage_limit,
+          ai_chat_enabled: (
+            settingsRef.value.ai_chat_enabled ?? settingsDefaults.ai_chat_enabled
+          ).toString(),
           auto_cleanup_enabled: (
             settingsRef.value.auto_cleanup_enabled ?? settingsDefaults.auto_cleanup_enabled
           ).toString(),

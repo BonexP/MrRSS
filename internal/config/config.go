@@ -37,6 +37,7 @@ type Defaults struct {
 	AISummaryPrompt          string `json:"ai_summary_prompt"`
 	AIUsageTokens            string `json:"ai_usage_tokens"`
 	AIUsageLimit             string `json:"ai_usage_limit"`
+	AIChatEnabled            bool   `json:"ai_chat_enabled"`
 	SummaryEnabled           bool   `json:"summary_enabled"`
 	SummaryLength            string `json:"summary_length"`
 	SummaryProvider          string `json:"summary_provider"`
@@ -132,6 +133,8 @@ func GetString(key string) string {
 		return defaults.AIUsageTokens
 	case "ai_usage_limit":
 		return defaults.AIUsageLimit
+	case "ai_chat_enabled":
+		return strconv.FormatBool(defaults.AIChatEnabled)
 	case "summary_enabled":
 		return strconv.FormatBool(defaults.SummaryEnabled)
 	case "summary_length":

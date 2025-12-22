@@ -78,6 +78,7 @@ function toggleTranslations() {
         :is-loading-content="isLoadingContent"
         :attach-image-event-listeners="attachImageEventListeners"
         :show-translations="showTranslations"
+        :show-content="showContent"
       />
     </div>
 

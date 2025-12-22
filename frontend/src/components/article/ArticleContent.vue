@@ -8,6 +8,8 @@ import ArticleLoading from './parts/ArticleLoading.vue';
 import ArticleBody from './parts/ArticleBody.vue';
 import AudioPlayer from './parts/AudioPlayer.vue';
 import VideoPlayer from './parts/VideoPlayer.vue';
+import ArticleChatButton from './ArticleChatButton.vue';
+import ArticleChatPanel from './ArticleChatPanel.vue';
 import { useArticleSummary } from '@/composables/article/useArticleSummary';
 import { useArticleTranslation } from '@/composables/article/useArticleTranslation';
 import { useArticleRendering } from '@/composables/article/useArticleRendering';
@@ -16,6 +18,7 @@ import {
   restorePreservedElements,
   hasOnlyPreservedContent,
 } from '@/composables/article/useContentTranslation';
+import { useSettings } from '@/composables/core/useSettings';
 import './ArticleContent.css';
 
 interface SummaryResult {
@@ -31,14 +34,39 @@ interface Props {
   isLoadingContent: boolean;
   attachImageEventListeners?: () => void;
   showTranslations?: boolean;
+  showContent?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showTranslations: true,
   attachImageEventListeners: undefined,
+  showContent: true,
 });
 
 const { t } = useI18n();
+
+// Chat state
+const { settings: appSettings, fetchSettings } = useSettings();
+const isChatPanelOpen = ref(false);
+
+// Fetch settings on mount to get actual values
+onMounted(async () => {
+  try {
+    await fetchSettings();
+  } catch (e) {
+    console.error('Error fetching settings for chat:', e);
+  }
+});
+
+// Computed to check if chat should be shown
+const showChatButton = computed(() => {
+  return (
+    appSettings.value.ai_chat_enabled &&
+    !props.isLoadingContent &&
+    props.articleContent &&
+    props.showContent
+  );
+});
 
 // Use composables for summary and translation
 const {
@@ -450,5 +478,17 @@ watch(
         :has-media-content="!!(article.audio_url || article.video_url)"
       />
     </div>
+
+    <!-- Chat Button (shown when content is loaded and chat is enabled) -->
+    <ArticleChatButton v-if="showChatButton && !isChatPanelOpen" @click="isChatPanelOpen = true" />
+
+    <!-- Chat Panel -->
+    <ArticleChatPanel
+      v-if="isChatPanelOpen"
+      :article="article"
+      :article-content="articleContent"
+      :settings="{ ai_chat_enabled: appSettings.ai_chat_enabled }"
+      @close="isChatPanelOpen = false"
+    />
   </div>
 </template>

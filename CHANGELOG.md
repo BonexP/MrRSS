@@ -9,11 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Supported drag-and-drop to reorder feeds or change feed categories. (#258)
+- Supported drag-and-drop to reorder feeds or change feed categories. (#288)
+- Supported AI Chat on article content. And of course **it's disabled by default**! (#286)
 
 ### Changed
 
-- AI summarization is now triggered manually on default to avoid excessive API usage. Users can enable automatic summarization in settings if desired. (#258)
+- AI summarization is now triggered manually on default to avoid excessive API usage. Users can enable automatic summarization in settings if desired. (#287)
 
 ## [1.3.6] - 2025-12-22
 

@@ -29,6 +29,7 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		aiSummaryPrompt, _ := h.DB.GetSetting("ai_summary_prompt")
 		aiUsageTokens, _ := h.DB.GetSetting("ai_usage_tokens")
 		aiUsageLimit, _ := h.DB.GetSetting("ai_usage_limit")
+		aiChatEnabled, _ := h.DB.GetSetting("ai_chat_enabled")
 		autoCleanup, _ := h.DB.GetSetting("auto_cleanup_enabled")
 		maxCacheSize, _ := h.DB.GetSetting("max_cache_size_mb")
 		maxArticleAge, _ := h.DB.GetSetting("max_article_age_days")
@@ -84,6 +85,7 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 			"ai_summary_prompt":           aiSummaryPrompt,
 			"ai_usage_tokens":             aiUsageTokens,
 			"ai_usage_limit":              aiUsageLimit,
+			"ai_chat_enabled":             aiChatEnabled,
 			"auto_cleanup_enabled":        autoCleanup,
 			"max_cache_size_mb":           maxCacheSize,
 			"max_article_age_days":        maxArticleAge,
@@ -141,6 +143,7 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 			AISummaryPrompt          string `json:"ai_summary_prompt"`
 			AIUsageTokens            string `json:"ai_usage_tokens"`
 			AIUsageLimit             string `json:"ai_usage_limit"`
+			AIChatEnabled            string `json:"ai_chat_enabled"`
 			AutoCleanupEnabled       string `json:"auto_cleanup_enabled"`
 			MaxCacheSizeMB           string `json:"max_cache_size_mb"`
 			MaxArticleAgeDays        string `json:"max_article_age_days"`
@@ -225,6 +228,7 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		// Always update AI usage settings
 		h.DB.SetSetting("ai_usage_tokens", req.AIUsageTokens)
 		h.DB.SetSetting("ai_usage_limit", req.AIUsageLimit)
+		h.DB.SetSetting("ai_chat_enabled", req.AIChatEnabled)
 
 		if req.AutoCleanupEnabled != "" {
 			h.DB.SetSetting("auto_cleanup_enabled", req.AutoCleanupEnabled)

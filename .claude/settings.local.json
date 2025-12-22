@@ -10,7 +10,10 @@
       "Bash(timeout:*)",
       "Bash(curl:*)",
       "Bash(go build:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(dir:*)",
+      "Bash(task build:*)",
+      "Bash(task build:frontend)"
     ]
   }
 }

@@ -19,6 +19,7 @@ export interface SettingsData {
   ai_summary_prompt: string;
   ai_usage_tokens: string;
   ai_usage_limit: string;
+  ai_chat_enabled: boolean;
   auto_cleanup_enabled: boolean;
   max_cache_size_mb: number;
   max_article_age_days: number;
