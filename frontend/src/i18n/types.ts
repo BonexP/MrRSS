@@ -57,6 +57,7 @@ export interface TranslationMessages {
   and: string;
   andNMore: string;
   appearance: string;
+  application: string;
   applyFilters: string;
   applyingRule: string;
   applyRuleNow: string;
@@ -227,6 +228,7 @@ export interface TranslationMessages {
   freshrssUsernamePlaceholder: string;
   fromFeed: string;
   general: string;
+  content: string;
   generateSummary: string;
   generatingAISummary: string;
   generatingSummary: string;
@@ -372,6 +374,7 @@ export interface TranslationMessages {
   publishedAfter: string;
   publishedBefore: string;
   readLater: string;
+  readingAndDisplay: string;
   readLaterStatus: string;
   readStatus: string;
   recentArticles: string;

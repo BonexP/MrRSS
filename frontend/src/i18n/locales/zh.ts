@@ -105,6 +105,7 @@ const zh: TranslationMessages = {
   andNMore: '等 {count} 个',
 
   appearance: '外观',
+  application: '应用',
   applyFilters: '应用过滤',
   applyingRule: '应用中...',
   applyRuleNow: '立即应用',
@@ -324,6 +325,7 @@ const zh: TranslationMessages = {
   freshrssUsernamePlaceholder: '输入用户名',
   fromFeed: '来自订阅源',
   general: '常规',
+  content: '内容',
   generateSummary: '生成摘要',
   generatingAISummary: '正在生成AI摘要...',
   generatingSummary: '正在生成摘要...',
@@ -491,6 +493,7 @@ const zh: TranslationMessages = {
   publishedAfter: '发布于此日期及之后',
   publishedBefore: '发布于此日期及之前',
   readLater: '稍后阅读',
+  readingAndDisplay: '阅读与显示',
   readLaterStatus: '稍后阅读状态',
   readStatus: '已读状态',
   recentArticles: '最近文章',

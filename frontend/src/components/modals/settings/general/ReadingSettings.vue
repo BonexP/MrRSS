@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import {
-  PhPalette,
-  PhMoon,
-  PhTranslate,
   PhArticle,
   PhImage,
   PhImages,
-  PhCursorClick,
   PhArticleNyTimes,
+  PhCursorClick,
+  PhEyeSlash,
 } from '@phosphor-icons/vue';
 import type { SettingsData } from '@/types/settings';
 
@@ -30,54 +28,11 @@ const emit = defineEmits<{
     <label
       class="font-semibold mb-2 sm:mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2"
     >
-      <PhPalette :size="14" class="sm:w-4 sm:h-4" />
-      {{ t('appearance') }}
+      <PhArticle :size="14" class="sm:w-4 sm:h-4" />
+      {{ t('readingAndDisplay') }}
     </label>
+
     <div class="setting-item">
-      <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
-        <PhMoon :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
-        <div class="flex-1 min-w-0">
-          <div class="font-medium mb-0 sm:mb-1 text-sm sm:text-base">{{ t('theme') }}</div>
-          <div class="text-xs text-text-secondary hidden sm:block">{{ t('themeDesc') }}</div>
-        </div>
-      </div>
-      <select
-        :value="settings.theme"
-        class="input-field w-24 sm:w-48 text-xs sm:text-sm"
-        @change="
-          (e) =>
-            emit('update:settings', { ...settings, theme: (e.target as HTMLSelectElement).value })
-        "
-      >
-        <option value="light">{{ t('light') }}</option>
-        <option value="dark">{{ t('dark') }}</option>
-        <option value="auto">{{ t('auto') }}</option>
-      </select>
-    </div>
-    <div class="setting-item mt-2 sm:mt-3">
-      <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
-        <PhTranslate :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
-        <div class="flex-1 min-w-0">
-          <div class="font-medium mb-0 sm:mb-1 text-sm sm:text-base">{{ t('language') }}</div>
-          <div class="text-xs text-text-secondary hidden sm:block">{{ t('languageDesc') }}</div>
-        </div>
-      </div>
-      <select
-        :value="settings.language"
-        class="input-field w-24 sm:w-48 text-xs sm:text-sm"
-        @change="
-          (e) =>
-            emit('update:settings', {
-              ...settings,
-              language: (e.target as HTMLSelectElement).value,
-            })
-        "
-      >
-        <option value="en-US">{{ t('english') }}</option>
-        <option value="zh-CN">{{ t('chinese') }}</option>
-      </select>
-    </div>
-    <div class="setting-item mt-2 sm:mt-3">
       <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
         <PhArticle :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
         <div class="flex-1 min-w-0">
@@ -104,6 +59,7 @@ const emit = defineEmits<{
         <option value="rendered">{{ t('viewModeRendered') }}</option>
       </select>
     </div>
+
     <div class="setting-item mt-2 sm:mt-3">
       <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
         <PhImage :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
@@ -129,6 +85,7 @@ const emit = defineEmits<{
         "
       />
     </div>
+
     <div class="setting-item mt-2 sm:mt-3">
       <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
         <PhArticleNyTimes :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
@@ -154,6 +111,7 @@ const emit = defineEmits<{
         "
       />
     </div>
+
     <div class="setting-item mt-2 sm:mt-3">
       <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
         <PhImages :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
@@ -179,6 +137,7 @@ const emit = defineEmits<{
         "
       />
     </div>
+
     <div class="setting-item mt-2 sm:mt-3">
       <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
         <PhCursorClick :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
@@ -200,6 +159,32 @@ const emit = defineEmits<{
             emit('update:settings', {
               ...settings,
               hover_mark_as_read: (e.target as HTMLInputElement).checked,
+            })
+        "
+      />
+    </div>
+
+    <div class="setting-item mt-2 sm:mt-3">
+      <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
+        <PhEyeSlash :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+        <div class="flex-1 min-w-0">
+          <div class="font-medium mb-0 sm:mb-1 text-sm sm:text-base">
+            {{ t('showHiddenArticles') }}
+          </div>
+          <div class="text-xs text-text-secondary hidden sm:block">
+            {{ t('showHiddenArticlesDesc') }}
+          </div>
+        </div>
+      </div>
+      <input
+        :checked="settings.show_hidden_articles"
+        type="checkbox"
+        class="toggle"
+        @change="
+          (e) =>
+            emit('update:settings', {
+              ...settings,
+              show_hidden_articles: (e.target as HTMLInputElement).checked,
             })
         "
       />

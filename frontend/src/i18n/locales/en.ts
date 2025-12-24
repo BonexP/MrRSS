@@ -106,6 +106,7 @@ const en: TranslationMessages = {
   andNMore: 'and {count} more',
 
   appearance: 'Appearance',
+  application: 'Application',
   applyFilters: 'Apply Filters',
   applyingRule: 'Applying...',
   applyRuleNow: 'Apply Now',
@@ -327,6 +328,7 @@ const en: TranslationMessages = {
   freshrssUsernamePlaceholder: 'Enter your username',
   fromFeed: 'From Feed',
   general: 'General',
+  content: 'Content',
   generateSummary: 'Generate Summary',
   generatingAISummary: 'Generating AI summary...',
   generatingSummary: 'Generating summary...',
@@ -498,6 +500,7 @@ const en: TranslationMessages = {
   publishedAfter: 'Published On/After',
   publishedBefore: 'Published On/Before',
   readLater: 'Read Later',
+  readingAndDisplay: 'Reading & Display',
   readLaterStatus: 'Read Later Status',
   readStatus: 'Read Status',
   recentArticles: 'Recent Articles',

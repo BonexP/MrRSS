@@ -107,6 +107,7 @@ export interface InstallResponse {
 export type TabName =
   | 'general'
   | 'feeds'
+  | 'content'
   | 'ai'
   | 'rules'
   | 'network'

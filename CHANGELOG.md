@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Supported customized request headers for AI services. (#301)
 
+### Changed
+
+- Reorganized settings page layout for better user experience.
+
 ## [1.3.8] - 2025-12-24
 
 ### Added
