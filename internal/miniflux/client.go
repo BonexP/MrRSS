@@ -259,13 +259,16 @@ func (s *SyncService) Sync(ctx context.Context) error {
 	}
 
 	// Convert Miniflux entries to MrRSS articles
+	// Note: MrRSS stores article content in the Summary field, which is used for
+	// displaying article previews and full content. The Content field from Miniflux
+	// contains the full article HTML/text.
 	articles := make([]*models.Article, 0, len(entries))
 	for _, entry := range entries {
 		article := &models.Article{
 			FeedID:      minifluxFeedID,
 			Title:       entry.Title,
 			URL:         entry.URL,
-			Summary:     entry.Content, // Store content in summary field
+			Summary:     entry.Content, // Store full content in summary field
 			PublishedAt: entry.PublishedAt,
 			IsRead:      false, // Miniflux unread entries
 			IsFavorite:  entry.Starred,
