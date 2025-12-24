@@ -265,7 +265,7 @@ func (s *SyncService) Sync(ctx context.Context) error {
 			FeedID:      minifluxFeedID,
 			Title:       entry.Title,
 			URL:         entry.URL,
-			Content:     entry.Content,
+			Summary:     entry.Content, // Store content in summary field
 			PublishedAt: entry.PublishedAt,
 			IsRead:      false, // Miniflux unread entries
 			IsFavorite:  entry.Starred,
