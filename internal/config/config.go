@@ -18,72 +18,72 @@ var defaultsJSON []byte
 
 // Defaults holds all default settings values
 type Defaults struct {
-	FullTextFetchEnabled     bool   `json:"full_text_fetch_enabled"`
-	Theme                    string `json:"theme"`
-	AITranslationPrompt      string `json:"ai_translation_prompt"`
-	ObsidianVault            string `json:"obsidian_vault"`
-	Language                 string `json:"language"`
 	AIAPIKey                 string `json:"ai_api_key"`
-	MediaCacheEnabled        bool   `json:"media_cache_enabled"`
-	ProxyUsername            string `json:"proxy_username"`
-	MaxConcurrentRefreshes   string `json:"max_concurrent_refreshes"`
-	AISummaryPrompt          string `json:"ai_summary_prompt"`
-	ProxyPassword            string `json:"proxy_password"`
-	LastArticleUpdate        string `json:"last_article_update"`
-	LastNetworkTest          string `json:"last_network_test"`
-	ImageGalleryEnabled      bool   `json:"image_gallery_enabled"`
-	UpdateInterval           int    `json:"update_interval"`
-	AIUsageLimit             string `json:"ai_usage_limit"`
 	AIChatEnabled            bool   `json:"ai_chat_enabled"`
-	SummaryTriggerMode       string `json:"summary_trigger_mode"`
-	WindowHeight             string `json:"window_height"`
-	WindowMaximized          string `json:"window_maximized"`
-	FreshRSSEnabled          bool   `json:"freshrss_enabled"`
-	RefreshMode              string `json:"refresh_mode"`
-	TranslationEnabled       bool   `json:"translation_enabled"`
-	TargetLanguage           string `json:"target_language"`
-	ProxyEnabled             bool   `json:"proxy_enabled"`
-	AutoShowAllContent       bool   `json:"auto_show_all_content"`
+	AICustomHeaders          string `json:"ai_custom_headers"`
+	AIEndpoint               string `json:"ai_endpoint"`
+	AIModel                  string `json:"ai_model"`
+	AISummaryPrompt          string `json:"ai_summary_prompt"`
+	AITranslationPrompt      string `json:"ai_translation_prompt"`
+	AIUsageLimit             string `json:"ai_usage_limit"`
 	AIUsageTokens            string `json:"ai_usage_tokens"`
-	StartupOnBoot            bool   `json:"startup_on_boot"`
+	AutoCleanupEnabled       bool   `json:"auto_cleanup_enabled"`
+	AutoShowAllContent       bool   `json:"auto_show_all_content"`
+	BaiduAppId               string `json:"baidu_app_id"`
+	BaiduSecretKey           string `json:"baidu_secret_key"`
 	CloseToTray              bool   `json:"close_to_tray"`
 	DeeplAPIKey              string `json:"deepl_api_key"`
 	DeeplEndpoint            string `json:"deepl_endpoint"`
-	BaiduAppId               string `json:"baidu_app_id"`
-	BaiduSecretKey           string `json:"baidu_secret_key"`
-	MaxCacheSizeMb           int    `json:"max_cache_size_mb"`
 	DefaultViewMode          string `json:"default_view_mode"`
-	ShowHiddenArticles       bool   `json:"show_hidden_articles"`
-	SummaryEnabled           bool   `json:"summary_enabled"`
-	MediaCacheMaxSizeMb      int    `json:"media_cache_max_size_mb"`
-	ProxyType                string `json:"proxy_type"`
-	Rules                    string `json:"rules"`
-	WindowWidth              string `json:"window_width"`
-	NetworkSpeed             string `json:"network_speed"`
-	Shortcuts                string `json:"shortcuts"`
-	NetworkBandwidthMbps     string `json:"network_bandwidth_mbps"`
-	FreshRSSUsername         string `json:"freshrss_username"`
-	TranslationProvider      string `json:"translation_provider"`
-	ProxyHost                string `json:"proxy_host"`
-	WindowX                  string `json:"window_x"`
-	FreshRSSServerUrl        string `json:"freshrss_server_url"`
-	MediaCacheMaxAgeDays     int    `json:"media_cache_max_age_days"`
-	GoogleTranslateEndpoint  string `json:"google_translate_endpoint"`
-	ShowArticlePreviewImages bool   `json:"show_article_preview_images"`
-	NetworkLatencyMs         string `json:"network_latency_ms"`
-	SummaryLength            string `json:"summary_length"`
-	MaxArticleAgeDays        int    `json:"max_article_age_days"`
-	ProxyPort                string `json:"proxy_port"`
-	HoverMarkAsRead          bool   `json:"hover_mark_as_read"`
-	AIEndpoint               string `json:"ai_endpoint"`
-	ObsidianVaultPath        string `json:"obsidian_vault_path"`
-	AIModel                  string `json:"ai_model"`
-	WindowY                  string `json:"window_y"`
-	AICustomHeaders          string `json:"ai_custom_headers"`
-	AutoCleanupEnabled       bool   `json:"auto_cleanup_enabled"`
-	ObsidianEnabled          bool   `json:"obsidian_enabled"`
-	SummaryProvider          string `json:"summary_provider"`
 	FreshRSSAPIPassword      string `json:"freshrss_api_password"`
+	FreshRSSEnabled          bool   `json:"freshrss_enabled"`
+	FreshRSSServerUrl        string `json:"freshrss_server_url"`
+	FreshRSSUsername         string `json:"freshrss_username"`
+	FullTextFetchEnabled     bool   `json:"full_text_fetch_enabled"`
+	GoogleTranslateEndpoint  string `json:"google_translate_endpoint"`
+	HoverMarkAsRead          bool   `json:"hover_mark_as_read"`
+	ImageGalleryEnabled      bool   `json:"image_gallery_enabled"`
+	Language                 string `json:"language"`
+	LastArticleUpdate        string `json:"last_article_update"`
+	LastNetworkTest          string `json:"last_network_test"`
+	MaxArticleAgeDays        int    `json:"max_article_age_days"`
+	MaxCacheSizeMb           int    `json:"max_cache_size_mb"`
+	MaxConcurrentRefreshes   string `json:"max_concurrent_refreshes"`
+	MediaCacheEnabled        bool   `json:"media_cache_enabled"`
+	MediaCacheMaxAgeDays     int    `json:"media_cache_max_age_days"`
+	MediaCacheMaxSizeMb      int    `json:"media_cache_max_size_mb"`
+	NetworkBandwidthMbps     string `json:"network_bandwidth_mbps"`
+	NetworkLatencyMs         string `json:"network_latency_ms"`
+	NetworkSpeed             string `json:"network_speed"`
+	ObsidianEnabled          bool   `json:"obsidian_enabled"`
+	ObsidianVault            string `json:"obsidian_vault"`
+	ObsidianVaultPath        string `json:"obsidian_vault_path"`
+	ProxyEnabled             bool   `json:"proxy_enabled"`
+	ProxyHost                string `json:"proxy_host"`
+	ProxyPassword            string `json:"proxy_password"`
+	ProxyPort                string `json:"proxy_port"`
+	ProxyType                string `json:"proxy_type"`
+	ProxyUsername            string `json:"proxy_username"`
+	RefreshMode              string `json:"refresh_mode"`
+	Rules                    string `json:"rules"`
+	Shortcuts                string `json:"shortcuts"`
+	ShowArticlePreviewImages bool   `json:"show_article_preview_images"`
+	ShowHiddenArticles       bool   `json:"show_hidden_articles"`
+	StartupOnBoot            bool   `json:"startup_on_boot"`
+	SummaryEnabled           bool   `json:"summary_enabled"`
+	SummaryLength            string `json:"summary_length"`
+	SummaryProvider          string `json:"summary_provider"`
+	SummaryTriggerMode       string `json:"summary_trigger_mode"`
+	TargetLanguage           string `json:"target_language"`
+	Theme                    string `json:"theme"`
+	TranslationEnabled       bool   `json:"translation_enabled"`
+	TranslationProvider      string `json:"translation_provider"`
+	UpdateInterval           int    `json:"update_interval"`
+	WindowHeight             string `json:"window_height"`
+	WindowMaximized          string `json:"window_maximized"`
+	WindowWidth              string `json:"window_width"`
+	WindowX                  string `json:"window_x"`
+	WindowY                  string `json:"window_y"`
 }
 
 var defaults Defaults
@@ -102,138 +102,138 @@ func Get() Defaults {
 // GetString returns a setting default as a string
 func GetString(key string) string {
 	switch key {
-	case "full_text_fetch_enabled":
-		return strconv.FormatBool(defaults.FullTextFetchEnabled)
-	case "theme":
-		return defaults.Theme
-	case "ai_translation_prompt":
-		return defaults.AITranslationPrompt
-	case "obsidian_vault":
-		return defaults.ObsidianVault
-	case "language":
-		return defaults.Language
 	case "ai_api_key":
 		return defaults.AIAPIKey
-	case "media_cache_enabled":
-		return strconv.FormatBool(defaults.MediaCacheEnabled)
-	case "proxy_username":
-		return defaults.ProxyUsername
-	case "max_concurrent_refreshes":
-		return defaults.MaxConcurrentRefreshes
-	case "ai_summary_prompt":
-		return defaults.AISummaryPrompt
-	case "proxy_password":
-		return defaults.ProxyPassword
-	case "last_article_update":
-		return defaults.LastArticleUpdate
-	case "last_network_test":
-		return defaults.LastNetworkTest
-	case "image_gallery_enabled":
-		return strconv.FormatBool(defaults.ImageGalleryEnabled)
-	case "update_interval":
-		return strconv.Itoa(defaults.UpdateInterval)
-	case "ai_usage_limit":
-		return defaults.AIUsageLimit
 	case "ai_chat_enabled":
 		return strconv.FormatBool(defaults.AIChatEnabled)
-	case "summary_trigger_mode":
-		return defaults.SummaryTriggerMode
-	case "window_height":
-		return defaults.WindowHeight
-	case "window_maximized":
-		return defaults.WindowMaximized
-	case "freshrss_enabled":
-		return strconv.FormatBool(defaults.FreshRSSEnabled)
-	case "refresh_mode":
-		return defaults.RefreshMode
-	case "translation_enabled":
-		return strconv.FormatBool(defaults.TranslationEnabled)
-	case "target_language":
-		return defaults.TargetLanguage
-	case "proxy_enabled":
-		return strconv.FormatBool(defaults.ProxyEnabled)
-	case "auto_show_all_content":
-		return strconv.FormatBool(defaults.AutoShowAllContent)
+	case "ai_custom_headers":
+		return defaults.AICustomHeaders
+	case "ai_endpoint":
+		return defaults.AIEndpoint
+	case "ai_model":
+		return defaults.AIModel
+	case "ai_summary_prompt":
+		return defaults.AISummaryPrompt
+	case "ai_translation_prompt":
+		return defaults.AITranslationPrompt
+	case "ai_usage_limit":
+		return defaults.AIUsageLimit
 	case "ai_usage_tokens":
 		return defaults.AIUsageTokens
-	case "startup_on_boot":
-		return strconv.FormatBool(defaults.StartupOnBoot)
+	case "auto_cleanup_enabled":
+		return strconv.FormatBool(defaults.AutoCleanupEnabled)
+	case "auto_show_all_content":
+		return strconv.FormatBool(defaults.AutoShowAllContent)
+	case "baidu_app_id":
+		return defaults.BaiduAppId
+	case "baidu_secret_key":
+		return defaults.BaiduSecretKey
 	case "close_to_tray":
 		return strconv.FormatBool(defaults.CloseToTray)
 	case "deepl_api_key":
 		return defaults.DeeplAPIKey
 	case "deepl_endpoint":
 		return defaults.DeeplEndpoint
-	case "baidu_app_id":
-		return defaults.BaiduAppId
-	case "baidu_secret_key":
-		return defaults.BaiduSecretKey
-	case "max_cache_size_mb":
-		return strconv.Itoa(defaults.MaxCacheSizeMb)
 	case "default_view_mode":
 		return defaults.DefaultViewMode
-	case "show_hidden_articles":
-		return strconv.FormatBool(defaults.ShowHiddenArticles)
-	case "summary_enabled":
-		return strconv.FormatBool(defaults.SummaryEnabled)
-	case "media_cache_max_size_mb":
-		return strconv.Itoa(defaults.MediaCacheMaxSizeMb)
-	case "proxy_type":
-		return defaults.ProxyType
-	case "rules":
-		return defaults.Rules
-	case "window_width":
-		return defaults.WindowWidth
-	case "network_speed":
-		return defaults.NetworkSpeed
-	case "shortcuts":
-		return defaults.Shortcuts
-	case "network_bandwidth_mbps":
-		return defaults.NetworkBandwidthMbps
-	case "freshrss_username":
-		return defaults.FreshRSSUsername
-	case "translation_provider":
-		return defaults.TranslationProvider
-	case "proxy_host":
-		return defaults.ProxyHost
-	case "window_x":
-		return defaults.WindowX
-	case "freshrss_server_url":
-		return defaults.FreshRSSServerUrl
-	case "media_cache_max_age_days":
-		return strconv.Itoa(defaults.MediaCacheMaxAgeDays)
-	case "google_translate_endpoint":
-		return defaults.GoogleTranslateEndpoint
-	case "show_article_preview_images":
-		return strconv.FormatBool(defaults.ShowArticlePreviewImages)
-	case "network_latency_ms":
-		return defaults.NetworkLatencyMs
-	case "summary_length":
-		return defaults.SummaryLength
-	case "max_article_age_days":
-		return strconv.Itoa(defaults.MaxArticleAgeDays)
-	case "proxy_port":
-		return defaults.ProxyPort
-	case "hover_mark_as_read":
-		return strconv.FormatBool(defaults.HoverMarkAsRead)
-	case "ai_endpoint":
-		return defaults.AIEndpoint
-	case "obsidian_vault_path":
-		return defaults.ObsidianVaultPath
-	case "ai_model":
-		return defaults.AIModel
-	case "window_y":
-		return defaults.WindowY
-	case "ai_custom_headers":
-		return defaults.AICustomHeaders
-	case "auto_cleanup_enabled":
-		return strconv.FormatBool(defaults.AutoCleanupEnabled)
-	case "obsidian_enabled":
-		return strconv.FormatBool(defaults.ObsidianEnabled)
-	case "summary_provider":
-		return defaults.SummaryProvider
 	case "freshrss_api_password":
 		return defaults.FreshRSSAPIPassword
+	case "freshrss_enabled":
+		return strconv.FormatBool(defaults.FreshRSSEnabled)
+	case "freshrss_server_url":
+		return defaults.FreshRSSServerUrl
+	case "freshrss_username":
+		return defaults.FreshRSSUsername
+	case "full_text_fetch_enabled":
+		return strconv.FormatBool(defaults.FullTextFetchEnabled)
+	case "google_translate_endpoint":
+		return defaults.GoogleTranslateEndpoint
+	case "hover_mark_as_read":
+		return strconv.FormatBool(defaults.HoverMarkAsRead)
+	case "image_gallery_enabled":
+		return strconv.FormatBool(defaults.ImageGalleryEnabled)
+	case "language":
+		return defaults.Language
+	case "last_article_update":
+		return defaults.LastArticleUpdate
+	case "last_network_test":
+		return defaults.LastNetworkTest
+	case "max_article_age_days":
+		return strconv.Itoa(defaults.MaxArticleAgeDays)
+	case "max_cache_size_mb":
+		return strconv.Itoa(defaults.MaxCacheSizeMb)
+	case "max_concurrent_refreshes":
+		return defaults.MaxConcurrentRefreshes
+	case "media_cache_enabled":
+		return strconv.FormatBool(defaults.MediaCacheEnabled)
+	case "media_cache_max_age_days":
+		return strconv.Itoa(defaults.MediaCacheMaxAgeDays)
+	case "media_cache_max_size_mb":
+		return strconv.Itoa(defaults.MediaCacheMaxSizeMb)
+	case "network_bandwidth_mbps":
+		return defaults.NetworkBandwidthMbps
+	case "network_latency_ms":
+		return defaults.NetworkLatencyMs
+	case "network_speed":
+		return defaults.NetworkSpeed
+	case "obsidian_enabled":
+		return strconv.FormatBool(defaults.ObsidianEnabled)
+	case "obsidian_vault":
+		return defaults.ObsidianVault
+	case "obsidian_vault_path":
+		return defaults.ObsidianVaultPath
+	case "proxy_enabled":
+		return strconv.FormatBool(defaults.ProxyEnabled)
+	case "proxy_host":
+		return defaults.ProxyHost
+	case "proxy_password":
+		return defaults.ProxyPassword
+	case "proxy_port":
+		return defaults.ProxyPort
+	case "proxy_type":
+		return defaults.ProxyType
+	case "proxy_username":
+		return defaults.ProxyUsername
+	case "refresh_mode":
+		return defaults.RefreshMode
+	case "rules":
+		return defaults.Rules
+	case "shortcuts":
+		return defaults.Shortcuts
+	case "show_article_preview_images":
+		return strconv.FormatBool(defaults.ShowArticlePreviewImages)
+	case "show_hidden_articles":
+		return strconv.FormatBool(defaults.ShowHiddenArticles)
+	case "startup_on_boot":
+		return strconv.FormatBool(defaults.StartupOnBoot)
+	case "summary_enabled":
+		return strconv.FormatBool(defaults.SummaryEnabled)
+	case "summary_length":
+		return defaults.SummaryLength
+	case "summary_provider":
+		return defaults.SummaryProvider
+	case "summary_trigger_mode":
+		return defaults.SummaryTriggerMode
+	case "target_language":
+		return defaults.TargetLanguage
+	case "theme":
+		return defaults.Theme
+	case "translation_enabled":
+		return strconv.FormatBool(defaults.TranslationEnabled)
+	case "translation_provider":
+		return defaults.TranslationProvider
+	case "update_interval":
+		return strconv.Itoa(defaults.UpdateInterval)
+	case "window_height":
+		return defaults.WindowHeight
+	case "window_maximized":
+		return defaults.WindowMaximized
+	case "window_width":
+		return defaults.WindowWidth
+	case "window_x":
+		return defaults.WindowX
+	case "window_y":
+		return defaults.WindowY
 	default:
 		return ""
 	}

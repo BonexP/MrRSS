@@ -199,96 +199,10 @@ Important: The database uses SQLite with WAL mode for better concurrency.
 
 **See [docs/SETTINGS.md](docs/SETTINGS.md) for complete guide.**
 
----
-
-#### Legacy Documentation (For Reference Only)
-
-The old way of manually editing multiple files is **deprecated**. The new schema-driven approach handles all the boilerplate automatically.
-
-1. Frontend defaults: `config/defaults.json`
-2. Backend defaults: `internal/config/defaults.json`
-3. Backend types: `internal/config/config.go`
-4. Database initialization: `internal/database/db.go`
-5. API handlers: `internal/handlers/settings/settings_handlers.go`
-6. Frontend types: `frontend/src/types/settings.ts`
-7. Frontend composables: `frontend/src/composables/core/useSettings.ts`
-8. Auto-save logic: `frontend/src/composables/core/useSettingsAutoSave.ts`
-9. UI Components: Add to appropriate settings tab (e.g., `ReadingSettings.vue`)
-10. Internationalization: Add translations to `frontend/src/i18n/locales/en.ts` and `zh.ts`
-
-### Adding a New Setting: Complete Checklist
-
-When adding a new setting (example: `auto_show_all_content`), follow these steps:
-
-#### Backend Changes (5 files)
-
-1. **`config/defaults.json`**
-
-   - Add default value: `"auto_show_all_content": false`
-
-2. **`internal/config/defaults.json`**
-
-   - Add default value: `"auto_show_all_content": false`
-
-3. **`internal/config/config.go`**
-
-   - Add field to `Defaults` struct: `AutoShowAllContent bool \`json:"auto_show_all_content"\``
-   - Add case to `GetString()` function: `case "auto_show_all_content": return strconv.FormatBool(defaults.AutoShowAllContent)`
-
-4. **`internal/database/db.go`**
-
-   - Add to `settingsKeys` array: `"auto_show_all_content"` (ensures database initialization)
-
-5. **`internal/handlers/settings/settings_handlers.go`**
-
-   - GET: Add variable: `autoShowAllContent, _ := h.DB.GetSetting("auto_show_all_content")`
-   - GET: Add to JSON response: `"auto_show_all_content": autoShowAllContent`
-   - POST: Add field to request struct: `AutoShowAllContent string \`json:"auto_show_all_content"\``
-   - POST: Add save logic: `if req.AutoShowAllContent != "" { h.DB.SetSetting("auto_show_all_content", req.AutoShowAllContent) }`
-
-#### Frontend Changes (6 files)
-
-1. **`frontend/src/types/settings.ts`**
-
-   - Add to `SettingsData` interface: `auto_show_all_content: boolean;`
-
-2. **`frontend/src/composables/core/useSettings.ts`**
-
-   - Add to initial settings object: `auto_show_all_content: settingsDefaults.auto_show_all_content`
-   - Add to `fetchSettings()` response: `auto_show_all_content: data.auto_show_all_content === 'true'`
-
-3. **`frontend/src/composables/core/useSettingsAutoSave.ts`**
-
-   - Add to save payload: `auto_show_all_content: (settingsRef.value.auto_show_all_content ?? settingsDefaults.auto_show_all_content).toString()`
-   - Add event dispatch: `window.dispatchEvent(new CustomEvent('auto-show-all-content-changed', { detail: { value: settingsRef.value.auto_show_all_content } }))`
-
-4. **`frontend/src/i18n/locales/en.ts`**
-
-   - Add translations: `autoShowAllContent: 'Auto Show All Content'` and `autoShowAllContentDesc: '...'`
-
-5. **`frontend/src/i18n/locales/zh.ts`**
-
-    - Add translations: `autoShowAllContent: '自动展示所有内容'` and `autoShowAllContentDesc: '...'`
-
-6. **UI Component** (e.g., `frontend/src/components/modals/settings/general/ReadingSettings.vue`)
-
-    - Add setting UI with checkbox/toggle
-    - Emit update event on change
-
-#### Implementation Logic (if needed)
-
-1. **Feature Implementation**
-
-    - Add composable or logic to implement the setting's functionality
-    - Listen for setting change events via `window.addEventListener()`
-    - Apply setting logic when value changes
-
-#### Common Pitfalls
-
-- **Missing database key**: Forgetting to add to `db.go` settingsKeys array causes setting to not persist
-- **Boolean conversion**: Backend returns strings, frontend must convert: `data.setting === 'true'`
-- **Type mismatch**: Ensure boolean settings use `.toString()` when sending to backend
-- **Event naming**: Use kebab-case for event names (e.g., `auto-show-all-content-changed`)
+**Key Points:**
+- **Frontend uses snake_case** (e.g., `settings.ai_api_key`, `settings.update_interval`)
+- All generated files are sorted alphabetically for stable diffs
+- The generator handles all boilerplate automatically
 
 ## Testing
 

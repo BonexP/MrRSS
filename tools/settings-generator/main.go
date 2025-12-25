@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -99,14 +100,24 @@ func main() {
 func generateDefaultsJSON(schema *SettingsSchema) error {
 	defaults := make(map[string]interface{})
 	// Use backend snake_case keys for defaults.json
-	for key, def := range schema.Settings {
-		defaults[key] = def.Default
+	// Sort keys for consistent output
+	var keys []string
+	for key := range schema.Settings {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		defaults[key] = schema.Settings[key].Default
 	}
 
 	data, err := json.MarshalIndent(defaults, "", "  ")
 	if err != nil {
 		return err
 	}
+
+	// Ensure file ends with newline (standard practice)
+	data = append(data, '\n')
 
 	return os.WriteFile("config/defaults.json", data, 0644)
 }
@@ -114,14 +125,24 @@ func generateDefaultsJSON(schema *SettingsSchema) error {
 func generateInternalDefaultsJSON(schema *SettingsSchema) error {
 	defaults := make(map[string]interface{})
 	// Use backend snake_case keys for defaults.json
-	for key, def := range schema.Settings {
-		defaults[key] = def.Default
+	// Sort keys for consistent output
+	var keys []string
+	for key := range schema.Settings {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		defaults[key] = schema.Settings[key].Default
 	}
 
 	data, err := json.MarshalIndent(defaults, "", "  ")
 	if err != nil {
 		return err
 	}
+
+	// Ensure file ends with newline (standard practice)
+	data = append(data, '\n')
 
 	return os.WriteFile("internal/config/defaults.json", data, 0644)
 }
@@ -131,13 +152,35 @@ func generateConfigGo(schema *SettingsSchema) error {
 	var structFields []string
 	var switchCases []string
 
-	for key, def := range schema.Settings {
+	// Sort keys for consistent output
+	var keys []string
+	for key := range schema.Settings {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	// Find the maximum field name + type length for alignment
+	maxFieldLen := 0
+	for _, key := range keys {
+		def := schema.Settings[key]
+		goKey := toGoFieldName(key)
+		goType := toGoType(def.Type)
+		fieldLen := len(goKey) + len(goType) + 1 // +1 for space
+		if fieldLen > maxFieldLen {
+			maxFieldLen = fieldLen
+		}
+	}
+
+	for _, key := range keys {
+		def := schema.Settings[key]
 		// Convert key to Go field name
 		goKey := toGoFieldName(key)
 		goType := toGoType(def.Type)
 
-		// Struct field with JSON tag
-		structFields = append(structFields, fmt.Sprintf("\t%s %s `json:\"%s\"`", goKey, goType, key))
+		// Struct field with JSON tag - aligned
+		fieldLen := len(goKey) + len(goType) + 1
+		padding := maxFieldLen - fieldLen
+		structFields = append(structFields, fmt.Sprintf("\t%s %s%s`json:\"%s\"`", goKey, goType, strings.Repeat(" ", padding), key))
 
 		// Switch case for GetString
 		caseStmt := fmt.Sprintf("\tcase \"%s\":", key)
@@ -209,7 +252,13 @@ func GetString(key string) string {
 func generateSettingsKeysGo(schema *SettingsSchema) error {
 	var keys []string
 	for key := range schema.Settings {
-		keys = append(keys, fmt.Sprintf("\"%s\"", key))
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	var keyStrings []string
+	for _, key := range keys {
+		keyStrings = append(keyStrings, fmt.Sprintf("\"%s\"", key))
 	}
 
 	tmpl := `// Copyright 2026 Ch3nyang & MrRSS Team. All rights reserved.
@@ -225,7 +274,7 @@ func SettingsKeys() []string {
 }
 `
 
-	content := fmt.Sprintf(tmpl, strings.Join(keys, ", "))
+	content := fmt.Sprintf(tmpl, strings.Join(keyStrings, ", "))
 	return os.WriteFile("internal/config/settings_keys.go", []byte(content), 0644)
 }
 
@@ -233,33 +282,49 @@ func generateSettingsHandlersGo(schema *SettingsSchema) error {
 	// Generate GET variables
 	var getVars []string
 	var jsonFields []string
-	for key, def := range schema.Settings {
+
+	// Sort keys for consistent output
+	var keys []string
+	for key := range schema.Settings {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		def := schema.Settings[key]
 		varName := toGoVarName(key)
 		if def.Encrypted {
-			getVars = append(getVars, fmt.Sprintf("\t%s, _ := h.DB.GetEncryptedSetting(\"%s\")", varName, key))
+			getVars = append(getVars, fmt.Sprintf("\t\t%s, _ := h.DB.GetEncryptedSetting(\"%s\")", varName, key))
 		} else {
-			getVars = append(getVars, fmt.Sprintf("\t%s, _ := h.DB.GetSetting(\"%s\")", varName, key))
+			getVars = append(getVars, fmt.Sprintf("\t\t%s, _ := h.DB.GetSetting(\"%s\")", varName, key))
 		}
-		jsonFields = append(jsonFields, fmt.Sprintf("\t\t\"%s\": %s,", key, varName))
+		jsonFields = append(jsonFields, fmt.Sprintf("\t\t\t\"%s\": %s,", key, varName))
 	}
 
 	// Generate POST struct fields and save logic
 	var structFields []string
 	var saveStatements []string
-	for key, def := range schema.Settings {
+
+	// Find maximum field name length for alignment
+	maxFieldNameLen := 0
+	for _, key := range keys {
 		goKey := toGoFieldName(key)
-		structFields = append(structFields, fmt.Sprintf("\t\t%s string `json:\"%s\"`", goKey, key))
+		if len(goKey) > maxFieldNameLen {
+			maxFieldNameLen = len(goKey)
+		}
+	}
+
+	for _, key := range keys {
+		def := schema.Settings[key]
+		goKey := toGoFieldName(key)
+		// Align struct field tags
+		padding := maxFieldNameLen - len(goKey)
+		structFields = append(structFields, fmt.Sprintf("\t\t%s%s string `json:\"%s\"`", goKey, strings.Repeat(" ", padding), key))
 
 		if def.Encrypted {
-			saveStatements = append(saveStatements, fmt.Sprintf(`		if err := h.DB.SetEncryptedSetting("%s", req.%s); err != nil {
-			log.Printf("Failed to save %s: %%v", err)
-			http.Error(w, "Failed to save %s", http.StatusInternalServerError)
-			return
-		}`, key, goKey, key, key))
+			saveStatements = append(saveStatements, fmt.Sprintf("\t\tif err := h.DB.SetEncryptedSetting(\"%s\", req.%s); err != nil {\n\t\t\tlog.Printf(\"Failed to save %s: %%v\", err)\n\t\t\thttp.Error(w, \"Failed to save %s\", http.StatusInternalServerError)\n\t\t\treturn\n\t\t}", key, goKey, key, key))
 		} else {
-			saveStatements = append(saveStatements, fmt.Sprintf(`		if req.%s != "" {
-			h.DB.SetSetting("%s", req.%s)
-		}`, goKey, key, goKey))
+			saveStatements = append(saveStatements, fmt.Sprintf("\t\tif req.%s != \"\" {\n\t\t\th.DB.SetSetting(\"%s\", req.%s)\n\t\t}", goKey, key, goKey))
 		}
 	}
 
@@ -310,10 +375,18 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 
 func generateFrontendTypes(schema *SettingsSchema) error {
 	var fields []string
-	for _, def := range schema.Settings {
-		feKey := def.FrontendKey
+	// Use backend snake_case keys for frontend types
+	// Sort keys for consistent output
+	var keys []string
+	for key := range schema.Settings {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		def := schema.Settings[key]
 		tsType := toTSType(def.Type)
-		fields = append(fields, fmt.Sprintf("\t%s: %s;", feKey, tsType))
+		fields = append(fields, fmt.Sprintf("  %s: %s;", key, tsType))
 	}
 
 	tmpl := `// Copyright 2026 Ch3nyang & MrRSS Team. All rights reserved.
@@ -324,6 +397,7 @@ func generateFrontendTypes(schema *SettingsSchema) error {
 
 export interface SettingsData {
 %s
+  [key: string]: unknown; // Allow additional properties
 }
 `
 
@@ -332,93 +406,88 @@ export interface SettingsData {
 }
 
 func generateFrontendComposable(schema *SettingsSchema) error {
+	var initFields []string
 	var fetchFields []string
 	var autoSaveFields []string
-	var eventListeners []string
 
-	for _, def := range schema.Settings {
-		feKey := def.FrontendKey
-		defaultVal := fmt.Sprintf("%#v", def.Default)
-		backendKey := toBackendKey(feKey)
+	// Sort settings by key for consistent output
+	var keys []string
+	for key := range schema.Settings {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		def := schema.Settings[key]
+
+		// Init field - using snake_case keys
+		initFields = append(initFields, fmt.Sprintf("    %s: settingsDefaults.%s,", key, key))
 
 		// Fetch field conversion
 		switch def.Type {
 		case "bool":
-			fetchFields = append(fetchFields, fmt.Sprintf("\t\t%s: data.%s === 'true',", feKey, backendKey))
+			fetchFields = append(fetchFields, fmt.Sprintf("    %s: data.%s === 'true',", key, key))
 		case "int":
-			fetchFields = append(fetchFields, fmt.Sprintf("\t\t%s: parseInt(data.%s) || %s,", feKey, backendKey, defaultVal))
+			fetchFields = append(fetchFields, fmt.Sprintf("    %s: parseInt(data.%s) || settingsDefaults.%s,", key, key, key))
 		default:
-			fetchFields = append(fetchFields, fmt.Sprintf("\t\t%s: data.%s || %s,", feKey, backendKey, defaultVal))
+			fetchFields = append(fetchFields, fmt.Sprintf("    %s: data.%s || settingsDefaults.%s,", key, key, key))
 		}
 
-		// Auto-save field
+		// Auto-save field - convert to string for backend
 		switch def.Type {
 		case "bool":
-			autoSaveFields = append(autoSaveFields, fmt.Sprintf("\t\t%s: (settingsRef.value.%s ?? settingsDefaults.%s).toString(),", backendKey, feKey, feKey))
+			autoSaveFields = append(autoSaveFields, fmt.Sprintf("    %s: (settingsRef.value.%s ?? settingsDefaults.%s).toString(),", key, key, key))
+		case "int":
+			autoSaveFields = append(autoSaveFields, fmt.Sprintf("    %s: (settingsRef.value.%s ?? settingsDefaults.%s).toString(),", key, key, key))
 		default:
-			autoSaveFields = append(autoSaveFields, fmt.Sprintf("\t\t%s: settingsRef.value.%s ?? settingsDefaults.%s,", backendKey, feKey, feKey))
-		}
-
-		// Event listener (for non-internal settings)
-		if def.Category != "internal" {
-			eventName := toKebabCase(feKey) + "-changed"
-			eventListeners = append(eventListeners, fmt.Sprintf("\t\twindow.dispatchEvent(new CustomEvent('%s', { detail: { value: settingsRef.value.%s } }))", eventName, feKey))
+			autoSaveFields = append(autoSaveFields, fmt.Sprintf("    %s: settingsRef.value.%s ?? settingsDefaults.%s,", key, key, key))
 		}
 	}
 
 	tmpl := `// Copyright 2026 Ch3nyang & MrRSS Team. All rights reserved.
 //
-// Auto-generated settings composable functions
+// Auto-generated settings composable helpers
 // CODE GENERATED - DO NOT EDIT MANUALLY
 // To add new settings, edit internal/config/settings_schema.json and run: go run tools/settings-generator/main.go
-import { type Ref } from 'vue'
-import type { SettingsData } from '@/types/settings.generated'
+import { type Ref } from 'vue';
+import type { SettingsData } from '@/types/settings.generated';
+import { settingsDefaults } from '@/config/defaults';
 
-// Generated settings defaults
-export const settingsDefaults = {
+/**
+ * Generate the initial settings object with defaults
+ * This should be used in useSettings() to initialize the settings ref
+ */
+export function generateInitialSettings(): SettingsData {
+  return {
 %s
-} as const
-
-// Generated fetchSettings function
-export function useGeneratedFetchSettings(settingsRef: Ref<SettingsData>) {
-  return async () => {
-    const response = await fetch('/api/settings')
-    if (!response.ok) {
-      throw new Error('Failed to fetch settings')
-    }
-    const data = await response.json()
-    settingsRef.value = {
-%s
-    }
-  }
+  } as SettingsData;
 }
 
-// Generated auto-save payload builder
-export function buildSavePayload(settingsRef: Ref<SettingsData>) {
+/**
+ * Generate the fetchSettings response parser
+ * This should be used in useSettings() fetchSettings() to parse backend data
+ */
+export function parseSettingsData(data: Record<string, string>): SettingsData {
+  return {
+%s
+  } as SettingsData;
+}
+
+/**
+ * Generate the auto-save payload
+ * This should be used in useSettingsAutoSave.ts to build the save payload
+ */
+export function buildAutoSavePayload(settingsRef: Ref<SettingsData>): Record<string, string> {
   return {
 %s
   }
 }
-
-// Generated event dispatchers
-export function dispatchSettingChangeEvents(settingsRef: Ref<SettingsData>) {
-%s
-}
 `
 
-	// Build defaults object
-	var defaultLines []string
-	for _, def := range schema.Settings {
-		feKey := def.FrontendKey
-		defaultVal := fmt.Sprintf("%#v", def.Default)
-		defaultLines = append(defaultLines, fmt.Sprintf("\t%s: %s,", feKey, defaultVal))
-	}
-
 	content := fmt.Sprintf(tmpl,
-		strings.Join(defaultLines, "\n"),
+		strings.Join(initFields, "\n"),
 		strings.Join(fetchFields, "\n"),
-		strings.Join(autoSaveFields, "\n"),
-		strings.Join(eventListeners, "\n"))
+		strings.Join(autoSaveFields, "\n"))
 
 	return os.WriteFile("frontend/src/composables/core/useSettings.generated.ts", []byte(content), 0644)
 }
@@ -504,27 +573,4 @@ func toKebabCase(s string) string {
 		result = append(result, r)
 	}
 	return strings.ToLower(string(result))
-}
-
-func toBackendKey(feKey string) string {
-	// Convert camelCase frontend key to snake_case backend key
-	var result []rune
-	for i, r := range feKey {
-		if r >= 'A' && r <= 'Z' {
-			result = append(result, '_')
-			result = append(result, r+32) // to lowercase
-		} else {
-			result = append(result, r)
-		}
-		if i == 0 && r >= 'A' && r <= 'Z' {
-			// Keep first letter uppercase for FreshRSS etc
-			result = result[:0]
-			result = append(result, r)
-		}
-	}
-	// Handle special cases
-	resultStr := string(result)
-	resultStr = strings.ReplaceAll(resultStr, "fresh_r_s_s", "freshrss")
-	resultStr = strings.ReplaceAll(resultStr, "a_i", "ai")
-	return resultStr
 }

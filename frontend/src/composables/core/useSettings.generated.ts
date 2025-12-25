@@ -1,537 +1,286 @@
 // Copyright 2026 Ch3nyang & MrRSS Team. All rights reserved.
 //
-// Auto-generated settings composable functions
+// Auto-generated settings composable helpers
 // CODE GENERATED - DO NOT EDIT MANUALLY
 // To add new settings, edit internal/config/settings_schema.json and run: go run tools/settings-generator/main.go
 import { type Ref } from 'vue';
 import type { SettingsData } from '@/types/settings.generated';
+import { settingsDefaults } from '@/config/defaults';
 
-// Generated settings defaults
-export const settingsDefaults = {
-  summaryProvider: 'local',
-  freshRSSAPIPassword: '',
-  fullTextFetchEnabled: true,
-  theme: 'auto',
-  aiTranslationPrompt:
-    'You are a translator. Translate the given text accurately. Output ONLY the translated text, nothing else.',
-  obsidianVault: '',
-  language: 'en-US',
-  aiAPIKey: '',
-  mediaCacheEnabled: false,
-  proxyUsername: '',
-  maxConcurrentRefreshes: '5',
-  aiSummaryPrompt:
-    'You are a summarizer. Generate a concise summary of the given text. Output ONLY the summary, nothing else.',
-  proxyPassword: '',
-  lastArticleUpdate: '',
-  lastNetworkTest: '',
-  imageGalleryEnabled: false,
-  updateInterval: 30,
-  aiUsageLimit: '200',
-  aiChatEnabled: false,
-  summaryTriggerMode: 'manual',
-  windowHeight: '768',
-  windowMaximized: 'false',
-  freshRSSSyncEnabled: false,
-  refreshMode: 'fixed',
-  translationEnabled: false,
-  targetLanguage: 'zh',
-  proxyEnabled: false,
-  autoShowAllContent: false,
-  aiUsageTokens: '0',
-  startupOnBoot: false,
-  closeToTray: true,
-  deeplAPIKey: '',
-  deeplEndpoint: '',
-  baiduAppID: '',
-  baiduSecretKey: '',
-  maxCacheSizeMB: 20,
-  defaultViewMode: 'rendered',
-  showHiddenArticles: false,
-  summaryEnabled: true,
-  mediaCacheMaxSizeMB: 100,
-  proxyType: 'https',
-  rules: '',
-  windowWidth: '1024',
-  networkSpeed: 'medium',
-  shortcuts: '',
-  networkBandwidth: '0',
-  freshRSSUsername: '',
-  translationProvider: 'google',
-  proxyHost: '127.0.0.1',
-  windowX: '0',
-  freshRSSServerURL: '',
-  mediaCacheMaxAgeDays: 7,
-  googleTranslateEndpoint: 'translate.googleapis.com',
-  showArticlePreviewImages: true,
-  networkLatency: '0',
-  summaryLength: 'medium',
-  maxArticleAgeDays: 30,
-  proxyPort: '7890',
-  hoverMarkAsRead: false,
-  aiEndpoint: 'https://api.openai.com/v1/chat/completions',
-  obsidianVaultPath: '',
-  aiModel: 'gpt-4o-mini',
-  windowY: '0',
-  aiCustomHeaders: '',
-  autoCleanupEnabled: false,
-  obsidianEnabled: false,
-} as const;
-
-// Generated fetchSettings function
-export function useGeneratedFetchSettings(settingsRef: Ref<SettingsData>) {
-  return async () => {
-    const response = await fetch('/api/settings');
-    if (!response.ok) {
-      throw new Error('Failed to fetch settings');
-    }
-    const data = await response.json();
-    settingsRef.value = {
-      aiSummaryPrompt:
-        data.ai_summary_prompt ||
-        'You are a summarizer. Generate a concise summary of the given text. Output ONLY the summary, nothing else.',
-      proxyPassword: data.proxy_password || '',
-      lastArticleUpdate: data.last_article_update || '',
-      lastNetworkTest: data.last_network_test || '',
-      imageGalleryEnabled: data.image_gallery_enabled === 'true',
-      updateInterval: parseInt(data.update_interval) || 30,
-      aiUsageLimit: data.ai_usage_limit || '200',
-      aiChatEnabled: data.ai_chat_enabled === 'true',
-      summaryTriggerMode: data.summary_trigger_mode || 'manual',
-      windowHeight: data.window_height || '768',
-      windowMaximized: data.window_maximized || 'false',
-      freshRSSSyncEnabled: data.freshrss_sync_enabled === 'true',
-      refreshMode: data.refresh_mode || 'fixed',
-      translationEnabled: data.translation_enabled === 'true',
-      targetLanguage: data.target_language || 'zh',
-      proxyEnabled: data.proxy_enabled === 'true',
-      autoShowAllContent: data.auto_show_all_content === 'true',
-      aiUsageTokens: data.ai_usage_tokens || '0',
-      startupOnBoot: data.startup_on_boot === 'true',
-      closeToTray: data.close_to_tray === 'true',
-      deeplAPIKey: data.deepl_a_p_i_key || '',
-      deeplEndpoint: data.deepl_endpoint || '',
-      baiduAppID: data.baidu_app_i_d || '',
-      baiduSecretKey: data.baidu_secret_key || '',
-      maxCacheSizeMB: parseInt(data.max_cache_size_m_b) || 20,
-      defaultViewMode: data.default_view_mode || 'rendered',
-      showHiddenArticles: data.show_hidden_articles === 'true',
-      summaryEnabled: data.summary_enabled === 'true',
-      mediaCacheMaxSizeMB: parseInt(data.media_cache_max_size_m_b) || 100,
-      proxyType: data.proxy_type || 'https',
-      rules: data.rules || '',
-      windowWidth: data.window_width || '1024',
-      networkSpeed: data.network_speed || 'medium',
-      shortcuts: data.shortcuts || '',
-      networkBandwidth: data.network_bandwidth || '0',
-      freshRSSUsername: data.freshrss_username || '',
-      translationProvider: data.translation_provider || 'google',
-      proxyHost: data.proxy_host || '127.0.0.1',
-      windowX: data.window_x || '0',
-      freshRSSServerURL: data.freshrss_server_u_r_l || '',
-      mediaCacheMaxAgeDays: parseInt(data.media_cache_max_age_days) || 7,
-      googleTranslateEndpoint: data.google_translate_endpoint || 'translate.googleapis.com',
-      showArticlePreviewImages: data.show_article_preview_images === 'true',
-      networkLatency: data.network_latency || '0',
-      summaryLength: data.summary_length || 'medium',
-      maxArticleAgeDays: parseInt(data.max_article_age_days) || 30,
-      proxyPort: data.proxy_port || '7890',
-      hoverMarkAsRead: data.hover_mark_as_read === 'true',
-      aiEndpoint: data.ai_endpoint || 'https://api.openai.com/v1/chat/completions',
-      obsidianVaultPath: data.obsidian_vault_path || '',
-      aiModel: data.ai_model || 'gpt-4o-mini',
-      windowY: data.window_y || '0',
-      aiCustomHeaders: data.ai_custom_headers || '',
-      autoCleanupEnabled: data.auto_cleanup_enabled === 'true',
-      obsidianEnabled: data.obsidian_enabled === 'true',
-      summaryProvider: data.summary_provider || 'local',
-      freshRSSAPIPassword: data.freshrss_a_p_i_password || '',
-      fullTextFetchEnabled: data.full_text_fetch_enabled === 'true',
-      theme: data.theme || 'auto',
-      aiTranslationPrompt:
-        data.ai_translation_prompt ||
-        'You are a translator. Translate the given text accurately. Output ONLY the translated text, nothing else.',
-      obsidianVault: data.obsidian_vault || '',
-      language: data.language || 'en-US',
-      aiAPIKey: data.ai_a_p_i_key || '',
-      mediaCacheEnabled: data.media_cache_enabled === 'true',
-      proxyUsername: data.proxy_username || '',
-      maxConcurrentRefreshes: data.max_concurrent_refreshes || '5',
-    };
-  };
+/**
+ * Generate the initial settings object with defaults
+ * This should be used in useSettings() to initialize the settings ref
+ */
+export function generateInitialSettings(): SettingsData {
+  return {
+    ai_api_key: settingsDefaults.ai_api_key,
+    ai_chat_enabled: settingsDefaults.ai_chat_enabled,
+    ai_custom_headers: settingsDefaults.ai_custom_headers,
+    ai_endpoint: settingsDefaults.ai_endpoint,
+    ai_model: settingsDefaults.ai_model,
+    ai_summary_prompt: settingsDefaults.ai_summary_prompt,
+    ai_translation_prompt: settingsDefaults.ai_translation_prompt,
+    ai_usage_limit: settingsDefaults.ai_usage_limit,
+    ai_usage_tokens: settingsDefaults.ai_usage_tokens,
+    auto_cleanup_enabled: settingsDefaults.auto_cleanup_enabled,
+    auto_show_all_content: settingsDefaults.auto_show_all_content,
+    baidu_app_id: settingsDefaults.baidu_app_id,
+    baidu_secret_key: settingsDefaults.baidu_secret_key,
+    close_to_tray: settingsDefaults.close_to_tray,
+    deepl_api_key: settingsDefaults.deepl_api_key,
+    deepl_endpoint: settingsDefaults.deepl_endpoint,
+    default_view_mode: settingsDefaults.default_view_mode,
+    freshrss_api_password: settingsDefaults.freshrss_api_password,
+    freshrss_enabled: settingsDefaults.freshrss_enabled,
+    freshrss_server_url: settingsDefaults.freshrss_server_url,
+    freshrss_username: settingsDefaults.freshrss_username,
+    full_text_fetch_enabled: settingsDefaults.full_text_fetch_enabled,
+    google_translate_endpoint: settingsDefaults.google_translate_endpoint,
+    hover_mark_as_read: settingsDefaults.hover_mark_as_read,
+    image_gallery_enabled: settingsDefaults.image_gallery_enabled,
+    language: settingsDefaults.language,
+    last_article_update: settingsDefaults.last_article_update,
+    last_network_test: settingsDefaults.last_network_test,
+    max_article_age_days: settingsDefaults.max_article_age_days,
+    max_cache_size_mb: settingsDefaults.max_cache_size_mb,
+    max_concurrent_refreshes: settingsDefaults.max_concurrent_refreshes,
+    media_cache_enabled: settingsDefaults.media_cache_enabled,
+    media_cache_max_age_days: settingsDefaults.media_cache_max_age_days,
+    media_cache_max_size_mb: settingsDefaults.media_cache_max_size_mb,
+    network_bandwidth_mbps: settingsDefaults.network_bandwidth_mbps,
+    network_latency_ms: settingsDefaults.network_latency_ms,
+    network_speed: settingsDefaults.network_speed,
+    obsidian_enabled: settingsDefaults.obsidian_enabled,
+    obsidian_vault: settingsDefaults.obsidian_vault,
+    obsidian_vault_path: settingsDefaults.obsidian_vault_path,
+    proxy_enabled: settingsDefaults.proxy_enabled,
+    proxy_host: settingsDefaults.proxy_host,
+    proxy_password: settingsDefaults.proxy_password,
+    proxy_port: settingsDefaults.proxy_port,
+    proxy_type: settingsDefaults.proxy_type,
+    proxy_username: settingsDefaults.proxy_username,
+    refresh_mode: settingsDefaults.refresh_mode,
+    rules: settingsDefaults.rules,
+    shortcuts: settingsDefaults.shortcuts,
+    show_article_preview_images: settingsDefaults.show_article_preview_images,
+    show_hidden_articles: settingsDefaults.show_hidden_articles,
+    startup_on_boot: settingsDefaults.startup_on_boot,
+    summary_enabled: settingsDefaults.summary_enabled,
+    summary_length: settingsDefaults.summary_length,
+    summary_provider: settingsDefaults.summary_provider,
+    summary_trigger_mode: settingsDefaults.summary_trigger_mode,
+    target_language: settingsDefaults.target_language,
+    theme: settingsDefaults.theme,
+    translation_enabled: settingsDefaults.translation_enabled,
+    translation_provider: settingsDefaults.translation_provider,
+    update_interval: settingsDefaults.update_interval,
+    window_height: settingsDefaults.window_height,
+    window_maximized: settingsDefaults.window_maximized,
+    window_width: settingsDefaults.window_width,
+    window_x: settingsDefaults.window_x,
+    window_y: settingsDefaults.window_y,
+  } as SettingsData;
 }
 
-// Generated auto-save payload builder
-export function buildSavePayload(settingsRef: Ref<SettingsData>) {
+/**
+ * Generate the fetchSettings response parser
+ * This should be used in useSettings() fetchSettings() to parse backend data
+ */
+export function parseSettingsData(data: Record<string, string>): SettingsData {
   return {
-    ai_summary_prompt: settingsRef.value.aiSummaryPrompt ?? settingsDefaults.aiSummaryPrompt,
-    proxy_password: settingsRef.value.proxyPassword ?? settingsDefaults.proxyPassword,
-    last_article_update: settingsRef.value.lastArticleUpdate ?? settingsDefaults.lastArticleUpdate,
-    last_network_test: settingsRef.value.lastNetworkTest ?? settingsDefaults.lastNetworkTest,
-    image_gallery_enabled: (
-      settingsRef.value.imageGalleryEnabled ?? settingsDefaults.imageGalleryEnabled
+    ai_api_key: data.ai_api_key || settingsDefaults.ai_api_key,
+    ai_chat_enabled: data.ai_chat_enabled === 'true',
+    ai_custom_headers: data.ai_custom_headers || settingsDefaults.ai_custom_headers,
+    ai_endpoint: data.ai_endpoint || settingsDefaults.ai_endpoint,
+    ai_model: data.ai_model || settingsDefaults.ai_model,
+    ai_summary_prompt: data.ai_summary_prompt || settingsDefaults.ai_summary_prompt,
+    ai_translation_prompt: data.ai_translation_prompt || settingsDefaults.ai_translation_prompt,
+    ai_usage_limit: data.ai_usage_limit || settingsDefaults.ai_usage_limit,
+    ai_usage_tokens: data.ai_usage_tokens || settingsDefaults.ai_usage_tokens,
+    auto_cleanup_enabled: data.auto_cleanup_enabled === 'true',
+    auto_show_all_content: data.auto_show_all_content === 'true',
+    baidu_app_id: data.baidu_app_id || settingsDefaults.baidu_app_id,
+    baidu_secret_key: data.baidu_secret_key || settingsDefaults.baidu_secret_key,
+    close_to_tray: data.close_to_tray === 'true',
+    deepl_api_key: data.deepl_api_key || settingsDefaults.deepl_api_key,
+    deepl_endpoint: data.deepl_endpoint || settingsDefaults.deepl_endpoint,
+    default_view_mode: data.default_view_mode || settingsDefaults.default_view_mode,
+    freshrss_api_password: data.freshrss_api_password || settingsDefaults.freshrss_api_password,
+    freshrss_enabled: data.freshrss_enabled === 'true',
+    freshrss_server_url: data.freshrss_server_url || settingsDefaults.freshrss_server_url,
+    freshrss_username: data.freshrss_username || settingsDefaults.freshrss_username,
+    full_text_fetch_enabled: data.full_text_fetch_enabled === 'true',
+    google_translate_endpoint:
+      data.google_translate_endpoint || settingsDefaults.google_translate_endpoint,
+    hover_mark_as_read: data.hover_mark_as_read === 'true',
+    image_gallery_enabled: data.image_gallery_enabled === 'true',
+    language: data.language || settingsDefaults.language,
+    last_article_update: data.last_article_update || settingsDefaults.last_article_update,
+    last_network_test: data.last_network_test || settingsDefaults.last_network_test,
+    max_article_age_days:
+      parseInt(data.max_article_age_days) || settingsDefaults.max_article_age_days,
+    max_cache_size_mb: parseInt(data.max_cache_size_mb) || settingsDefaults.max_cache_size_mb,
+    max_concurrent_refreshes:
+      data.max_concurrent_refreshes || settingsDefaults.max_concurrent_refreshes,
+    media_cache_enabled: data.media_cache_enabled === 'true',
+    media_cache_max_age_days:
+      parseInt(data.media_cache_max_age_days) || settingsDefaults.media_cache_max_age_days,
+    media_cache_max_size_mb:
+      parseInt(data.media_cache_max_size_mb) || settingsDefaults.media_cache_max_size_mb,
+    network_bandwidth_mbps: data.network_bandwidth_mbps || settingsDefaults.network_bandwidth_mbps,
+    network_latency_ms: data.network_latency_ms || settingsDefaults.network_latency_ms,
+    network_speed: data.network_speed || settingsDefaults.network_speed,
+    obsidian_enabled: data.obsidian_enabled === 'true',
+    obsidian_vault: data.obsidian_vault || settingsDefaults.obsidian_vault,
+    obsidian_vault_path: data.obsidian_vault_path || settingsDefaults.obsidian_vault_path,
+    proxy_enabled: data.proxy_enabled === 'true',
+    proxy_host: data.proxy_host || settingsDefaults.proxy_host,
+    proxy_password: data.proxy_password || settingsDefaults.proxy_password,
+    proxy_port: data.proxy_port || settingsDefaults.proxy_port,
+    proxy_type: data.proxy_type || settingsDefaults.proxy_type,
+    proxy_username: data.proxy_username || settingsDefaults.proxy_username,
+    refresh_mode: data.refresh_mode || settingsDefaults.refresh_mode,
+    rules: data.rules || settingsDefaults.rules,
+    shortcuts: data.shortcuts || settingsDefaults.shortcuts,
+    show_article_preview_images: data.show_article_preview_images === 'true',
+    show_hidden_articles: data.show_hidden_articles === 'true',
+    startup_on_boot: data.startup_on_boot === 'true',
+    summary_enabled: data.summary_enabled === 'true',
+    summary_length: data.summary_length || settingsDefaults.summary_length,
+    summary_provider: data.summary_provider || settingsDefaults.summary_provider,
+    summary_trigger_mode: data.summary_trigger_mode || settingsDefaults.summary_trigger_mode,
+    target_language: data.target_language || settingsDefaults.target_language,
+    theme: data.theme || settingsDefaults.theme,
+    translation_enabled: data.translation_enabled === 'true',
+    translation_provider: data.translation_provider || settingsDefaults.translation_provider,
+    update_interval: parseInt(data.update_interval) || settingsDefaults.update_interval,
+    window_height: data.window_height || settingsDefaults.window_height,
+    window_maximized: data.window_maximized || settingsDefaults.window_maximized,
+    window_width: data.window_width || settingsDefaults.window_width,
+    window_x: data.window_x || settingsDefaults.window_x,
+    window_y: data.window_y || settingsDefaults.window_y,
+  } as SettingsData;
+}
+
+/**
+ * Generate the auto-save payload
+ * This should be used in useSettingsAutoSave.ts to build the save payload
+ */
+export function buildAutoSavePayload(settingsRef: Ref<SettingsData>): Record<string, string> {
+  return {
+    ai_api_key: settingsRef.value.ai_api_key ?? settingsDefaults.ai_api_key,
+    ai_chat_enabled: (
+      settingsRef.value.ai_chat_enabled ?? settingsDefaults.ai_chat_enabled
     ).toString(),
-    update_interval: settingsRef.value.updateInterval ?? settingsDefaults.updateInterval,
-    ai_usage_limit: settingsRef.value.aiUsageLimit ?? settingsDefaults.aiUsageLimit,
-    ai_chat_enabled: (settingsRef.value.aiChatEnabled ?? settingsDefaults.aiChatEnabled).toString(),
-    summary_trigger_mode:
-      settingsRef.value.summaryTriggerMode ?? settingsDefaults.summaryTriggerMode,
-    window_height: settingsRef.value.windowHeight ?? settingsDefaults.windowHeight,
-    window_maximized: settingsRef.value.windowMaximized ?? settingsDefaults.windowMaximized,
-    freshrss_sync_enabled: (
-      settingsRef.value.freshRSSSyncEnabled ?? settingsDefaults.freshRSSSyncEnabled
+    ai_custom_headers: settingsRef.value.ai_custom_headers ?? settingsDefaults.ai_custom_headers,
+    ai_endpoint: settingsRef.value.ai_endpoint ?? settingsDefaults.ai_endpoint,
+    ai_model: settingsRef.value.ai_model ?? settingsDefaults.ai_model,
+    ai_summary_prompt: settingsRef.value.ai_summary_prompt ?? settingsDefaults.ai_summary_prompt,
+    ai_translation_prompt:
+      settingsRef.value.ai_translation_prompt ?? settingsDefaults.ai_translation_prompt,
+    ai_usage_limit: settingsRef.value.ai_usage_limit ?? settingsDefaults.ai_usage_limit,
+    ai_usage_tokens: settingsRef.value.ai_usage_tokens ?? settingsDefaults.ai_usage_tokens,
+    auto_cleanup_enabled: (
+      settingsRef.value.auto_cleanup_enabled ?? settingsDefaults.auto_cleanup_enabled
     ).toString(),
-    refresh_mode: settingsRef.value.refreshMode ?? settingsDefaults.refreshMode,
-    translation_enabled: (
-      settingsRef.value.translationEnabled ?? settingsDefaults.translationEnabled
-    ).toString(),
-    target_language: settingsRef.value.targetLanguage ?? settingsDefaults.targetLanguage,
-    proxy_enabled: (settingsRef.value.proxyEnabled ?? settingsDefaults.proxyEnabled).toString(),
     auto_show_all_content: (
-      settingsRef.value.autoShowAllContent ?? settingsDefaults.autoShowAllContent
+      settingsRef.value.auto_show_all_content ?? settingsDefaults.auto_show_all_content
     ).toString(),
-    ai_usage_tokens: settingsRef.value.aiUsageTokens ?? settingsDefaults.aiUsageTokens,
-    startup_on_boot: (settingsRef.value.startupOnBoot ?? settingsDefaults.startupOnBoot).toString(),
-    close_to_tray: (settingsRef.value.closeToTray ?? settingsDefaults.closeToTray).toString(),
-    deepl_a_p_i_key: settingsRef.value.deeplAPIKey ?? settingsDefaults.deeplAPIKey,
-    deepl_endpoint: settingsRef.value.deeplEndpoint ?? settingsDefaults.deeplEndpoint,
-    baidu_app_i_d: settingsRef.value.baiduAppID ?? settingsDefaults.baiduAppID,
-    baidu_secret_key: settingsRef.value.baiduSecretKey ?? settingsDefaults.baiduSecretKey,
-    max_cache_size_m_b: settingsRef.value.maxCacheSizeMB ?? settingsDefaults.maxCacheSizeMB,
-    default_view_mode: settingsRef.value.defaultViewMode ?? settingsDefaults.defaultViewMode,
+    baidu_app_id: settingsRef.value.baidu_app_id ?? settingsDefaults.baidu_app_id,
+    baidu_secret_key: settingsRef.value.baidu_secret_key ?? settingsDefaults.baidu_secret_key,
+    close_to_tray: (settingsRef.value.close_to_tray ?? settingsDefaults.close_to_tray).toString(),
+    deepl_api_key: settingsRef.value.deepl_api_key ?? settingsDefaults.deepl_api_key,
+    deepl_endpoint: settingsRef.value.deepl_endpoint ?? settingsDefaults.deepl_endpoint,
+    default_view_mode: settingsRef.value.default_view_mode ?? settingsDefaults.default_view_mode,
+    freshrss_api_password:
+      settingsRef.value.freshrss_api_password ?? settingsDefaults.freshrss_api_password,
+    freshrss_enabled: (
+      settingsRef.value.freshrss_enabled ?? settingsDefaults.freshrss_enabled
+    ).toString(),
+    freshrss_server_url:
+      settingsRef.value.freshrss_server_url ?? settingsDefaults.freshrss_server_url,
+    freshrss_username: settingsRef.value.freshrss_username ?? settingsDefaults.freshrss_username,
+    full_text_fetch_enabled: (
+      settingsRef.value.full_text_fetch_enabled ?? settingsDefaults.full_text_fetch_enabled
+    ).toString(),
+    google_translate_endpoint:
+      settingsRef.value.google_translate_endpoint ?? settingsDefaults.google_translate_endpoint,
+    hover_mark_as_read: (
+      settingsRef.value.hover_mark_as_read ?? settingsDefaults.hover_mark_as_read
+    ).toString(),
+    image_gallery_enabled: (
+      settingsRef.value.image_gallery_enabled ?? settingsDefaults.image_gallery_enabled
+    ).toString(),
+    language: settingsRef.value.language ?? settingsDefaults.language,
+    last_article_update:
+      settingsRef.value.last_article_update ?? settingsDefaults.last_article_update,
+    last_network_test: settingsRef.value.last_network_test ?? settingsDefaults.last_network_test,
+    max_article_age_days: (
+      settingsRef.value.max_article_age_days ?? settingsDefaults.max_article_age_days
+    ).toString(),
+    max_cache_size_mb: (
+      settingsRef.value.max_cache_size_mb ?? settingsDefaults.max_cache_size_mb
+    ).toString(),
+    max_concurrent_refreshes:
+      settingsRef.value.max_concurrent_refreshes ?? settingsDefaults.max_concurrent_refreshes,
+    media_cache_enabled: (
+      settingsRef.value.media_cache_enabled ?? settingsDefaults.media_cache_enabled
+    ).toString(),
+    media_cache_max_age_days: (
+      settingsRef.value.media_cache_max_age_days ?? settingsDefaults.media_cache_max_age_days
+    ).toString(),
+    media_cache_max_size_mb: (
+      settingsRef.value.media_cache_max_size_mb ?? settingsDefaults.media_cache_max_size_mb
+    ).toString(),
+    network_bandwidth_mbps:
+      settingsRef.value.network_bandwidth_mbps ?? settingsDefaults.network_bandwidth_mbps,
+    network_latency_ms: settingsRef.value.network_latency_ms ?? settingsDefaults.network_latency_ms,
+    network_speed: settingsRef.value.network_speed ?? settingsDefaults.network_speed,
+    obsidian_enabled: (
+      settingsRef.value.obsidian_enabled ?? settingsDefaults.obsidian_enabled
+    ).toString(),
+    obsidian_vault: settingsRef.value.obsidian_vault ?? settingsDefaults.obsidian_vault,
+    obsidian_vault_path:
+      settingsRef.value.obsidian_vault_path ?? settingsDefaults.obsidian_vault_path,
+    proxy_enabled: (settingsRef.value.proxy_enabled ?? settingsDefaults.proxy_enabled).toString(),
+    proxy_host: settingsRef.value.proxy_host ?? settingsDefaults.proxy_host,
+    proxy_password: settingsRef.value.proxy_password ?? settingsDefaults.proxy_password,
+    proxy_port: settingsRef.value.proxy_port ?? settingsDefaults.proxy_port,
+    proxy_type: settingsRef.value.proxy_type ?? settingsDefaults.proxy_type,
+    proxy_username: settingsRef.value.proxy_username ?? settingsDefaults.proxy_username,
+    refresh_mode: settingsRef.value.refresh_mode ?? settingsDefaults.refresh_mode,
+    rules: settingsRef.value.rules ?? settingsDefaults.rules,
+    shortcuts: settingsRef.value.shortcuts ?? settingsDefaults.shortcuts,
+    show_article_preview_images: (
+      settingsRef.value.show_article_preview_images ?? settingsDefaults.show_article_preview_images
+    ).toString(),
     show_hidden_articles: (
-      settingsRef.value.showHiddenArticles ?? settingsDefaults.showHiddenArticles
+      settingsRef.value.show_hidden_articles ?? settingsDefaults.show_hidden_articles
+    ).toString(),
+    startup_on_boot: (
+      settingsRef.value.startup_on_boot ?? settingsDefaults.startup_on_boot
     ).toString(),
     summary_enabled: (
-      settingsRef.value.summaryEnabled ?? settingsDefaults.summaryEnabled
+      settingsRef.value.summary_enabled ?? settingsDefaults.summary_enabled
     ).toString(),
-    media_cache_max_size_m_b:
-      settingsRef.value.mediaCacheMaxSizeMB ?? settingsDefaults.mediaCacheMaxSizeMB,
-    proxy_type: settingsRef.value.proxyType ?? settingsDefaults.proxyType,
-    rules: settingsRef.value.rules ?? settingsDefaults.rules,
-    window_width: settingsRef.value.windowWidth ?? settingsDefaults.windowWidth,
-    network_speed: settingsRef.value.networkSpeed ?? settingsDefaults.networkSpeed,
-    shortcuts: settingsRef.value.shortcuts ?? settingsDefaults.shortcuts,
-    network_bandwidth: settingsRef.value.networkBandwidth ?? settingsDefaults.networkBandwidth,
-    freshrss_username: settingsRef.value.freshRSSUsername ?? settingsDefaults.freshRSSUsername,
-    translation_provider:
-      settingsRef.value.translationProvider ?? settingsDefaults.translationProvider,
-    proxy_host: settingsRef.value.proxyHost ?? settingsDefaults.proxyHost,
-    window_x: settingsRef.value.windowX ?? settingsDefaults.windowX,
-    freshrss_server_u_r_l:
-      settingsRef.value.freshRSSServerURL ?? settingsDefaults.freshRSSServerURL,
-    media_cache_max_age_days:
-      settingsRef.value.mediaCacheMaxAgeDays ?? settingsDefaults.mediaCacheMaxAgeDays,
-    google_translate_endpoint:
-      settingsRef.value.googleTranslateEndpoint ?? settingsDefaults.googleTranslateEndpoint,
-    show_article_preview_images: (
-      settingsRef.value.showArticlePreviewImages ?? settingsDefaults.showArticlePreviewImages
-    ).toString(),
-    network_latency: settingsRef.value.networkLatency ?? settingsDefaults.networkLatency,
-    summary_length: settingsRef.value.summaryLength ?? settingsDefaults.summaryLength,
-    max_article_age_days: settingsRef.value.maxArticleAgeDays ?? settingsDefaults.maxArticleAgeDays,
-    proxy_port: settingsRef.value.proxyPort ?? settingsDefaults.proxyPort,
-    hover_mark_as_read: (
-      settingsRef.value.hoverMarkAsRead ?? settingsDefaults.hoverMarkAsRead
-    ).toString(),
-    ai_endpoint: settingsRef.value.aiEndpoint ?? settingsDefaults.aiEndpoint,
-    obsidian_vault_path: settingsRef.value.obsidianVaultPath ?? settingsDefaults.obsidianVaultPath,
-    ai_model: settingsRef.value.aiModel ?? settingsDefaults.aiModel,
-    window_y: settingsRef.value.windowY ?? settingsDefaults.windowY,
-    ai_custom_headers: settingsRef.value.aiCustomHeaders ?? settingsDefaults.aiCustomHeaders,
-    auto_cleanup_enabled: (
-      settingsRef.value.autoCleanupEnabled ?? settingsDefaults.autoCleanupEnabled
-    ).toString(),
-    obsidian_enabled: (
-      settingsRef.value.obsidianEnabled ?? settingsDefaults.obsidianEnabled
-    ).toString(),
-    summary_provider: settingsRef.value.summaryProvider ?? settingsDefaults.summaryProvider,
-    freshrss_a_p_i_password:
-      settingsRef.value.freshRSSAPIPassword ?? settingsDefaults.freshRSSAPIPassword,
-    full_text_fetch_enabled: (
-      settingsRef.value.fullTextFetchEnabled ?? settingsDefaults.fullTextFetchEnabled
-    ).toString(),
+    summary_length: settingsRef.value.summary_length ?? settingsDefaults.summary_length,
+    summary_provider: settingsRef.value.summary_provider ?? settingsDefaults.summary_provider,
+    summary_trigger_mode:
+      settingsRef.value.summary_trigger_mode ?? settingsDefaults.summary_trigger_mode,
+    target_language: settingsRef.value.target_language ?? settingsDefaults.target_language,
     theme: settingsRef.value.theme ?? settingsDefaults.theme,
-    ai_translation_prompt:
-      settingsRef.value.aiTranslationPrompt ?? settingsDefaults.aiTranslationPrompt,
-    obsidian_vault: settingsRef.value.obsidianVault ?? settingsDefaults.obsidianVault,
-    language: settingsRef.value.language ?? settingsDefaults.language,
-    ai_a_p_i_key: settingsRef.value.aiAPIKey ?? settingsDefaults.aiAPIKey,
-    media_cache_enabled: (
-      settingsRef.value.mediaCacheEnabled ?? settingsDefaults.mediaCacheEnabled
+    translation_enabled: (
+      settingsRef.value.translation_enabled ?? settingsDefaults.translation_enabled
     ).toString(),
-    proxy_username: settingsRef.value.proxyUsername ?? settingsDefaults.proxyUsername,
-    max_concurrent_refreshes:
-      settingsRef.value.maxConcurrentRefreshes ?? settingsDefaults.maxConcurrentRefreshes,
+    translation_provider:
+      settingsRef.value.translation_provider ?? settingsDefaults.translation_provider,
+    update_interval: (
+      settingsRef.value.update_interval ?? settingsDefaults.update_interval
+    ).toString(),
+    window_height: settingsRef.value.window_height ?? settingsDefaults.window_height,
+    window_maximized: settingsRef.value.window_maximized ?? settingsDefaults.window_maximized,
+    window_width: settingsRef.value.window_width ?? settingsDefaults.window_width,
+    window_x: settingsRef.value.window_x ?? settingsDefaults.window_x,
+    window_y: settingsRef.value.window_y ?? settingsDefaults.window_y,
   };
-}
-
-// Generated event dispatchers
-export function dispatchSettingChangeEvents(settingsRef: Ref<SettingsData>) {
-  window.dispatchEvent(
-    new CustomEvent('ai-summary-prompt-changed', {
-      detail: { value: settingsRef.value.aiSummaryPrompt },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('proxy-password-changed', {
-      detail: { value: settingsRef.value.proxyPassword },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('last-network-test-changed', {
-      detail: { value: settingsRef.value.lastNetworkTest },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('image-gallery-enabled-changed', {
-      detail: { value: settingsRef.value.imageGalleryEnabled },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('update-interval-changed', {
-      detail: { value: settingsRef.value.updateInterval },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('ai-usage-limit-changed', { detail: { value: settingsRef.value.aiUsageLimit } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('ai-chat-enabled-changed', {
-      detail: { value: settingsRef.value.aiChatEnabled },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('summary-trigger-mode-changed', {
-      detail: { value: settingsRef.value.summaryTriggerMode },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('fresh-r-s-s-sync-enabled-changed', {
-      detail: { value: settingsRef.value.freshRSSSyncEnabled },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('refresh-mode-changed', { detail: { value: settingsRef.value.refreshMode } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('translation-enabled-changed', {
-      detail: { value: settingsRef.value.translationEnabled },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('target-language-changed', {
-      detail: { value: settingsRef.value.targetLanguage },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('proxy-enabled-changed', { detail: { value: settingsRef.value.proxyEnabled } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('auto-show-all-content-changed', {
-      detail: { value: settingsRef.value.autoShowAllContent },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('ai-usage-tokens-changed', {
-      detail: { value: settingsRef.value.aiUsageTokens },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('startup-on-boot-changed', {
-      detail: { value: settingsRef.value.startupOnBoot },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('close-to-tray-changed', { detail: { value: settingsRef.value.closeToTray } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('deepl-a-p-i-key-changed', { detail: { value: settingsRef.value.deeplAPIKey } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('deepl-endpoint-changed', {
-      detail: { value: settingsRef.value.deeplEndpoint },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('baidu-app-i-d-changed', { detail: { value: settingsRef.value.baiduAppID } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('baidu-secret-key-changed', {
-      detail: { value: settingsRef.value.baiduSecretKey },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('max-cache-size-m-b-changed', {
-      detail: { value: settingsRef.value.maxCacheSizeMB },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('default-view-mode-changed', {
-      detail: { value: settingsRef.value.defaultViewMode },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('show-hidden-articles-changed', {
-      detail: { value: settingsRef.value.showHiddenArticles },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('summary-enabled-changed', {
-      detail: { value: settingsRef.value.summaryEnabled },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('media-cache-max-size-m-b-changed', {
-      detail: { value: settingsRef.value.mediaCacheMaxSizeMB },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('proxy-type-changed', { detail: { value: settingsRef.value.proxyType } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('rules-changed', { detail: { value: settingsRef.value.rules } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('network-speed-changed', { detail: { value: settingsRef.value.networkSpeed } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('shortcuts-changed', { detail: { value: settingsRef.value.shortcuts } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('network-bandwidth-changed', {
-      detail: { value: settingsRef.value.networkBandwidth },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('fresh-r-s-s-username-changed', {
-      detail: { value: settingsRef.value.freshRSSUsername },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('translation-provider-changed', {
-      detail: { value: settingsRef.value.translationProvider },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('proxy-host-changed', { detail: { value: settingsRef.value.proxyHost } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('fresh-r-s-s-server-u-r-l-changed', {
-      detail: { value: settingsRef.value.freshRSSServerURL },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('media-cache-max-age-days-changed', {
-      detail: { value: settingsRef.value.mediaCacheMaxAgeDays },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('google-translate-endpoint-changed', {
-      detail: { value: settingsRef.value.googleTranslateEndpoint },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('show-article-preview-images-changed', {
-      detail: { value: settingsRef.value.showArticlePreviewImages },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('network-latency-changed', {
-      detail: { value: settingsRef.value.networkLatency },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('summary-length-changed', {
-      detail: { value: settingsRef.value.summaryLength },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('max-article-age-days-changed', {
-      detail: { value: settingsRef.value.maxArticleAgeDays },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('proxy-port-changed', { detail: { value: settingsRef.value.proxyPort } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('hover-mark-as-read-changed', {
-      detail: { value: settingsRef.value.hoverMarkAsRead },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('ai-endpoint-changed', { detail: { value: settingsRef.value.aiEndpoint } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('obsidian-vault-path-changed', {
-      detail: { value: settingsRef.value.obsidianVaultPath },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('ai-model-changed', { detail: { value: settingsRef.value.aiModel } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('ai-custom-headers-changed', {
-      detail: { value: settingsRef.value.aiCustomHeaders },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('auto-cleanup-enabled-changed', {
-      detail: { value: settingsRef.value.autoCleanupEnabled },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('obsidian-enabled-changed', {
-      detail: { value: settingsRef.value.obsidianEnabled },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('summary-provider-changed', {
-      detail: { value: settingsRef.value.summaryProvider },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('fresh-r-s-s-a-p-i-password-changed', {
-      detail: { value: settingsRef.value.freshRSSAPIPassword },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('full-text-fetch-enabled-changed', {
-      detail: { value: settingsRef.value.fullTextFetchEnabled },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('theme-changed', { detail: { value: settingsRef.value.theme } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('ai-translation-prompt-changed', {
-      detail: { value: settingsRef.value.aiTranslationPrompt },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('obsidian-vault-changed', {
-      detail: { value: settingsRef.value.obsidianVault },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('language-changed', { detail: { value: settingsRef.value.language } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('ai-a-p-i-key-changed', { detail: { value: settingsRef.value.aiAPIKey } })
-  );
-  window.dispatchEvent(
-    new CustomEvent('media-cache-enabled-changed', {
-      detail: { value: settingsRef.value.mediaCacheEnabled },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('proxy-username-changed', {
-      detail: { value: settingsRef.value.proxyUsername },
-    })
-  );
-  window.dispatchEvent(
-    new CustomEvent('max-concurrent-refreshes-changed', {
-      detail: { value: settingsRef.value.maxConcurrentRefreshes },
-    })
-  );
 }

@@ -1,12 +1,12 @@
 /**
  * Composable for auto-saving settings with debouncing
  */
-import { ref, watch, onMounted, onUnmounted, type Ref, toRef, computed, isRef } from 'vue';
+import { ref, watch, onMounted, onUnmounted, type Ref, computed, isRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAppStore } from '@/stores/app';
 import type { SettingsData } from '@/types/settings';
 import { settingsDefaults } from '@/config/defaults';
-import { useSettingsValidation } from './useSettingsValidation';
+import { buildAutoSavePayload } from './useSettings.generated';
 
 export function useSettingsAutoSave(settings: Ref<SettingsData> | (() => SettingsData)) {
   const { locale } = useI18n();
@@ -17,9 +17,6 @@ export function useSettingsAutoSave(settings: Ref<SettingsData> | (() => Setting
 
   // Convert to ref if it's a getter function
   const settingsRef = isRef(settings) ? settings : computed(settings);
-
-  // Use validation composable
-  const { isValid } = useSettingsValidation(settingsRef);
 
   // Track previous translation settings
   const prevTranslationSettings: Ref<{
@@ -85,130 +82,11 @@ export function useSettingsAutoSave(settings: Ref<SettingsData> | (() => Setting
       // Features that require valid settings (e.g., translation with API keys) will check
       // for valid values at runtime and fail gracefully if settings are incomplete/invalid.
 
-      // Save to backend
+      // Save to backend using generated payload (alphabetically sorted)
       await fetch('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          update_interval: (
-            settingsRef.value.update_interval ?? settingsDefaults.update_interval
-          ).toString(),
-          refresh_mode: settingsRef.value.refresh_mode ?? settingsDefaults.refresh_mode,
-          translation_enabled: (
-            settingsRef.value.translation_enabled ?? settingsDefaults.translation_enabled
-          ).toString(),
-          target_language: settingsRef.value.target_language ?? settingsDefaults.target_language,
-          translation_provider:
-            settingsRef.value.translation_provider ?? settingsDefaults.translation_provider,
-          deepl_api_key: settingsRef.value.deepl_api_key ?? settingsDefaults.deepl_api_key,
-          deepl_endpoint: settingsRef.value.deepl_endpoint ?? settingsDefaults.deepl_endpoint,
-          baidu_app_id: settingsRef.value.baidu_app_id ?? settingsDefaults.baidu_app_id,
-          baidu_secret_key: settingsRef.value.baidu_secret_key ?? settingsDefaults.baidu_secret_key,
-          ai_api_key: settingsRef.value.ai_api_key ?? settingsDefaults.ai_api_key,
-          ai_endpoint: settingsRef.value.ai_endpoint ?? settingsDefaults.ai_endpoint,
-          ai_model: settingsRef.value.ai_model ?? settingsDefaults.ai_model,
-          ai_translation_prompt:
-            settingsRef.value.ai_translation_prompt ?? settingsDefaults.ai_translation_prompt,
-          ai_summary_prompt:
-            settingsRef.value.ai_summary_prompt ?? settingsDefaults.ai_summary_prompt,
-          ai_custom_headers:
-            settingsRef.value.ai_custom_headers ?? settingsDefaults.ai_custom_headers,
-          ai_usage_tokens: settingsRef.value.ai_usage_tokens ?? settingsDefaults.ai_usage_tokens,
-          ai_usage_limit: settingsRef.value.ai_usage_limit ?? settingsDefaults.ai_usage_limit,
-          ai_chat_enabled: (
-            settingsRef.value.ai_chat_enabled ?? settingsDefaults.ai_chat_enabled
-          ).toString(),
-          auto_cleanup_enabled: (
-            settingsRef.value.auto_cleanup_enabled ?? settingsDefaults.auto_cleanup_enabled
-          ).toString(),
-          max_cache_size_mb: (
-            settingsRef.value.max_cache_size_mb ?? settingsDefaults.max_cache_size_mb
-          ).toString(),
-          max_article_age_days: (
-            settingsRef.value.max_article_age_days ?? settingsDefaults.max_article_age_days
-          ).toString(),
-          language: settingsRef.value.language ?? settingsDefaults.language,
-          theme: settingsRef.value.theme ?? settingsDefaults.theme,
-          show_hidden_articles: (
-            settingsRef.value.show_hidden_articles ?? settingsDefaults.show_hidden_articles
-          ).toString(),
-          hover_mark_as_read: (
-            settingsRef.value.hover_mark_as_read ?? settingsDefaults.hover_mark_as_read
-          ).toString(),
-          default_view_mode:
-            settingsRef.value.default_view_mode ?? settingsDefaults.default_view_mode,
-          media_cache_enabled: (
-            settingsRef.value.media_cache_enabled ?? settingsDefaults.media_cache_enabled
-          ).toString(),
-          media_cache_max_size_mb: (
-            settingsRef.value.media_cache_max_size_mb ?? settingsDefaults.media_cache_max_size_mb
-          ).toString(),
-          media_cache_max_age_days: (
-            settingsRef.value.media_cache_max_age_days ?? settingsDefaults.media_cache_max_age_days
-          ).toString(),
-          startup_on_boot: (
-            settingsRef.value.startup_on_boot ?? settingsDefaults.startup_on_boot
-          ).toString(),
-          close_to_tray: (
-            settingsRef.value.close_to_tray ?? settingsDefaults.close_to_tray
-          ).toString(),
-          shortcuts: settingsRef.value.shortcuts ?? settingsDefaults.shortcuts,
-          summary_enabled: (
-            settingsRef.value.summary_enabled ?? settingsDefaults.summary_enabled
-          ).toString(),
-          summary_length: settingsRef.value.summary_length ?? settingsDefaults.summary_length,
-          summary_provider: settingsRef.value.summary_provider ?? settingsDefaults.summary_provider,
-          summary_trigger_mode:
-            settingsRef.value.summary_trigger_mode ?? settingsDefaults.summary_trigger_mode,
-          proxy_enabled: (
-            settingsRef.value.proxy_enabled ?? settingsDefaults.proxy_enabled
-          ).toString(),
-          proxy_type: settingsRef.value.proxy_type ?? settingsDefaults.proxy_type,
-          proxy_host: settingsRef.value.proxy_host ?? settingsDefaults.proxy_host,
-          proxy_port: settingsRef.value.proxy_port ?? settingsDefaults.proxy_port,
-          proxy_username: settingsRef.value.proxy_username ?? settingsDefaults.proxy_username,
-          proxy_password: settingsRef.value.proxy_password ?? settingsDefaults.proxy_password,
-          google_translate_endpoint:
-            settingsRef.value.google_translate_endpoint ??
-            settingsDefaults.google_translate_endpoint,
-          show_article_preview_images: (
-            settingsRef.value.show_article_preview_images ??
-            settingsDefaults.show_article_preview_images
-          ).toString(),
-          obsidian_enabled: (
-            settingsRef.value.obsidian_enabled ?? settingsDefaults.obsidian_enabled
-          ).toString(),
-          obsidian_vault: settingsRef.value.obsidian_vault ?? settingsDefaults.obsidian_vault,
-          obsidian_vault_path:
-            settingsRef.value.obsidian_vault_path ?? settingsDefaults.obsidian_vault_path,
-          network_speed: settingsRef.value.network_speed ?? settingsDefaults.network_speed,
-          network_bandwidth_mbps:
-            settingsRef.value.network_bandwidth_mbps ?? settingsDefaults.network_bandwidth_mbps,
-          network_latency_ms:
-            settingsRef.value.network_latency_ms ?? settingsDefaults.network_latency_ms,
-          max_concurrent_refreshes:
-            settingsRef.value.max_concurrent_refreshes ?? settingsDefaults.max_concurrent_refreshes,
-          last_network_test:
-            settingsRef.value.last_network_test ?? settingsDefaults.last_network_test,
-          image_gallery_enabled: (
-            settingsRef.value.image_gallery_enabled ?? settingsDefaults.image_gallery_enabled
-          ).toString(),
-          freshrss_enabled: (
-            settingsRef.value.freshrss_enabled ?? settingsDefaults.freshrss_enabled
-          ).toString(),
-          freshrss_server_url:
-            settingsRef.value.freshrss_server_url ?? settingsDefaults.freshrss_server_url,
-          freshrss_username:
-            settingsRef.value.freshrss_username ?? settingsDefaults.freshrss_username,
-          freshrss_api_password:
-            settingsRef.value.freshrss_api_password ?? settingsDefaults.freshrss_api_password,
-          full_text_fetch_enabled: (
-            settingsRef.value.full_text_fetch_enabled ?? settingsDefaults.full_text_fetch_enabled
-          ).toString(),
-          auto_show_all_content: (
-            settingsRef.value.auto_show_all_content ?? settingsDefaults.auto_show_all_content
-          ).toString(),
-        }),
+        body: JSON.stringify(buildAutoSavePayload(settingsRef)),
       });
 
       // Clear and re-translate if translation settings changed

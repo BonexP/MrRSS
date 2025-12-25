@@ -24,7 +24,7 @@ Edit `internal/config/settings_schema.json`:
   "default": false,
   "category": "general",
   "encrypted": false,
-  "frontend_key": "yourSettingKey"
+  "frontend_key": "your_setting_key"  // snake_case (same as key)
 }
 ```
 
@@ -41,8 +41,8 @@ Add to your settings component:
 ```vue
 <SettingItem :title="t('yourSettingKey')">
   <Toggle
-    :model-value="settings.yourSettingKey"
-    @update:model-value="updateSetting('yourSettingKey', $event)"
+    :model-value="settings.your_setting_key"
+    @update:model-value="updateSetting('your_setting_key', $event)"
   />
 </SettingItem>
 ```
@@ -80,10 +80,26 @@ After running the generator, these files are **automatically created/updated**:
 - ✅ `internal/config/config.go` - Go struct and `GetString()` function
 - ✅ `internal/config/settings_keys.go` - Settings keys array for DB init
 - ✅ `internal/handlers/settings/settings_handlers.go` - GET/POST API handlers
-- ✅ `frontend/src/types/settings.generated.ts` - TypeScript interface
+- ✅ `frontend/src/types/settings.generated.ts` - TypeScript interface (snake_case)
 - ✅ `frontend/src/composables/core/useSettings.generated.ts` - Helper functions
 - ✅ `config/defaults.json` - Frontend defaults (snake_case)
 - ✅ `internal/config/defaults.json` - Backend defaults (snake_case)
+
+**Important:** All generated files are sorted alphabetically to minimize diff changes when adding new settings.
+
+### Naming Convention
+
+**Frontend uses snake_case everywhere** (NOT camelCase):
+
+- ✅ `settings.ai_api_key` (correct)
+- ❌ `settings.aiAPIKey` (incorrect)
+
+This convention is used consistently across:
+
+- TypeScript interfaces (`SettingsData`)
+- Vue components
+- API communication
+- Event names
 
 ---
 
@@ -99,7 +115,7 @@ Edit `internal/config/settings_schema.json`, add to the `settings` object:
   "default": false,            // Default value
   "category": "general",       // Category (see reference below)
   "encrypted": false,          // Set to true for sensitive data
-  "frontend_key": "yourNewSetting"  // camelCase version for frontend
+  "frontend_key": "your_new_setting"  // Use same snake_case as key
 }
 ```
 
@@ -111,7 +127,9 @@ Edit `internal/config/settings_schema.json`, add to the `settings` object:
 | `default` | mixed | Required: Default value (must match type) |
 | `category` | string | Required: See [Categories](#categories) below |
 | `encrypted` | boolean | Required: `true` for sensitive data (API keys, passwords) |
-| `frontend_key` | string | Required: camelCase version for frontend |
+| `frontend_key` | string | Required: Use the same snake_case as the key (for reference) |
+
+**Note:** The `frontend_key` is currently for reference only and should match the key in snake_case. The actual frontend implementation uses snake_case property names.
 
 ### Step 2: Run the Code Generator
 
@@ -167,8 +185,8 @@ Add the setting UI to the appropriate settings component.
   :description="t('yourNewSettingDesc')"
 >
   <Toggle
-    :model-value="settings.yourNewSetting"
-    @update:model-value="updateSetting('yourNewSetting', $event)"
+    :model-value="settings.your_new_setting"
+    @update:model-value="updateSetting('your_new_setting', $event)"
   />
 </SettingItem>
 ```
@@ -178,28 +196,28 @@ Add the setting UI to the appropriate settings component.
 ```vue
 <!-- Boolean/Toggle -->
 <Toggle
-  :model-value="settings.yourSetting"
-  @update:model-value="updateSetting('yourSetting', $event)"
+  :model-value="settings.your_setting"
+  @update:model-value="updateSetting('your_setting', $event)"
 />
 
 <!-- String/Input -->
 <Input
-  v-model="settings.yourSetting"
-  @change="updateSetting('yourSetting', $event)"
+  v-model="settings.your_setting"
+  @change="updateSetting('your_setting', $event)"
 />
 
 <!-- Integer/Number -->
 <Input
-  v-model.number="settings.yourSetting"
+  v-model.number="settings.your_setting"
   type="number"
-  @change="updateSetting('yourSetting', $event)"
+  @change="updateSetting('your_setting', $event)"
 />
 
 <!-- Select/Enum -->
 <Select
-  v-model="settings.yourSetting"
+  v-model="settings.your_setting"
   :options="[{value: 'option1', label: 'Option 1'}, ...]"
-  @change="updateSetting('yourSetting', $event)"
+  @change="updateSetting('your_setting', $event)"
 />
 ```
 
@@ -219,11 +237,11 @@ const featureEnabled = ref(false)
 
 onMounted(() => {
   // Apply the setting
-  featureEnabled.value = settings.value.yourSetting
+  featureEnabled.value = settings.value.your_new_setting
 })
 
 // Listen for changes
-window.addEventListener('your-setting-changed', (event: any) => {
+window.addEventListener('your-new-setting-changed', (event: any) => {
   featureEnabled.value = event.detail.value
 })
 </script>
@@ -240,7 +258,7 @@ import { useSettings } from './useSettings'
 export function useYourFeature() {
   const { settings } = useSettings()
 
-  const featureEnabled = computed(() => settings.value.yourSetting)
+  const featureEnabled = computed(() => settings.value.your_new_setting)
 
   return {
     featureEnabled
@@ -283,7 +301,7 @@ Edit `internal/config/settings_schema.json`:
   "default": false,
   "category": "general",
   "encrypted": false,
-  "frontend_key": "autoCollapseSidebar"
+  "frontend_key": "auto_collapse_sidebar"
 }
 ```
 
@@ -293,7 +311,7 @@ Edit `internal/config/settings_schema.json`:
 - `default: false` - Most users want sidebar expanded by default
 - `category: "general"` - It's a general UI preference
 - `encrypted: false` - Not sensitive data
-- `frontend_key: "autoCollapseSidebar"` - camelCase for frontend
+- `frontend_key: "auto_collapse_sidebar"` - Use snake_case (same as key)
 
 ### Step 2: Generate Code
 
@@ -317,12 +335,12 @@ go run tools/settings-generator/main.go
    - Added save logic: `if req.AutoCollapseSidebar != "" { h.DB.SetSetting(...) }`
 
 4. **`frontend/src/types/settings.generated.ts`**
-   - Added: `autoCollapseSidebar: boolean;`
+   - Added: `auto_collapse_sidebar: boolean;`
 
 5. **`frontend/src/composables/core/useSettings.generated.ts`**
-   - Added: `autoCollapseSidebar: false,` to defaults
-   - Added fetch: `autoCollapseSidebar: data.auto_collapse_sidebar === 'true',`
-   - Added save: `auto_collapse_sidebar: (settingsRef.value.autoCollapseSidebar ?? settingsDefaults.autoCollapseSidebar).toString(),`
+   - Added: `auto_collapse_sidebar: false,` to defaults
+   - Added fetch: `auto_collapse_sidebar: data.auto_collapse_sidebar === 'true',`
+   - Added save: `auto_collapse_sidebar: (settingsRef.value.auto_collapse_sidebar ?? settingsDefaults.auto_collapse_sidebar).toString(),`
    - Added event: `window.dispatchEvent(new CustomEvent('auto-collapse-sidebar-changed', ...))`
 
 6. **`config/defaults.json` & `internal/config/defaults.json`**
@@ -354,8 +372,8 @@ Add to `frontend/src/components/modals/settings/general/GeneralSettings.vue`:
   :description="t('autoCollapseSidebarDesc')"
 >
   <Toggle
-    :model-value="settings.autoCollapseSidebar"
-    @update:model-value="updateSetting('autoCollapseSidebar', $event)"
+    :model-value="settings.auto_collapse_sidebar"
+    @update:model-value="updateSetting('auto_collapse_sidebar', $event)"
   />
 </SettingItem>
 ```
@@ -376,7 +394,7 @@ const isCollapsed = ref(false)
 
 onMounted(() => {
   // Apply the setting
-  isCollapsed.value = settings.value.autoCollapseSidebar
+  isCollapsed.value = settings.value.auto_collapse_sidebar
 })
 
 // Listen for changes
@@ -505,7 +523,7 @@ For sensitive data (API keys, passwords), set `"encrypted": true`:
   "default": "",
   "category": "integrations",
   "encrypted": true,  // ← Important!
-  "frontend_key": "myAPIKey"
+  "frontend_key": "my_api_key"
 }
 ```
 
@@ -515,17 +533,19 @@ Encrypted settings are automatically:
 - Fetched using `GetEncryptedSetting()` instead of `GetSetting()`
 - Saved using `SetEncryptedSetting()` instead of `SetSetting()`
 
-### Frontend Key Naming
+### Frontend Key Convention
 
-The `frontend_key` should be in **camelCase** and map to the backend key:
+**Important:** Frontend uses **snake_case** everywhere (not camelCase).
 
-| Backend Key | Frontend Key |
-| ----------- | ----------- |
-| `update_interval` | `updateInterval` |
-| `startup_on_boot` | `startupOnBoot` |
-| `deepl_api_key` | `deeplAPIKey` |
-| `ai_endpoint` | `aiEndpoint` |
-| `freshrss_enabled` | `freshRSSSyncEnabled` |
+| Backend Key (JSON) | Frontend Property (TypeScript) |
+| ------------------ | ------------------------------ |
+| `update_interval` | `settings.update_interval` ✅ |
+| `startup_on_boot` | `settings.startup_on_boot` ✅ |
+| `deepl_api_key` | `settings.deepl_api_key` ✅ |
+| `ai_endpoint` | `settings.ai_endpoint` ✅ |
+| `ai_chat_enabled` | `settings.ai_chat_enabled` ✅ |
+
+The `frontend_key` in the schema is for reference and should match the key in snake_case.
 
 ### Quick Examples
 
@@ -537,8 +557,17 @@ The `frontend_key` should be in **camelCase** and map to the backend key:
   "default": true,
   "category": "general",
   "encrypted": false,
-  "frontend_key": "enableFeature"
+  "frontend_key": "enable_feature"
 }
+```
+
+Usage in Vue:
+
+```vue
+<Toggle
+  :model-value="settings.enable_feature"
+  @update:model-value="updateSetting('enable_feature', $event)"
+/>
 ```
 
 **Integer Setting:**
@@ -549,7 +578,7 @@ The `frontend_key` should be in **camelCase** and map to the backend key:
   "default": 100,
   "category": "storage",
   "encrypted": false,
-  "frontend_key": "maxItems"
+  "frontend_key": "max_items"
 }
 ```
 
@@ -561,7 +590,7 @@ The `frontend_key` should be in **camelCase** and map to the backend key:
   "default": "https://api.example.com",
   "category": "integrations",
   "encrypted": false,
-  "frontend_key": "apiEndpoint"
+  "frontend_key": "api_endpoint"
 }
 ```
 
@@ -573,7 +602,7 @@ The `frontend_key` should be in **camelCase** and map to the backend key:
   "default": "",
   "category": "integrations",
   "encrypted": true,    // ← Encrypts in DB
-  "frontend_key": "apiSecret"
+  "frontend_key": "api_secret"
 }
 ```
 
@@ -588,13 +617,13 @@ window.addEventListener('your-setting-key-changed', (event) => {
 })
 ```
 
-Event name format: `{frontend_key in kebab-case}-changed`
+Event name format: `{key in kebab-case}-changed`
 
 Examples:
 
-- `autoCollapseSidebar` → `auto-collapse-sidebar-changed`
-- `aiAPIKey` → `ai-api-key-changed`
-- `freshRSSSyncEnabled` → `fresh-rss-sync-enabled-changed`
+- `auto_collapse_sidebar` → `auto-collapse-sidebar-changed`
+- `ai_api_key` → `ai-api-key-changed`
+- `ai_chat_enabled` → `ai-chat-enabled-changed`
 
 ### Common Mistakes
 
@@ -603,7 +632,7 @@ Examples:
 ```json
 "type": "boolean",     // Should be "bool"
 "category": "General", // Should be lowercase
-"frontend_key": "my_setting" // Should be camelCase
+"frontend_key": "myAPIKey" // Should be snake_case (my_api_key)
 ```
 
 ✅ **Correct:**
@@ -611,7 +640,7 @@ Examples:
 ```json
 "type": "bool",
 "category": "general",
-"frontend_key": "mySetting"
+"frontend_key": "my_api_key"
 ```
 
 ### Troubleshooting
@@ -629,7 +658,7 @@ Examples:
 
 #### Frontend Errors
 
-**Problem:** `Property 'mySetting' does not exist`
+**Problem:** `Property 'my_setting' does not exist`
 
 **Solution:**
 
@@ -659,7 +688,7 @@ Examples:
 2. Check if POST to `/api/settings` is sent
 3. Check response status (should be 200 OK)
 4. Check database directly via SQLite browser
-5. Verify `frontend_key` matches in schema
+5. Verify the key name matches in schema
 
 ---
 
@@ -686,6 +715,8 @@ The generated code is compatible with the existing database and API.
 6. **Encrypt sensitive data** - API keys, passwords, tokens
 7. **Test after adding** - Run the app and verify the setting works
 8. **Document complex settings** - Add comments if behavior is non-obvious
+9. **Use snake_case** - Frontend uses snake_case consistently (not camelCase)
+10. **Keep frontend_key same as key** - The `frontend_key` should match the setting key
 
 ---
 
@@ -702,5 +733,6 @@ This optimization:
 - ✅ Ensures consistency between frontend and backend
 - ✅ Maintains type safety automatically
 - ✅ Makes adding new settings trivial
+- ✅ Uses snake_case throughout (simpler than camelCase)
 
 Happy coding! 🚀
