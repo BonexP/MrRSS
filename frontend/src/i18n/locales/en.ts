@@ -259,7 +259,7 @@ const en: TranslationMessages = {
   exportedToObsidian: 'Article successfully exported to Obsidian',
   exportFailed: 'Export failed: {error}',
   exportingToObsidian: 'Exporting to Obsidian...',
-  exportOPML: 'Export OPML',
+  exportOPML: 'Export Feeds',
   exportToObsidian: 'Export to Obsidian',
   failedToCopy: 'Failed to copy',
   favorites: 'Favorites',
@@ -371,7 +371,7 @@ const en: TranslationMessages = {
   imageViewerHelpExtended:
     'Use mouse wheel or +/- keys to zoom • Drag to move • Ctrl+S to save • ESC to close',
   importFailed: 'Import failed: {error}',
-  importOPML: 'Import OPML',
+  importOPML: 'Import Feeds',
   inputValue: 'Value',
   installFailed: 'Installation failed',
   installingUpdate: 'Installing update...',

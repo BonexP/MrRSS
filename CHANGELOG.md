@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Supported import and export feeds in JSON format. (#317)
+
 ### Changed
 
 - Improved I18n translations, icons, and descriptions in settings page for better clarity and user experience.
