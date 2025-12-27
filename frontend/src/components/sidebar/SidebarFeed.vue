@@ -10,6 +10,7 @@ interface Props {
   isActive: boolean;
   unreadCount: number;
   isEditMode?: boolean;
+  level?: number;
 }
 
 defineProps<Props>();
@@ -42,6 +43,7 @@ function handleDragEnd() {
   <div
     :class="['feed-item', isActive ? 'active' : '']"
     :data-feed-id="feed.id"
+    :data-level="level || 0"
     @click="emit('click')"
     @contextmenu="(e) => emit('contextmenu', e)"
   >
@@ -92,6 +94,41 @@ function handleDragEnd() {
 
 .feed-item {
   @apply px-2 sm:px-3 py-1.5 sm:py-2 cursor-pointer rounded-md text-xs sm:text-sm text-text-primary flex items-center gap-1.5 sm:gap-2.5 hover:bg-bg-tertiary transition-colors;
+}
+
+/* Indentation for nested feeds */
+.feed-item[data-level='1'] {
+  padding-left: calc(0.5rem + 1rem);
+}
+
+.feed-item[data-level='2'] {
+  padding-left: calc(0.5rem + 2rem);
+}
+
+.feed-item[data-level='3'] {
+  padding-left: calc(0.5rem + 3rem);
+}
+
+.feed-item[data-level='4'] {
+  padding-left: calc(0.5rem + 4rem);
+}
+
+@media (min-width: 640px) {
+  .feed-item[data-level='1'] {
+    padding-left: calc(0.75rem + 1rem);
+  }
+
+  .feed-item[data-level='2'] {
+    padding-left: calc(0.75rem + 2rem);
+  }
+
+  .feed-item[data-level='3'] {
+    padding-left: calc(0.75rem + 3rem);
+  }
+
+  .feed-item[data-level='4'] {
+    padding-left: calc(0.75rem + 4rem);
+  }
 }
 .feed-item.active {
   @apply bg-bg-tertiary text-accent font-medium;

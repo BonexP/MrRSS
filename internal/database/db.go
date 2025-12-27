@@ -117,6 +117,14 @@ func (db *DB) Init() error {
 		// Migration: Add position column to feeds table for custom ordering
 		// Error is ignored - if column exists, the operation fails harmlessly.
 		_, _ = db.Exec(`ALTER TABLE feeds ADD COLUMN position INTEGER DEFAULT 0`)
+
+		// Migration: Add article_view_mode column to feeds table for per-feed view mode override
+		// Error is ignored - if column exists, the operation fails harmlessly.
+		_, _ = db.Exec(`ALTER TABLE feeds ADD COLUMN article_view_mode TEXT DEFAULT 'global'`)
+
+		// Migration: Add auto_expand_content column to feeds table for per-feed content expansion override
+		// Error is ignored - if column exists, the operation fails harmlessly.
+		_, _ = db.Exec(`ALTER TABLE feeds ADD COLUMN auto_expand_content TEXT DEFAULT 'global'`)
 	})
 	return err
 }

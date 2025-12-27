@@ -1,5 +1,8 @@
 /**
  * Settings types for SettingsModal and related components
+ *
+ * Note: SettingsData interface is auto-generated in settings.generated.ts
+ * This file contains non-settings-related types and re-exports SettingsData for convenience
  */
 
 export interface SettingsData {
@@ -108,6 +111,7 @@ export interface InstallResponse {
 export type TabName =
   | 'general'
   | 'feeds'
+  | 'content'
   | 'ai'
   | 'rules'
   | 'network'

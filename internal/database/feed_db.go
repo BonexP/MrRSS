@@ -27,8 +27,8 @@ func (db *DB) AddFeed(feed *models.Feed) (int64, error) {
 			}
 		}
 
-		query := `INSERT INTO feeds (title, url, link, description, category, image_url, position, script_path, hide_from_timeline, proxy_url, proxy_enabled, refresh_interval, is_image_mode, type, xpath_item, xpath_item_title, xpath_item_content, xpath_item_uri, xpath_item_author, xpath_item_timestamp, xpath_item_time_format, xpath_item_thumbnail, xpath_item_categories, xpath_item_uid, last_updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-		result, err := db.Exec(query, feed.Title, feed.URL, feed.Link, feed.Description, feed.Category, feed.ImageURL, position, feed.ScriptPath, feed.HideFromTimeline, feed.ProxyURL, feed.ProxyEnabled, feed.RefreshInterval, feed.IsImageMode, feed.Type, feed.XPathItem, feed.XPathItemTitle, feed.XPathItemContent, feed.XPathItemUri, feed.XPathItemAuthor, feed.XPathItemTimestamp, feed.XPathItemTimeFormat, feed.XPathItemThumbnail, feed.XPathItemCategories, feed.XPathItemUid, time.Now())
+		query := `INSERT INTO feeds (title, url, link, description, category, image_url, position, script_path, hide_from_timeline, proxy_url, proxy_enabled, refresh_interval, is_image_mode, type, xpath_item, xpath_item_title, xpath_item_content, xpath_item_uri, xpath_item_author, xpath_item_timestamp, xpath_item_time_format, xpath_item_thumbnail, xpath_item_categories, xpath_item_uid, article_view_mode, auto_expand_content, last_updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+		result, err := db.Exec(query, feed.Title, feed.URL, feed.Link, feed.Description, feed.Category, feed.ImageURL, position, feed.ScriptPath, feed.HideFromTimeline, feed.ProxyURL, feed.ProxyEnabled, feed.RefreshInterval, feed.IsImageMode, feed.Type, feed.XPathItem, feed.XPathItemTitle, feed.XPathItemContent, feed.XPathItemUri, feed.XPathItemAuthor, feed.XPathItemTimestamp, feed.XPathItemTimeFormat, feed.XPathItemThumbnail, feed.XPathItemCategories, feed.XPathItemUid, feed.ArticleViewMode, feed.AutoExpandContent, time.Now())
 		if err != nil {
 			return 0, err
 		}
@@ -42,8 +42,8 @@ func (db *DB) AddFeed(feed *models.Feed) (int64, error) {
 	}
 
 	// Feed exists, update it
-	query := `UPDATE feeds SET title = ?, link = ?, description = ?, category = ?, image_url = ?, position = ?, script_path = ?, hide_from_timeline = ?, proxy_url = ?, proxy_enabled = ?, refresh_interval = ?, is_image_mode = ?, type = ?, xpath_item = ?, xpath_item_title = ?, xpath_item_content = ?, xpath_item_uri = ?, xpath_item_author = ?, xpath_item_timestamp = ?, xpath_item_time_format = ?, xpath_item_thumbnail = ?, xpath_item_categories = ?, xpath_item_uid = ?, last_updated = ? WHERE id = ?`
-	_, err = db.Exec(query, feed.Title, feed.Link, feed.Description, feed.Category, feed.ImageURL, feed.Position, feed.ScriptPath, feed.HideFromTimeline, feed.ProxyURL, feed.ProxyEnabled, feed.RefreshInterval, feed.IsImageMode, feed.Type, feed.XPathItem, feed.XPathItemTitle, feed.XPathItemContent, feed.XPathItemUri, feed.XPathItemAuthor, feed.XPathItemTimestamp, feed.XPathItemTimeFormat, feed.XPathItemThumbnail, feed.XPathItemCategories, feed.XPathItemUid, time.Now(), existingID)
+	query := `UPDATE feeds SET title = ?, link = ?, description = ?, category = ?, image_url = ?, position = ?, script_path = ?, hide_from_timeline = ?, proxy_url = ?, proxy_enabled = ?, refresh_interval = ?, is_image_mode = ?, type = ?, xpath_item = ?, xpath_item_title = ?, xpath_item_content = ?, xpath_item_uri = ?, xpath_item_author = ?, xpath_item_timestamp = ?, xpath_item_time_format = ?, xpath_item_thumbnail = ?, xpath_item_categories = ?, xpath_item_uid = ?, article_view_mode = ?, auto_expand_content = ?, last_updated = ? WHERE id = ?`
+	_, err = db.Exec(query, feed.Title, feed.Link, feed.Description, feed.Category, feed.ImageURL, feed.Position, feed.ScriptPath, feed.HideFromTimeline, feed.ProxyURL, feed.ProxyEnabled, feed.RefreshInterval, feed.IsImageMode, feed.Type, feed.XPathItem, feed.XPathItemTitle, feed.XPathItemContent, feed.XPathItemUri, feed.XPathItemAuthor, feed.XPathItemTimestamp, feed.XPathItemTimeFormat, feed.XPathItemThumbnail, feed.XPathItemCategories, feed.XPathItemUid, feed.ArticleViewMode, feed.AutoExpandContent, time.Now(), existingID)
 	return existingID, err
 }
 
@@ -62,7 +62,7 @@ func (db *DB) DeleteFeed(id int64) error {
 // GetFeeds returns all feeds ordered by category and position.
 func (db *DB) GetFeeds() ([]models.Feed, error) {
 	db.WaitForReady()
-	rows, err := db.Query("SELECT id, title, url, link, description, category, image_url, COALESCE(position, 0), last_updated, last_error, COALESCE(discovery_completed, 0), COALESCE(script_path, ''), COALESCE(hide_from_timeline, 0), COALESCE(proxy_url, ''), COALESCE(proxy_enabled, 0), COALESCE(refresh_interval, 0), COALESCE(is_image_mode, 0), COALESCE(type, ''), COALESCE(xpath_item, ''), COALESCE(xpath_item_title, ''), COALESCE(xpath_item_content, ''), COALESCE(xpath_item_uri, ''), COALESCE(xpath_item_author, ''), COALESCE(xpath_item_timestamp, ''), COALESCE(xpath_item_time_format, ''), COALESCE(xpath_item_thumbnail, ''), COALESCE(xpath_item_categories, ''), COALESCE(xpath_item_uid, '') FROM feeds ORDER BY category ASC, position ASC, id ASC")
+	rows, err := db.Query("SELECT id, title, url, link, description, category, image_url, COALESCE(position, 0), last_updated, last_error, COALESCE(discovery_completed, 0), COALESCE(script_path, ''), COALESCE(hide_from_timeline, 0), COALESCE(proxy_url, ''), COALESCE(proxy_enabled, 0), COALESCE(refresh_interval, 0), COALESCE(is_image_mode, 0), COALESCE(type, ''), COALESCE(xpath_item, ''), COALESCE(xpath_item_title, ''), COALESCE(xpath_item_content, ''), COALESCE(xpath_item_uri, ''), COALESCE(xpath_item_author, ''), COALESCE(xpath_item_timestamp, ''), COALESCE(xpath_item_time_format, ''), COALESCE(xpath_item_thumbnail, ''), COALESCE(xpath_item_categories, ''), COALESCE(xpath_item_uid, ''), COALESCE(article_view_mode, 'global'), COALESCE(auto_expand_content, 'global') FROM feeds ORDER BY category ASC, position ASC, id ASC")
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +71,8 @@ func (db *DB) GetFeeds() ([]models.Feed, error) {
 	var feeds []models.Feed
 	for rows.Next() {
 		var f models.Feed
-		var link, category, imageURL, lastError, scriptPath, proxyURL, feedType, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid sql.NullString
-		if err := rows.Scan(&f.ID, &f.Title, &f.URL, &link, &f.Description, &category, &imageURL, &f.Position, &f.LastUpdated, &lastError, &f.DiscoveryCompleted, &scriptPath, &f.HideFromTimeline, &proxyURL, &f.ProxyEnabled, &f.RefreshInterval, &f.IsImageMode, &feedType, &xpathItem, &xpathItemTitle, &xpathItemContent, &xpathItemUri, &xpathItemAuthor, &xpathItemTimestamp, &xpathItemTimeFormat, &xpathItemThumbnail, &xpathItemCategories, &xpathItemUid); err != nil {
+		var link, category, imageURL, lastError, scriptPath, proxyURL, feedType, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid, articleViewMode, autoExpandContent sql.NullString
+		if err := rows.Scan(&f.ID, &f.Title, &f.URL, &link, &f.Description, &category, &imageURL, &f.Position, &f.LastUpdated, &lastError, &f.DiscoveryCompleted, &scriptPath, &f.HideFromTimeline, &proxyURL, &f.ProxyEnabled, &f.RefreshInterval, &f.IsImageMode, &feedType, &xpathItem, &xpathItemTitle, &xpathItemContent, &xpathItemUri, &xpathItemAuthor, &xpathItemTimestamp, &xpathItemTimeFormat, &xpathItemThumbnail, &xpathItemCategories, &xpathItemUid, &articleViewMode, &autoExpandContent); err != nil {
 			return nil, err
 		}
 		f.Link = link.String
@@ -92,6 +92,14 @@ func (db *DB) GetFeeds() ([]models.Feed, error) {
 		f.XPathItemThumbnail = xpathItemThumbnail.String
 		f.XPathItemCategories = xpathItemCategories.String
 		f.XPathItemUid = xpathItemUid.String
+		f.ArticleViewMode = articleViewMode.String
+		if f.ArticleViewMode == "" {
+			f.ArticleViewMode = "global"
+		}
+		f.AutoExpandContent = autoExpandContent.String
+		if f.AutoExpandContent == "" {
+			f.AutoExpandContent = "global"
+		}
 		feeds = append(feeds, f)
 	}
 	return feeds, nil
@@ -100,11 +108,11 @@ func (db *DB) GetFeeds() ([]models.Feed, error) {
 // GetFeedByID retrieves a specific feed by its ID.
 func (db *DB) GetFeedByID(id int64) (*models.Feed, error) {
 	db.WaitForReady()
-	row := db.QueryRow("SELECT id, title, url, link, description, category, image_url, COALESCE(position, 0), last_updated, last_error, COALESCE(discovery_completed, 0), COALESCE(script_path, ''), COALESCE(hide_from_timeline, 0), COALESCE(proxy_url, ''), COALESCE(proxy_enabled, 0), COALESCE(refresh_interval, 0), COALESCE(is_image_mode, 0), COALESCE(type, ''), COALESCE(xpath_item, ''), COALESCE(xpath_item_title, ''), COALESCE(xpath_item_content, ''), COALESCE(xpath_item_uri, ''), COALESCE(xpath_item_author, ''), COALESCE(xpath_item_timestamp, ''), COALESCE(xpath_item_time_format, ''), COALESCE(xpath_item_thumbnail, ''), COALESCE(xpath_item_categories, ''), COALESCE(xpath_item_uid, '') FROM feeds WHERE id = ?", id)
+	row := db.QueryRow("SELECT id, title, url, link, description, category, image_url, COALESCE(position, 0), last_updated, last_error, COALESCE(discovery_completed, 0), COALESCE(script_path, ''), COALESCE(hide_from_timeline, 0), COALESCE(proxy_url, ''), COALESCE(proxy_enabled, 0), COALESCE(refresh_interval, 0), COALESCE(is_image_mode, 0), COALESCE(type, ''), COALESCE(xpath_item, ''), COALESCE(xpath_item_title, ''), COALESCE(xpath_item_content, ''), COALESCE(xpath_item_uri, ''), COALESCE(xpath_item_author, ''), COALESCE(xpath_item_timestamp, ''), COALESCE(xpath_item_time_format, ''), COALESCE(xpath_item_thumbnail, ''), COALESCE(xpath_item_categories, ''), COALESCE(xpath_item_uid, ''), COALESCE(article_view_mode, 'global'), COALESCE(auto_expand_content, 'global') FROM feeds WHERE id = ?", id)
 
 	var f models.Feed
-	var link, category, imageURL, lastError, scriptPath, proxyURL, feedType, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid sql.NullString
-	if err := row.Scan(&f.ID, &f.Title, &f.URL, &link, &f.Description, &category, &imageURL, &f.Position, &f.LastUpdated, &lastError, &f.DiscoveryCompleted, &scriptPath, &f.HideFromTimeline, &proxyURL, &f.ProxyEnabled, &f.RefreshInterval, &f.IsImageMode, &feedType, &xpathItem, &xpathItemTitle, &xpathItemContent, &xpathItemUri, &xpathItemAuthor, &xpathItemTimestamp, &xpathItemTimeFormat, &xpathItemThumbnail, &xpathItemCategories, &xpathItemUid); err != nil {
+	var link, category, imageURL, lastError, scriptPath, proxyURL, feedType, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid, articleViewMode, autoExpandContent sql.NullString
+	if err := row.Scan(&f.ID, &f.Title, &f.URL, &link, &f.Description, &category, &imageURL, &f.Position, &f.LastUpdated, &lastError, &f.DiscoveryCompleted, &scriptPath, &f.HideFromTimeline, &proxyURL, &f.ProxyEnabled, &f.RefreshInterval, &f.IsImageMode, &feedType, &xpathItem, &xpathItemTitle, &xpathItemContent, &xpathItemUri, &xpathItemAuthor, &xpathItemTimestamp, &xpathItemTimeFormat, &xpathItemThumbnail, &xpathItemCategories, &xpathItemUid, &articleViewMode, &autoExpandContent); err != nil {
 		return nil, err
 	}
 	f.Link = link.String
@@ -124,6 +132,14 @@ func (db *DB) GetFeedByID(id int64) (*models.Feed, error) {
 	f.XPathItemThumbnail = xpathItemThumbnail.String
 	f.XPathItemCategories = xpathItemCategories.String
 	f.XPathItemUid = xpathItemUid.String
+	f.ArticleViewMode = articleViewMode.String
+	if f.ArticleViewMode == "" {
+		f.ArticleViewMode = "global"
+	}
+	f.AutoExpandContent = autoExpandContent.String
+	if f.AutoExpandContent == "" {
+		f.AutoExpandContent = "global"
+	}
 
 	return &f, nil
 }
@@ -148,17 +164,17 @@ func (db *DB) GetAllFeedURLs() (map[string]bool, error) {
 	return urls, rows.Err()
 }
 
-// UpdateFeed updates feed title, URL, category, script_path, hide_from_timeline, proxy settings, refresh_interval, is_image_mode, and XPath fields.
-func (db *DB) UpdateFeed(id int64, title, url, category, scriptPath string, hideFromTimeline bool, proxyURL string, proxyEnabled bool, refreshInterval int, isImageMode bool, feedType string, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid string) error {
+// UpdateFeed updates feed title, URL, category, script_path, hide_from_timeline, proxy settings, refresh_interval, is_image_mode, XPath fields, article_view_mode, and auto_expand_content.
+func (db *DB) UpdateFeed(id int64, title, url, category, scriptPath string, hideFromTimeline bool, proxyURL string, proxyEnabled bool, refreshInterval int, isImageMode bool, feedType string, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid, articleViewMode, autoExpandContent string) error {
 	db.WaitForReady()
-	_, err := db.Exec("UPDATE feeds SET title = ?, url = ?, category = ?, script_path = ?, hide_from_timeline = ?, proxy_url = ?, proxy_enabled = ?, refresh_interval = ?, is_image_mode = ?, type = ?, xpath_item = ?, xpath_item_title = ?, xpath_item_content = ?, xpath_item_uri = ?, xpath_item_author = ?, xpath_item_timestamp = ?, xpath_item_time_format = ?, xpath_item_thumbnail = ?, xpath_item_categories = ?, xpath_item_uid = ? WHERE id = ?", title, url, category, scriptPath, hideFromTimeline, proxyURL, proxyEnabled, refreshInterval, isImageMode, feedType, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid, id)
+	_, err := db.Exec("UPDATE feeds SET title = ?, url = ?, category = ?, script_path = ?, hide_from_timeline = ?, proxy_url = ?, proxy_enabled = ?, refresh_interval = ?, is_image_mode = ?, type = ?, xpath_item = ?, xpath_item_title = ?, xpath_item_content = ?, xpath_item_uri = ?, xpath_item_author = ?, xpath_item_timestamp = ?, xpath_item_time_format = ?, xpath_item_thumbnail = ?, xpath_item_categories = ?, xpath_item_uid = ?, article_view_mode = ?, auto_expand_content = ? WHERE id = ?", title, url, category, scriptPath, hideFromTimeline, proxyURL, proxyEnabled, refreshInterval, isImageMode, feedType, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid, articleViewMode, autoExpandContent, id)
 	return err
 }
 
 // UpdateFeedWithPosition updates a feed including its position field.
-func (db *DB) UpdateFeedWithPosition(id int64, title, url, category, scriptPath string, position int, hideFromTimeline bool, proxyURL string, proxyEnabled bool, refreshInterval int, isImageMode bool, feedType string, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid string) error {
+func (db *DB) UpdateFeedWithPosition(id int64, title, url, category, scriptPath string, position int, hideFromTimeline bool, proxyURL string, proxyEnabled bool, refreshInterval int, isImageMode bool, feedType string, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid, articleViewMode, autoExpandContent string) error {
 	db.WaitForReady()
-	_, err := db.Exec("UPDATE feeds SET title = ?, url = ?, category = ?, script_path = ?, position = ?, hide_from_timeline = ?, proxy_url = ?, proxy_enabled = ?, refresh_interval = ?, is_image_mode = ?, type = ?, xpath_item = ?, xpath_item_title = ?, xpath_item_content = ?, xpath_item_uri = ?, xpath_item_author = ?, xpath_item_timestamp = ?, xpath_item_time_format = ?, xpath_item_thumbnail = ?, xpath_item_categories = ?, xpath_item_uid = ? WHERE id = ?", title, url, category, scriptPath, position, hideFromTimeline, proxyURL, proxyEnabled, refreshInterval, isImageMode, feedType, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid, id)
+	_, err := db.Exec("UPDATE feeds SET title = ?, url = ?, category = ?, script_path = ?, position = ?, hide_from_timeline = ?, proxy_url = ?, proxy_enabled = ?, refresh_interval = ?, is_image_mode = ?, type = ?, xpath_item = ?, xpath_item_title = ?, xpath_item_content = ?, xpath_item_uri = ?, xpath_item_author = ?, xpath_item_timestamp = ?, xpath_item_time_format = ?, xpath_item_thumbnail = ?, xpath_item_categories = ?, xpath_item_uid = ?, article_view_mode = ?, auto_expand_content = ? WHERE id = ?", title, url, category, scriptPath, position, hideFromTimeline, proxyURL, proxyEnabled, refreshInterval, isImageMode, feedType, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid, articleViewMode, autoExpandContent, id)
 	return err
 }
 

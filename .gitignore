@@ -15,6 +15,7 @@ mrrss-test
 mrrss-test.exe
 test-build
 test-build.exe
+nul
 
 # Test binary, built with `go test -c`
 *.test

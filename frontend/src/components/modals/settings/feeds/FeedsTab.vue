@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import DataManagementSettings from './DataManagementSettings.vue';
 import FeedManagementSettings from './FeedManagementSettings.vue';
+import DiscoverySettings from './DiscoverySettings.vue';
 import type { Feed } from '@/types/models';
 import type { SettingsData } from '@/types/settings';
 import { useSettingsAutoSave } from '@/composables/core/useSettingsAutoSave';
@@ -76,7 +77,6 @@ function handleBatchMove(ids: number[]) {
       @import-opml="handleImportOPML"
       @export-opml="handleExportOPML"
       @cleanup-database="handleCleanupDatabase"
-      @discover-all="handleDiscoverAll"
     />
 
     <FeedManagementSettings
@@ -86,5 +86,7 @@ function handleBatchMove(ids: number[]) {
       @batch-delete="handleBatchDelete"
       @batch-move="handleBatchMove"
     />
+
+    <DiscoverySettings @discover-all="handleDiscoverAll" />
   </div>
 </template>

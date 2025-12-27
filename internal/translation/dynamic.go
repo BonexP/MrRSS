@@ -26,14 +26,15 @@ type DynamicTranslator struct {
 	cache    CacheProvider
 	mu       sync.RWMutex
 	// Cache the current translator to avoid recreating it for every translation
-	cachedTranslator Translator
-	cachedProvider   string
-	cachedAPIKey     string
-	cachedAppID      string
-	cachedSecretKey  string
-	cachedEndpoint   string
-	cachedModel      string
-	cachedPrompt     string
+	cachedTranslator    Translator
+	cachedProvider      string
+	cachedAPIKey        string
+	cachedAppID         string
+	cachedSecretKey     string
+	cachedEndpoint      string
+	cachedModel         string
+	cachedPrompt        string
+	cachedCustomHeaders string
 }
 
 // NewDynamicTranslator creates a new dynamic translator that uses the given settings provider.
@@ -80,7 +81,7 @@ func (t *DynamicTranslator) getTranslatorWithProvider() (Translator, string, err
 	}
 
 	// Get provider-specific settings (use encrypted methods for sensitive credentials)
-	var apiKey, appID, secretKey, endpoint, model, systemPrompt string
+	var apiKey, appID, secretKey, endpoint, model, systemPrompt, customHeaders string
 	switch provider {
 	case "deepl":
 		apiKey, _ = t.settings.GetEncryptedSetting("deepl_api_key")
@@ -93,6 +94,7 @@ func (t *DynamicTranslator) getTranslatorWithProvider() (Translator, string, err
 		endpoint, _ = t.settings.GetSetting("ai_endpoint")
 		model, _ = t.settings.GetSetting("ai_model")
 		systemPrompt, _ = t.settings.GetSetting("ai_translation_prompt")
+		customHeaders, _ = t.settings.GetSetting("ai_custom_headers")
 	}
 
 	// Check if we can reuse the cached translator
@@ -104,7 +106,8 @@ func (t *DynamicTranslator) getTranslatorWithProvider() (Translator, string, err
 		t.cachedSecretKey == secretKey &&
 		t.cachedEndpoint == endpoint &&
 		t.cachedModel == model &&
-		t.cachedPrompt == systemPrompt {
+		t.cachedPrompt == systemPrompt &&
+		t.cachedCustomHeaders == customHeaders {
 		translator := t.cachedTranslator
 		t.mu.RUnlock()
 		return translator, provider, nil
@@ -143,6 +146,9 @@ func (t *DynamicTranslator) getTranslatorWithProvider() (Translator, string, err
 		if systemPrompt != "" {
 			aiTranslator.SetSystemPrompt(systemPrompt)
 		}
+		if customHeaders != "" {
+			aiTranslator.SetCustomHeaders(customHeaders)
+		}
 		translator = aiTranslator
 	default:
 		translator = NewGoogleFreeTranslator()
@@ -157,6 +163,7 @@ func (t *DynamicTranslator) getTranslatorWithProvider() (Translator, string, err
 	t.cachedEndpoint = endpoint
 	t.cachedModel = model
 	t.cachedPrompt = systemPrompt
+	t.cachedCustomHeaders = customHeaders
 
 	return translator, provider, nil
 }

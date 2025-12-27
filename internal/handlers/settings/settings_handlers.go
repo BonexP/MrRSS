@@ -6,57 +6,64 @@ import (
 	"net/http"
 
 	"MrRSS/internal/handlers/core"
-	"MrRSS/internal/utils"
 )
 
 // HandleSettings handles GET and POST requests for application settings.
+// CODE GENERATED - DO NOT EDIT MANUALLY
+// To add new settings, edit internal/config/settings_schema.json and run: go run tools/settings-generator/main.go
 func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		interval, _ := h.DB.GetSetting("update_interval")
-		refreshMode, _ := h.DB.GetSetting("refresh_mode")
-		translationEnabled, _ := h.DB.GetSetting("translation_enabled")
-		targetLang, _ := h.DB.GetSetting("target_language")
-		provider, _ := h.DB.GetSetting("translation_provider")
-		apiKey, _ := h.DB.GetEncryptedSetting("deepl_api_key")
-		deeplEndpoint, _ := h.DB.GetSetting("deepl_endpoint")
-		baiduAppID, _ := h.DB.GetSetting("baidu_app_id")
-		baiduSecretKey, _ := h.DB.GetEncryptedSetting("baidu_secret_key")
-		aiAPIKey, _ := h.DB.GetEncryptedSetting("ai_api_key")
+		aiApiKey, _ := h.DB.GetEncryptedSetting("ai_api_key")
+		aiChatEnabled, _ := h.DB.GetSetting("ai_chat_enabled")
+		aiCustomHeaders, _ := h.DB.GetSetting("ai_custom_headers")
 		aiEndpoint, _ := h.DB.GetSetting("ai_endpoint")
 		aiModel, _ := h.DB.GetSetting("ai_model")
-		aiTranslationPrompt, _ := h.DB.GetSetting("ai_translation_prompt")
 		aiSummaryPrompt, _ := h.DB.GetSetting("ai_summary_prompt")
-		aiUsageTokens, _ := h.DB.GetSetting("ai_usage_tokens")
+		aiTranslationPrompt, _ := h.DB.GetSetting("ai_translation_prompt")
 		aiUsageLimit, _ := h.DB.GetSetting("ai_usage_limit")
-		aiChatEnabled, _ := h.DB.GetSetting("ai_chat_enabled")
-		autoCleanup, _ := h.DB.GetSetting("auto_cleanup_enabled")
-		maxCacheSize, _ := h.DB.GetSetting("max_cache_size_mb")
-		maxArticleAge, _ := h.DB.GetSetting("max_article_age_days")
-		language, _ := h.DB.GetSetting("language")
-		theme, _ := h.DB.GetSetting("theme")
-		lastUpdate, _ := h.DB.GetSetting("last_article_update")
-		showHidden, _ := h.DB.GetSetting("show_hidden_articles")
-		hoverMarkAsRead, _ := h.DB.GetSetting("hover_mark_as_read")
-		startupOnBoot, _ := h.DB.GetSetting("startup_on_boot")
+		aiUsageTokens, _ := h.DB.GetSetting("ai_usage_tokens")
+		autoCleanupEnabled, _ := h.DB.GetSetting("auto_cleanup_enabled")
+		autoShowAllContent, _ := h.DB.GetSetting("auto_show_all_content")
+		baiduAppId, _ := h.DB.GetSetting("baidu_app_id")
+		baiduSecretKey, _ := h.DB.GetEncryptedSetting("baidu_secret_key")
 		closeToTray, _ := h.DB.GetSetting("close_to_tray")
-		shortcuts, _ := h.DB.GetSetting("shortcuts")
-		rules, _ := h.DB.GetSetting("rules")
+		customCssFile, _ := h.DB.GetSetting("custom_css_file")
+		deeplApiKey, _ := h.DB.GetEncryptedSetting("deepl_api_key")
+		deeplEndpoint, _ := h.DB.GetSetting("deepl_endpoint")
 		defaultViewMode, _ := h.DB.GetSetting("default_view_mode")
-		mediaCacheEnabled, _ := h.DB.GetSetting("media_cache_enabled")
-		mediaCacheMaxSizeMB, _ := h.DB.GetSetting("media_cache_max_size_mb")
-		mediaCacheMaxAgeDays, _ := h.DB.GetSetting("media_cache_max_age_days")
-		summaryEnabled, _ := h.DB.GetSetting("summary_enabled")
-		summaryLength, _ := h.DB.GetSetting("summary_length")
-		summaryProvider, _ := h.DB.GetSetting("summary_provider")
-		summaryTriggerMode, _ := h.DB.GetSetting("summary_trigger_mode")
-		proxyEnabled, _ := h.DB.GetSetting("proxy_enabled")
-		proxyType, _ := h.DB.GetSetting("proxy_type")
-		proxyHost, _ := h.DB.GetSetting("proxy_host")
-		proxyPort, _ := h.DB.GetSetting("proxy_port")
-		proxyUsername, _ := h.DB.GetEncryptedSetting("proxy_username")
-		proxyPassword, _ := h.DB.GetEncryptedSetting("proxy_password")
+		freshrssApiPassword, _ := h.DB.GetEncryptedSetting("freshrss_api_password")
+		freshrssEnabled, _ := h.DB.GetSetting("freshrss_enabled")
+		freshrssServerUrl, _ := h.DB.GetSetting("freshrss_server_url")
+		freshrssUsername, _ := h.DB.GetSetting("freshrss_username")
+		fullTextFetchEnabled, _ := h.DB.GetSetting("full_text_fetch_enabled")
 		googleTranslateEndpoint, _ := h.DB.GetSetting("google_translate_endpoint")
+		hoverMarkAsRead, _ := h.DB.GetSetting("hover_mark_as_read")
+		imageGalleryEnabled, _ := h.DB.GetSetting("image_gallery_enabled")
+		language, _ := h.DB.GetSetting("language")
+		lastArticleUpdate, _ := h.DB.GetSetting("last_article_update")
+		lastNetworkTest, _ := h.DB.GetSetting("last_network_test")
+		maxArticleAgeDays, _ := h.DB.GetSetting("max_article_age_days")
+		maxCacheSizeMb, _ := h.DB.GetSetting("max_cache_size_mb")
+		maxConcurrentRefreshes, _ := h.DB.GetSetting("max_concurrent_refreshes")
+		mediaCacheEnabled, _ := h.DB.GetSetting("media_cache_enabled")
+		mediaCacheMaxAgeDays, _ := h.DB.GetSetting("media_cache_max_age_days")
+		mediaCacheMaxSizeMb, _ := h.DB.GetSetting("media_cache_max_size_mb")
+		networkBandwidthMbps, _ := h.DB.GetSetting("network_bandwidth_mbps")
+		networkLatencyMs, _ := h.DB.GetSetting("network_latency_ms")
+		networkSpeed, _ := h.DB.GetSetting("network_speed")
+		obsidianEnabled, _ := h.DB.GetSetting("obsidian_enabled")
+		obsidianVault, _ := h.DB.GetSetting("obsidian_vault")
+		obsidianVaultPath, _ := h.DB.GetSetting("obsidian_vault_path")
+		proxyEnabled, _ := h.DB.GetSetting("proxy_enabled")
+		proxyHost, _ := h.DB.GetSetting("proxy_host")
+		proxyPassword, _ := h.DB.GetEncryptedSetting("proxy_password")
+		proxyPort, _ := h.DB.GetSetting("proxy_port")
+		proxyType, _ := h.DB.GetSetting("proxy_type")
+		proxyUsername, _ := h.DB.GetEncryptedSetting("proxy_username")
+		refreshMode, _ := h.DB.GetSetting("refresh_mode")
+		rules, _ := h.DB.GetSetting("rules")
+		shortcuts, _ := h.DB.GetSetting("shortcuts")
 		showArticlePreviewImages, _ := h.DB.GetSetting("show_article_preview_images")
 		obsidianEnabled, _ := h.DB.GetSetting("obsidian_enabled")
 		obsidianVault, _ := h.DB.GetSetting("obsidian_vault")
@@ -75,50 +82,56 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		minifluxAPIKey, _ := h.DB.GetSetting("miniflux_api_key")
 		fullTextFetchEnabled, _ := h.DB.GetSetting("full_text_fetch_enabled")
 		json.NewEncoder(w).Encode(map[string]string{
-			"update_interval":             interval,
-			"refresh_mode":                refreshMode,
-			"translation_enabled":         translationEnabled,
-			"target_language":             targetLang,
-			"translation_provider":        provider,
-			"deepl_api_key":               apiKey,
-			"deepl_endpoint":              deeplEndpoint,
-			"baidu_app_id":                baiduAppID,
-			"baidu_secret_key":            baiduSecretKey,
-			"ai_api_key":                  aiAPIKey,
+			"ai_api_key":                  aiApiKey,
+			"ai_chat_enabled":             aiChatEnabled,
+			"ai_custom_headers":           aiCustomHeaders,
 			"ai_endpoint":                 aiEndpoint,
 			"ai_model":                    aiModel,
-			"ai_translation_prompt":       aiTranslationPrompt,
 			"ai_summary_prompt":           aiSummaryPrompt,
-			"ai_usage_tokens":             aiUsageTokens,
+			"ai_translation_prompt":       aiTranslationPrompt,
 			"ai_usage_limit":              aiUsageLimit,
-			"ai_chat_enabled":             aiChatEnabled,
-			"auto_cleanup_enabled":        autoCleanup,
-			"max_cache_size_mb":           maxCacheSize,
-			"max_article_age_days":        maxArticleAge,
-			"language":                    language,
-			"theme":                       theme,
-			"last_article_update":         lastUpdate,
-			"show_hidden_articles":        showHidden,
-			"hover_mark_as_read":          hoverMarkAsRead,
-			"startup_on_boot":             startupOnBoot,
+			"ai_usage_tokens":             aiUsageTokens,
+			"auto_cleanup_enabled":        autoCleanupEnabled,
+			"auto_show_all_content":       autoShowAllContent,
+			"baidu_app_id":                baiduAppId,
+			"baidu_secret_key":            baiduSecretKey,
 			"close_to_tray":               closeToTray,
-			"shortcuts":                   shortcuts,
-			"rules":                       rules,
+			"custom_css_file":             customCssFile,
+			"deepl_api_key":               deeplApiKey,
+			"deepl_endpoint":              deeplEndpoint,
 			"default_view_mode":           defaultViewMode,
-			"media_cache_enabled":         mediaCacheEnabled,
-			"media_cache_max_size_mb":     mediaCacheMaxSizeMB,
-			"media_cache_max_age_days":    mediaCacheMaxAgeDays,
-			"summary_enabled":             summaryEnabled,
-			"summary_length":              summaryLength,
-			"summary_provider":            summaryProvider,
-			"summary_trigger_mode":        summaryTriggerMode,
-			"proxy_enabled":               proxyEnabled,
-			"proxy_type":                  proxyType,
-			"proxy_host":                  proxyHost,
-			"proxy_port":                  proxyPort,
-			"proxy_username":              proxyUsername,
-			"proxy_password":              proxyPassword,
+			"freshrss_api_password":       freshrssApiPassword,
+			"freshrss_enabled":            freshrssEnabled,
+			"freshrss_server_url":         freshrssServerUrl,
+			"freshrss_username":           freshrssUsername,
+			"full_text_fetch_enabled":     fullTextFetchEnabled,
 			"google_translate_endpoint":   googleTranslateEndpoint,
+			"hover_mark_as_read":          hoverMarkAsRead,
+			"image_gallery_enabled":       imageGalleryEnabled,
+			"language":                    language,
+			"last_article_update":         lastArticleUpdate,
+			"last_network_test":           lastNetworkTest,
+			"max_article_age_days":        maxArticleAgeDays,
+			"max_cache_size_mb":           maxCacheSizeMb,
+			"max_concurrent_refreshes":    maxConcurrentRefreshes,
+			"media_cache_enabled":         mediaCacheEnabled,
+			"media_cache_max_age_days":    mediaCacheMaxAgeDays,
+			"media_cache_max_size_mb":     mediaCacheMaxSizeMb,
+			"network_bandwidth_mbps":      networkBandwidthMbps,
+			"network_latency_ms":          networkLatencyMs,
+			"network_speed":               networkSpeed,
+			"obsidian_enabled":            obsidianEnabled,
+			"obsidian_vault":              obsidianVault,
+			"obsidian_vault_path":         obsidianVaultPath,
+			"proxy_enabled":               proxyEnabled,
+			"proxy_host":                  proxyHost,
+			"proxy_password":              proxyPassword,
+			"proxy_port":                  proxyPort,
+			"proxy_type":                  proxyType,
+			"proxy_username":              proxyUsername,
+			"refresh_mode":                refreshMode,
+			"rules":                       rules,
+			"shortcuts":                   shortcuts,
 			"show_article_preview_images": showArticlePreviewImages,
 			"obsidian_enabled":            obsidianEnabled,
 			"obsidian_vault":              obsidianVault,
@@ -139,49 +152,56 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		})
 	case http.MethodPost:
 		var req struct {
-			UpdateInterval           string `json:"update_interval"`
-			RefreshMode              string `json:"refresh_mode"`
-			TranslationEnabled       string `json:"translation_enabled"`
-			TargetLanguage           string `json:"target_language"`
-			TranslationProvider      string `json:"translation_provider"`
-			DeepLAPIKey              string `json:"deepl_api_key"`
-			DeepLEndpoint            string `json:"deepl_endpoint"`
-			BaiduAppID               string `json:"baidu_app_id"`
-			BaiduSecretKey           string `json:"baidu_secret_key"`
 			AIAPIKey                 string `json:"ai_api_key"`
+			AIChatEnabled            string `json:"ai_chat_enabled"`
+			AICustomHeaders          string `json:"ai_custom_headers"`
 			AIEndpoint               string `json:"ai_endpoint"`
 			AIModel                  string `json:"ai_model"`
-			AITranslationPrompt      string `json:"ai_translation_prompt"`
 			AISummaryPrompt          string `json:"ai_summary_prompt"`
-			AIUsageTokens            string `json:"ai_usage_tokens"`
+			AITranslationPrompt      string `json:"ai_translation_prompt"`
 			AIUsageLimit             string `json:"ai_usage_limit"`
-			AIChatEnabled            string `json:"ai_chat_enabled"`
+			AIUsageTokens            string `json:"ai_usage_tokens"`
 			AutoCleanupEnabled       string `json:"auto_cleanup_enabled"`
-			MaxCacheSizeMB           string `json:"max_cache_size_mb"`
-			MaxArticleAgeDays        string `json:"max_article_age_days"`
-			Language                 string `json:"language"`
-			Theme                    string `json:"theme"`
-			ShowHiddenArticles       string `json:"show_hidden_articles"`
-			HoverMarkAsRead          string `json:"hover_mark_as_read"`
-			StartupOnBoot            string `json:"startup_on_boot"`
+			AutoShowAllContent       string `json:"auto_show_all_content"`
+			BaiduAppId               string `json:"baidu_app_id"`
+			BaiduSecretKey           string `json:"baidu_secret_key"`
 			CloseToTray              string `json:"close_to_tray"`
-			Shortcuts                string `json:"shortcuts"`
-			Rules                    string `json:"rules"`
+			CustomCssFile            string `json:"custom_css_file"`
+			DeeplAPIKey              string `json:"deepl_api_key"`
+			DeeplEndpoint            string `json:"deepl_endpoint"`
 			DefaultViewMode          string `json:"default_view_mode"`
-			MediaCacheEnabled        string `json:"media_cache_enabled"`
-			MediaCacheMaxSizeMB      string `json:"media_cache_max_size_mb"`
-			MediaCacheMaxAgeDays     string `json:"media_cache_max_age_days"`
-			SummaryEnabled           string `json:"summary_enabled"`
-			SummaryLength            string `json:"summary_length"`
-			SummaryProvider          string `json:"summary_provider"`
-			SummaryTriggerMode       string `json:"summary_trigger_mode"`
-			ProxyEnabled             string `json:"proxy_enabled"`
-			ProxyType                string `json:"proxy_type"`
-			ProxyHost                string `json:"proxy_host"`
-			ProxyPort                string `json:"proxy_port"`
-			ProxyUsername            string `json:"proxy_username"`
-			ProxyPassword            string `json:"proxy_password"`
+			FreshRSSAPIPassword      string `json:"freshrss_api_password"`
+			FreshRSSEnabled          string `json:"freshrss_enabled"`
+			FreshRSSServerUrl        string `json:"freshrss_server_url"`
+			FreshRSSUsername         string `json:"freshrss_username"`
+			FullTextFetchEnabled     string `json:"full_text_fetch_enabled"`
 			GoogleTranslateEndpoint  string `json:"google_translate_endpoint"`
+			HoverMarkAsRead          string `json:"hover_mark_as_read"`
+			ImageGalleryEnabled      string `json:"image_gallery_enabled"`
+			Language                 string `json:"language"`
+			LastArticleUpdate        string `json:"last_article_update"`
+			LastNetworkTest          string `json:"last_network_test"`
+			MaxArticleAgeDays        string `json:"max_article_age_days"`
+			MaxCacheSizeMb           string `json:"max_cache_size_mb"`
+			MaxConcurrentRefreshes   string `json:"max_concurrent_refreshes"`
+			MediaCacheEnabled        string `json:"media_cache_enabled"`
+			MediaCacheMaxAgeDays     string `json:"media_cache_max_age_days"`
+			MediaCacheMaxSizeMb      string `json:"media_cache_max_size_mb"`
+			NetworkBandwidthMbps     string `json:"network_bandwidth_mbps"`
+			NetworkLatencyMs         string `json:"network_latency_ms"`
+			NetworkSpeed             string `json:"network_speed"`
+			ObsidianEnabled          string `json:"obsidian_enabled"`
+			ObsidianVault            string `json:"obsidian_vault"`
+			ObsidianVaultPath        string `json:"obsidian_vault_path"`
+			ProxyEnabled             string `json:"proxy_enabled"`
+			ProxyHost                string `json:"proxy_host"`
+			ProxyPassword            string `json:"proxy_password"`
+			ProxyPort                string `json:"proxy_port"`
+			ProxyType                string `json:"proxy_type"`
+			ProxyUsername            string `json:"proxy_username"`
+			RefreshMode              string `json:"refresh_mode"`
+			Rules                    string `json:"rules"`
+			Shortcuts                string `json:"shortcuts"`
 			ShowArticlePreviewImages string `json:"show_article_preview_images"`
 			ObsidianEnabled          string `json:"obsidian_enabled"`
 			ObsidianVault            string `json:"obsidian_vault"`
@@ -204,102 +224,228 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if req.UpdateInterval != "" {
-			h.DB.SetSetting("update_interval", req.UpdateInterval)
-		}
-		if req.RefreshMode != "" {
-			h.DB.SetSetting("refresh_mode", req.RefreshMode)
-		}
-		if req.TranslationEnabled != "" {
-			h.DB.SetSetting("translation_enabled", req.TranslationEnabled)
-		}
-		if req.TargetLanguage != "" {
-			h.DB.SetSetting("target_language", req.TargetLanguage)
-		}
-		if req.TranslationProvider != "" {
-			h.DB.SetSetting("translation_provider", req.TranslationProvider)
-		}
-		// Always update API keys as they might be cleared (use encrypted storage for sensitive credentials)
-		if err := h.DB.SetEncryptedSetting("deepl_api_key", req.DeepLAPIKey); err != nil {
-			log.Printf("Failed to save DeepL API key: %v", err)
-			http.Error(w, "Failed to save DeepL API key", http.StatusInternalServerError)
-			return
-		}
-		// Always update DeepL endpoint (for deeplx self-hosted support)
-		h.DB.SetSetting("deepl_endpoint", req.DeepLEndpoint)
-		h.DB.SetSetting("baidu_app_id", req.BaiduAppID)
-		if err := h.DB.SetEncryptedSetting("baidu_secret_key", req.BaiduSecretKey); err != nil {
-			log.Printf("Failed to save Baidu secret key: %v", err)
-			http.Error(w, "Failed to save Baidu secret key", http.StatusInternalServerError)
-			return
-		}
 		if err := h.DB.SetEncryptedSetting("ai_api_key", req.AIAPIKey); err != nil {
-			log.Printf("Failed to save AI API key: %v", err)
-			http.Error(w, "Failed to save AI API key", http.StatusInternalServerError)
+			log.Printf("Failed to save ai_api_key: %v", err)
+			http.Error(w, "Failed to save ai_api_key", http.StatusInternalServerError)
 			return
 		}
-		h.DB.SetSetting("ai_endpoint", req.AIEndpoint)
-		h.DB.SetSetting("ai_model", req.AIModel)
-		h.DB.SetSetting("ai_translation_prompt", req.AITranslationPrompt)
-		h.DB.SetSetting("ai_summary_prompt", req.AISummaryPrompt)
 
-		// Always update AI usage settings
-		h.DB.SetSetting("ai_usage_tokens", req.AIUsageTokens)
-		h.DB.SetSetting("ai_usage_limit", req.AIUsageLimit)
-		h.DB.SetSetting("ai_chat_enabled", req.AIChatEnabled)
+		if req.AIChatEnabled != "" {
+			h.DB.SetSetting("ai_chat_enabled", req.AIChatEnabled)
+		}
+
+		if req.AICustomHeaders != "" {
+			h.DB.SetSetting("ai_custom_headers", req.AICustomHeaders)
+		}
+
+		if req.AIEndpoint != "" {
+			h.DB.SetSetting("ai_endpoint", req.AIEndpoint)
+		}
+
+		if req.AIModel != "" {
+			h.DB.SetSetting("ai_model", req.AIModel)
+		}
+
+		if req.AISummaryPrompt != "" {
+			h.DB.SetSetting("ai_summary_prompt", req.AISummaryPrompt)
+		}
+
+		if req.AITranslationPrompt != "" {
+			h.DB.SetSetting("ai_translation_prompt", req.AITranslationPrompt)
+		}
+
+		if req.AIUsageLimit != "" {
+			h.DB.SetSetting("ai_usage_limit", req.AIUsageLimit)
+		}
+
+		if req.AIUsageTokens != "" {
+			h.DB.SetSetting("ai_usage_tokens", req.AIUsageTokens)
+		}
 
 		if req.AutoCleanupEnabled != "" {
 			h.DB.SetSetting("auto_cleanup_enabled", req.AutoCleanupEnabled)
 		}
 
-		if req.MaxCacheSizeMB != "" {
-			h.DB.SetSetting("max_cache_size_mb", req.MaxCacheSizeMB)
+		if req.AutoShowAllContent != "" {
+			h.DB.SetSetting("auto_show_all_content", req.AutoShowAllContent)
 		}
 
-		if req.MaxArticleAgeDays != "" {
-			h.DB.SetSetting("max_article_age_days", req.MaxArticleAgeDays)
+		if req.BaiduAppId != "" {
+			h.DB.SetSetting("baidu_app_id", req.BaiduAppId)
 		}
 
-		if req.Language != "" {
-			h.DB.SetSetting("language", req.Language)
-		}
-
-		if req.Theme != "" {
-			h.DB.SetSetting("theme", req.Theme)
-		}
-
-		if req.ShowHiddenArticles != "" {
-			h.DB.SetSetting("show_hidden_articles", req.ShowHiddenArticles)
-		}
-
-		if req.HoverMarkAsRead != "" {
-			h.DB.SetSetting("hover_mark_as_read", req.HoverMarkAsRead)
+		if err := h.DB.SetEncryptedSetting("baidu_secret_key", req.BaiduSecretKey); err != nil {
+			log.Printf("Failed to save baidu_secret_key: %v", err)
+			http.Error(w, "Failed to save baidu_secret_key", http.StatusInternalServerError)
+			return
 		}
 
 		if req.CloseToTray != "" {
 			h.DB.SetSetting("close_to_tray", req.CloseToTray)
 		}
 
-		// Always update shortcuts as it might be cleared or modified
-		h.DB.SetSetting("shortcuts", req.Shortcuts)
+		if req.CustomCssFile != "" {
+			h.DB.SetSetting("custom_css_file", req.CustomCssFile)
+		}
 
-		// Always update rules as it might be cleared or modified
-		h.DB.SetSetting("rules", req.Rules)
+		if err := h.DB.SetEncryptedSetting("deepl_api_key", req.DeeplAPIKey); err != nil {
+			log.Printf("Failed to save deepl_api_key: %v", err)
+			http.Error(w, "Failed to save deepl_api_key", http.StatusInternalServerError)
+			return
+		}
+
+		if req.DeeplEndpoint != "" {
+			h.DB.SetSetting("deepl_endpoint", req.DeeplEndpoint)
+		}
 
 		if req.DefaultViewMode != "" {
 			h.DB.SetSetting("default_view_mode", req.DefaultViewMode)
+		}
+
+		if err := h.DB.SetEncryptedSetting("freshrss_api_password", req.FreshRSSAPIPassword); err != nil {
+			log.Printf("Failed to save freshrss_api_password: %v", err)
+			http.Error(w, "Failed to save freshrss_api_password", http.StatusInternalServerError)
+			return
+		}
+
+		if req.FreshRSSEnabled != "" {
+			h.DB.SetSetting("freshrss_enabled", req.FreshRSSEnabled)
+		}
+
+		if req.FreshRSSServerUrl != "" {
+			h.DB.SetSetting("freshrss_server_url", req.FreshRSSServerUrl)
+		}
+
+		if req.FreshRSSUsername != "" {
+			h.DB.SetSetting("freshrss_username", req.FreshRSSUsername)
+		}
+
+		if req.FullTextFetchEnabled != "" {
+			h.DB.SetSetting("full_text_fetch_enabled", req.FullTextFetchEnabled)
+		}
+
+		if req.GoogleTranslateEndpoint != "" {
+			h.DB.SetSetting("google_translate_endpoint", req.GoogleTranslateEndpoint)
+		}
+
+		if req.HoverMarkAsRead != "" {
+			h.DB.SetSetting("hover_mark_as_read", req.HoverMarkAsRead)
+		}
+
+		if req.ImageGalleryEnabled != "" {
+			h.DB.SetSetting("image_gallery_enabled", req.ImageGalleryEnabled)
+		}
+
+		if req.Language != "" {
+			h.DB.SetSetting("language", req.Language)
+		}
+
+		if req.LastArticleUpdate != "" {
+			h.DB.SetSetting("last_article_update", req.LastArticleUpdate)
+		}
+
+		if req.LastNetworkTest != "" {
+			h.DB.SetSetting("last_network_test", req.LastNetworkTest)
+		}
+
+		if req.MaxArticleAgeDays != "" {
+			h.DB.SetSetting("max_article_age_days", req.MaxArticleAgeDays)
+		}
+
+		if req.MaxCacheSizeMb != "" {
+			h.DB.SetSetting("max_cache_size_mb", req.MaxCacheSizeMb)
+		}
+
+		if req.MaxConcurrentRefreshes != "" {
+			h.DB.SetSetting("max_concurrent_refreshes", req.MaxConcurrentRefreshes)
 		}
 
 		if req.MediaCacheEnabled != "" {
 			h.DB.SetSetting("media_cache_enabled", req.MediaCacheEnabled)
 		}
 
-		if req.MediaCacheMaxSizeMB != "" {
-			h.DB.SetSetting("media_cache_max_size_mb", req.MediaCacheMaxSizeMB)
-		}
-
 		if req.MediaCacheMaxAgeDays != "" {
 			h.DB.SetSetting("media_cache_max_age_days", req.MediaCacheMaxAgeDays)
+		}
+
+		if req.MediaCacheMaxSizeMb != "" {
+			h.DB.SetSetting("media_cache_max_size_mb", req.MediaCacheMaxSizeMb)
+		}
+
+		if req.NetworkBandwidthMbps != "" {
+			h.DB.SetSetting("network_bandwidth_mbps", req.NetworkBandwidthMbps)
+		}
+
+		if req.NetworkLatencyMs != "" {
+			h.DB.SetSetting("network_latency_ms", req.NetworkLatencyMs)
+		}
+
+		if req.NetworkSpeed != "" {
+			h.DB.SetSetting("network_speed", req.NetworkSpeed)
+		}
+
+		if req.ObsidianEnabled != "" {
+			h.DB.SetSetting("obsidian_enabled", req.ObsidianEnabled)
+		}
+
+		if req.ObsidianVault != "" {
+			h.DB.SetSetting("obsidian_vault", req.ObsidianVault)
+		}
+
+		if req.ObsidianVaultPath != "" {
+			h.DB.SetSetting("obsidian_vault_path", req.ObsidianVaultPath)
+		}
+
+		if req.ProxyEnabled != "" {
+			h.DB.SetSetting("proxy_enabled", req.ProxyEnabled)
+		}
+
+		if req.ProxyHost != "" {
+			h.DB.SetSetting("proxy_host", req.ProxyHost)
+		}
+
+		if err := h.DB.SetEncryptedSetting("proxy_password", req.ProxyPassword); err != nil {
+			log.Printf("Failed to save proxy_password: %v", err)
+			http.Error(w, "Failed to save proxy_password", http.StatusInternalServerError)
+			return
+		}
+
+		if req.ProxyPort != "" {
+			h.DB.SetSetting("proxy_port", req.ProxyPort)
+		}
+
+		if req.ProxyType != "" {
+			h.DB.SetSetting("proxy_type", req.ProxyType)
+		}
+
+		if err := h.DB.SetEncryptedSetting("proxy_username", req.ProxyUsername); err != nil {
+			log.Printf("Failed to save proxy_username: %v", err)
+			http.Error(w, "Failed to save proxy_username", http.StatusInternalServerError)
+			return
+		}
+
+		if req.RefreshMode != "" {
+			h.DB.SetSetting("refresh_mode", req.RefreshMode)
+		}
+
+		if req.Rules != "" {
+			h.DB.SetSetting("rules", req.Rules)
+		}
+
+		if req.Shortcuts != "" {
+			h.DB.SetSetting("shortcuts", req.Shortcuts)
+		}
+
+		if req.ShowArticlePreviewImages != "" {
+			h.DB.SetSetting("show_article_preview_images", req.ShowArticlePreviewImages)
+		}
+
+		if req.ShowHiddenArticles != "" {
+			h.DB.SetSetting("show_hidden_articles", req.ShowHiddenArticles)
+		}
+
+		if req.StartupOnBoot != "" {
+			h.DB.SetSetting("startup_on_boot", req.StartupOnBoot)
 		}
 
 		if req.SummaryEnabled != "" {
@@ -318,110 +464,36 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 			h.DB.SetSetting("summary_trigger_mode", req.SummaryTriggerMode)
 		}
 
-		// AI summary prompt is now handled by common AI settings (ai_summary_prompt)
-
-		if req.ProxyEnabled != "" {
-			h.DB.SetSetting("proxy_enabled", req.ProxyEnabled)
+		if req.TargetLanguage != "" {
+			h.DB.SetSetting("target_language", req.TargetLanguage)
 		}
 
-		// Always update proxy settings as they might be cleared (use encrypted storage for credentials)
-		h.DB.SetSetting("proxy_type", req.ProxyType)
-		h.DB.SetSetting("proxy_host", req.ProxyHost)
-		h.DB.SetSetting("proxy_port", req.ProxyPort)
-		if err := h.DB.SetEncryptedSetting("proxy_username", req.ProxyUsername); err != nil {
-			log.Printf("Failed to save proxy username: %v", err)
-			http.Error(w, "Failed to save proxy credentials", http.StatusInternalServerError)
-			return
-		}
-		if err := h.DB.SetEncryptedSetting("proxy_password", req.ProxyPassword); err != nil {
-			log.Printf("Failed to save proxy password: %v", err)
-			http.Error(w, "Failed to save proxy credentials", http.StatusInternalServerError)
-			return
+		if req.Theme != "" {
+			h.DB.SetSetting("theme", req.Theme)
 		}
 
-		// Always update google_translate_endpoint as it might be reset to default
-		h.DB.SetSetting("google_translate_endpoint", req.GoogleTranslateEndpoint)
-
-		if req.ShowArticlePreviewImages != "" {
-			h.DB.SetSetting("show_article_preview_images", req.ShowArticlePreviewImages)
+		if req.TranslationEnabled != "" {
+			h.DB.SetSetting("translation_enabled", req.TranslationEnabled)
 		}
 
-		if req.ObsidianEnabled != "" {
-			h.DB.SetSetting("obsidian_enabled", req.ObsidianEnabled)
+		if req.TranslationProvider != "" {
+			h.DB.SetSetting("translation_provider", req.TranslationProvider)
 		}
 
-		if req.ObsidianVault != "" {
-			h.DB.SetSetting("obsidian_vault", req.ObsidianVault)
+		if req.UpdateInterval != "" {
+			h.DB.SetSetting("update_interval", req.UpdateInterval)
 		}
 
-		if req.ObsidianVaultPath != "" {
-			h.DB.SetSetting("obsidian_vault_path", req.ObsidianVaultPath)
+		if req.WindowHeight != "" {
+			h.DB.SetSetting("window_height", req.WindowHeight)
 		}
 
-		if req.NetworkSpeed != "" {
-			h.DB.SetSetting("network_speed", req.NetworkSpeed)
+		if req.WindowMaximized != "" {
+			h.DB.SetSetting("window_maximized", req.WindowMaximized)
 		}
 
-		if req.NetworkBandwidth != "" {
-			h.DB.SetSetting("network_bandwidth_mbps", req.NetworkBandwidth)
-		}
-
-		if req.NetworkLatency != "" {
-			h.DB.SetSetting("network_latency_ms", req.NetworkLatency)
-		}
-
-		if req.MaxConcurrentRefreshes != "" {
-			h.DB.SetSetting("max_concurrent_refreshes", req.MaxConcurrentRefreshes)
-		}
-
-		if req.LastNetworkTest != "" {
-			h.DB.SetSetting("last_network_test", req.LastNetworkTest)
-		}
-
-		if req.ImageGalleryEnabled != "" {
-			h.DB.SetSetting("image_gallery_enabled", req.ImageGalleryEnabled)
-		}
-
-		if req.StartupOnBoot != "" {
-			// Get current value to check if it changed
-			currentValue, err := h.DB.GetSetting("startup_on_boot")
-			if err != nil {
-				log.Printf("Failed to get startup_on_boot setting: %v", err)
-				// If we can't read the current value, save the new value but don't apply it
-				h.DB.SetSetting("startup_on_boot", req.StartupOnBoot)
-			} else if currentValue != req.StartupOnBoot {
-				// Only apply if the value changed
-				h.DB.SetSetting("startup_on_boot", req.StartupOnBoot)
-
-				// Apply the startup setting
-				if req.StartupOnBoot == "true" {
-					if err := utils.EnableStartup(); err != nil {
-						log.Printf("Failed to enable startup: %v", err)
-					}
-				} else {
-					if err := utils.DisableStartup(); err != nil {
-						log.Printf("Failed to disable startup: %v", err)
-					}
-				}
-			}
-		}
-
-		if req.FreshRSSSyncEnabled != "" {
-			h.DB.SetSetting("freshrss_enabled", req.FreshRSSSyncEnabled)
-		}
-
-		if req.FreshRSSServerURL != "" {
-			h.DB.SetSetting("freshrss_server_url", req.FreshRSSServerURL)
-		}
-
-		if req.FreshRSSUsername != "" {
-			h.DB.SetSetting("freshrss_username", req.FreshRSSUsername)
-		}
-
-		if err := h.DB.SetEncryptedSetting("freshrss_api_password", req.FreshRSSAPIPassword); err != nil {
-			log.Printf("Failed to save FreshRSS API password: %v", err)
-			http.Error(w, "Failed to save FreshRSS API password", http.StatusInternalServerError)
-			return
+		if req.WindowWidth != "" {
+			h.DB.SetSetting("window_width", req.WindowWidth)
 		}
 
 		if req.MinifluxServerURL != "" {
@@ -436,6 +508,9 @@ func HandleSettings(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 			h.DB.SetSetting("full_text_fetch_enabled", req.FullTextFetchEnabled)
 		}
 
+		if req.WindowY != "" {
+			h.DB.SetSetting("window_y", req.WindowY)
+		}
 		w.WriteHeader(http.StatusOK)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

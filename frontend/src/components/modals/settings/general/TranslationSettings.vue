@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { PhGlobe, PhArticle, PhPackage, PhKey, PhLink, PhRobot, PhInfo } from '@phosphor-icons/vue';
+import {
+  PhGlobe,
+  PhTranslate,
+  PhPackage,
+  PhKey,
+  PhLink,
+  PhRobot,
+  PhInfo,
+} from '@phosphor-icons/vue';
 import type { SettingsData } from '@/types/settings';
 
 const { t } = useI18n();
@@ -26,7 +34,7 @@ const emit = defineEmits<{
     </label>
     <div class="setting-item mb-2 sm:mb-4">
       <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
-        <PhArticle :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+        <PhTranslate :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
         <div class="flex-1 min-w-0">
           <div class="font-medium mb-0 sm:mb-1 text-sm sm:text-base">
             {{ t('enableTranslation') }}

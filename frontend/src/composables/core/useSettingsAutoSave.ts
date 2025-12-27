@@ -1,12 +1,12 @@
 /**
  * Composable for auto-saving settings with debouncing
  */
-import { ref, watch, onMounted, onUnmounted, type Ref, toRef, computed, isRef } from 'vue';
+import { ref, watch, onMounted, onUnmounted, type Ref, computed, isRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAppStore } from '@/stores/app';
 import type { SettingsData } from '@/types/settings';
 import { settingsDefaults } from '@/config/defaults';
-import { useSettingsValidation } from './useSettingsValidation';
+import { buildAutoSavePayload } from './useSettings.generated';
 
 export function useSettingsAutoSave(settings: Ref<SettingsData> | (() => SettingsData)) {
   const { locale } = useI18n();
@@ -17,9 +17,6 @@ export function useSettingsAutoSave(settings: Ref<SettingsData> | (() => Setting
 
   // Convert to ref if it's a getter function
   const settingsRef = isRef(settings) ? settings : computed(settings);
-
-  // Use validation composable
-  const { isValid } = useSettingsValidation(settingsRef);
 
   // Track previous translation settings
   const prevTranslationSettings: Ref<{
@@ -85,7 +82,7 @@ export function useSettingsAutoSave(settings: Ref<SettingsData> | (() => Setting
       // Features that require valid settings (e.g., translation with API keys) will check
       // for valid values at runtime and fail gracefully if settings are incomplete/invalid.
 
-      // Save to backend
+      // Save to backend using generated payload (alphabetically sorted)
       await fetch('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -251,6 +248,15 @@ export function useSettingsAutoSave(settings: Ref<SettingsData> | (() => Setting
         new CustomEvent('image-gallery-setting-changed', {
           detail: {
             enabled: settingsRef.value.image_gallery_enabled,
+          },
+        })
+      );
+
+      // Notify about auto_show_all_content change
+      window.dispatchEvent(
+        new CustomEvent('auto-show-all-content-changed', {
+          detail: {
+            value: settingsRef.value.auto_show_all_content,
           },
         })
       );

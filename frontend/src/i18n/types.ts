@@ -57,6 +57,7 @@ export interface TranslationMessages {
   and: string;
   andNMore: string;
   appearance: string;
+  application: string;
   applyFilters: string;
   applyingRule: string;
   applyRuleNow: string;
@@ -109,6 +110,20 @@ export interface TranslationMessages {
   currentCacheSize: string;
   currentMode: string;
   currentVersion: string;
+  customCSS: string;
+  customCSSDesc: string;
+  customCSSApplied: string;
+  customCSSGuide: string;
+  cssFileUploaded: string;
+  cssFileUploadFailed: string;
+  cssFileDeleted: string;
+  cssFileDeleteFailed: string;
+  invalidCSSFile: string;
+  cssFileTooLarge: string;
+  uploadCSS: string;
+  deleteCSS: string;
+  uploading: string;
+  deleting: string;
   customScript: string;
   customScriptDescription: string;
   dark: string;
@@ -137,6 +152,7 @@ export interface TranslationMessages {
   detecting: string;
   discoverAllFeeds: string;
   discoverAllFeedsDesc: string;
+  discoveryLongRunningWarning: string;
   discoverFeeds: string;
   discovering: string;
   discoveringAllFeeds: string;
@@ -186,6 +202,7 @@ export interface TranslationMessages {
   feedRefreshStarted: string;
   feedReordered: string;
   feeds: string;
+  feedDiscovery: string;
   feedsDeletedSuccess: string;
   feedsMovedSuccess: string;
   feedSource: string;
@@ -227,6 +244,7 @@ export interface TranslationMessages {
   freshrssUsernamePlaceholder: string;
   fromFeed: string;
   general: string;
+  content: string;
   generateSummary: string;
   generatingAISummary: string;
   generatingSummary: string;
@@ -293,6 +311,7 @@ export interface TranslationMessages {
   mediaCacheMaxAgeDesc: string;
   mediaCacheMaxSize: string;
   mediaCacheMaxSizeDesc: string;
+  minutes: string;
   minutesAgo: string;
   move: string;
   moveFeeds: string;
@@ -372,6 +391,7 @@ export interface TranslationMessages {
   publishedAfter: string;
   publishedBefore: string;
   readLater: string;
+  readingAndDisplay: string;
   readLaterStatus: string;
   readStatus: string;
   recentArticles: string;

@@ -6,7 +6,6 @@ import {
   PhBroom,
   PhHardDrive,
   PhCalendarX,
-  PhEyeSlash,
   PhImage,
   PhTrash,
 } from '@phosphor-icons/vue';
@@ -77,8 +76,10 @@ onMounted(() => {
       class="font-semibold mb-2 sm:mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2"
     >
       <PhDatabase :size="14" class="sm:w-4 sm:h-4" />
-      {{ t('database') }}
+      {{ t('dataManagement') }}
     </label>
+
+    <!-- Article Cleanup -->
     <div class="setting-item">
       <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
         <PhBroom :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
@@ -166,33 +167,8 @@ onMounted(() => {
       </div>
     </div>
 
+    <!-- Media Cache -->
     <div class="setting-item mt-2 sm:mt-3">
-      <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
-        <PhEyeSlash :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
-        <div class="flex-1 min-w-0">
-          <div class="font-medium mb-0 sm:mb-1 text-sm sm:text-base">
-            {{ t('showHiddenArticles') }}
-          </div>
-          <div class="text-xs text-text-secondary hidden sm:block">
-            {{ t('showHiddenArticlesDesc') }}
-          </div>
-        </div>
-      </div>
-      <input
-        :checked="props.settings.show_hidden_articles"
-        type="checkbox"
-        class="toggle"
-        @change="
-          (e) =>
-            emit('update:settings', {
-              ...props.settings,
-              show_hidden_articles: (e.target as HTMLInputElement).checked,
-            })
-        "
-      />
-    </div>
-
-    <div class="setting-item">
       <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
         <PhImage :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
         <div class="flex-1 min-w-0">
@@ -293,11 +269,8 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <button
-          :disabled="isCleaningCache"
-          class="btn-secondary text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5"
-          @click="cleanMediaCache"
-        >
+        <button :disabled="isCleaningCache" class="btn-secondary" @click="cleanMediaCache">
+          <PhBroom :size="16" class="sm:w-5 sm:h-5" />
           {{ isCleaningCache ? t('cleaning') : t('cleanupMediaCache') }}
         </button>
       </div>
@@ -328,7 +301,7 @@ onMounted(() => {
   @apply flex items-center sm:items-start justify-between gap-2 sm:gap-4 p-2 sm:p-2.5 rounded-md bg-bg-tertiary;
 }
 .btn-secondary {
-  @apply bg-bg-tertiary hover:bg-bg-secondary border border-border text-text-primary rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply bg-bg-tertiary border border-border text-text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-secondary transition-colors;
 }
 .setting-group {
   @apply space-y-2 sm:space-y-3;

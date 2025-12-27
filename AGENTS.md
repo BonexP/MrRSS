@@ -161,20 +161,26 @@ When making changes, follow these guidelines:
 - **Refactoring**: Extract reusable logic into composables (frontend) or separate packages (backend)
 - **Build Verification**: Before completing any change, run `wails3 build` to verify the application can be built and packaged correctly
 
-### Settings Management (CRITICAL)
+### Settings Management (OPTIMIZED)
 
-⚠️ **This is the #1 source of bugs!** When adding/modifying/deleting a setting, you MUST update ALL 8 locations:
+✅ **The settings system has been optimized!** Adding new settings is now much simpler:
 
-1. **Default Values** (2 files): `config/defaults.json` + `internal/config/defaults.json`
-2. **Backend Type**: `internal/config/config.go` (struct + switch case)
-3. **Database Init**: `internal/database/db.go` (settingsKeys array)
-4. **API Handler**: `internal/handlers/settings/settings_handlers.go` (GET + POST, 4 places)
-5. **Frontend Type**: `frontend/src/types/settings.ts`
-6. **Settings Composable**: `frontend/src/composables/core/useSettings.ts` (2 places)
-7. **Auto-Save**: `frontend/src/composables/core/useSettingsAutoSave.ts`
-8. **UI Component**: `frontend/src/components/modals/settings/` (if user-facing)
+**Quick Method (3 steps):**
 
-📚 **Complete Guide**: See [CODE_PATTERNS.md](docs/CODE_PATTERNS.md#settings-management)
+1. Edit `internal/config/settings_schema.json` (add 5 lines)
+2. Run `go run tools/settings-generator/main.go` (generates all code)
+3. Add UI and translations (optional)
+
+**What Gets Generated Automatically:**
+
+- Backend types and handlers
+- Frontend types and composables
+- Database initialization keys
+- Default values
+
+📚 **Complete Guide**: See [docs/SETTINGS.md](docs/SETTINGS.md)
+
+**Old Method (Deprecated):** The manual 8-file checklist is no longer needed. All new settings should use the schema-driven approach.
 
 ## Coding Standards
 

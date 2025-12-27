@@ -31,6 +31,8 @@ const adjustedPosition = ref({ top: 0, left: 0 });
 
 // Map old icon names to new component names
 const iconMap: Record<string, string> = {
+  'ph-link': 'PhLink',
+  'ph-text-t': 'PhTextT',
   'ph-check-circle': 'PhCheckCircle',
   'ph-globe': 'PhGlobe',
   'ph-pencil': 'PhPencil',

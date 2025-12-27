@@ -1,8 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { PhFolder, PhFolderDashed, PhCaretDown } from '@phosphor-icons/vue';
 import type { Feed } from '@/types/models';
 import type { DropPreview } from '@/composables/ui/useDragDrop';
 import SidebarFeed from './SidebarFeed.vue';
+
+interface TreeNode {
+  _feeds: Feed[];
+  _children: Record<string, TreeNode>;
+  isOpen: boolean;
+}
 
 interface Props {
   name: string;
@@ -17,9 +24,22 @@ interface Props {
   isEditMode?: boolean;
   dropPreview?: DropPreview;
   draggingFeedId?: number | null;
+  // Multi-level support
+  children?: Record<string, TreeNode>;
+  level?: number;
+  categoryPath?: string;
+  // eslint-disable-next-line no-unused-vars
+  isCategoryOpen?: (path: string) => boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  children: undefined,
+  level: 0,
+  categoryPath: '',
+  isCategoryOpen: undefined,
+  dropPreview: undefined,
+  draggingFeedId: null,
+});
 
 const emit = defineEmits<{
   toggle: [];
@@ -32,6 +52,10 @@ const emit = defineEmits<{
   dragstart: [feedId: number, event: Event];
   dragend: [];
   dragleave: [categoryName: string, event: Event];
+  // Multi-level events
+  childToggle: [path: string];
+  childSelectCategory: [path: string];
+  childContextMenu: [event: MouseEvent, path: string];
 }>();
 
 // Handle dragover on the feeds-list container using event delegation
@@ -57,6 +81,14 @@ function handleFeedsListDragOver(event: DragEvent) {
     const feedsList = event.currentTarget as HTMLElement;
     if (feedsList) {
       const feedItems = Array.from(feedsList.querySelectorAll('.feed-item'));
+
+      // If there are no feed items (empty category), emit null immediately
+      if (feedItems.length === 0) {
+        console.log('[SidebarCategory] Empty category, emitting feedDragOver with null feedId');
+        emit('feedDragOver', null, event);
+        return;
+      }
+
       const listRect = feedsList.getBoundingClientRect();
       const mouseY = event.clientY - listRect.top;
 
@@ -85,7 +117,8 @@ function handleFeedsListDragOver(event: DragEvent) {
   }
 }
 
-function handleDrop() {
+function handleDrop(event: DragEvent) {
+  event.preventDefault();
   emit('drop');
 }
 
@@ -94,14 +127,33 @@ function handleCategoryDragOver(event: DragEvent) {
   event.preventDefault();
   emit('feedDragOver', null, event);
 }
+
+// Computed properties for child categories
+const hasChildren = computed(() => {
+  return props.children && Object.keys(props.children).length > 0;
+});
+
+// Get the full category path for this node
+const fullPath = computed(() => {
+  return props.categoryPath ? `${props.categoryPath}/${props.name}` : props.name;
+});
+
+// Check if a category should be open
+const checkIsOpen = (path: string) => {
+  if (props.isCategoryOpen) {
+    return props.isCategoryOpen(path);
+  }
+  return false;
+};
 </script>
 
 <template>
   <div
     :class="['mb-1 category-container', isDragOver ? 'drag-over' : '']"
+    :data-level="level"
     @dragover.self="handleCategoryDragOver"
     @dragleave.self="(e) => $emit('dragleave', props.name, e)"
-    @drop.self="handleDrop"
+    @drop.self.prevent="handleDrop"
   >
     <div
       :class="['category-header', isActive ? 'active' : '']"
@@ -144,6 +196,7 @@ function handleCategoryDragOver(event: DragEvent) {
             :is-active="currentFeedId === feed.id"
             :unread-count="feedUnreadCounts[feed.id] || 0"
             :is-edit-mode="isEditMode"
+            :level="level"
             @click="emit('selectFeed', feed.id)"
             @contextmenu="(e) => emit('feedContextMenu', e, feed)"
             @dragstart="(e) => emit('dragstart', feed.id, e)"
@@ -162,11 +215,43 @@ function handleCategoryDragOver(event: DragEvent) {
           ></div>
         </div>
       </template>
-      <!-- Drop indicator at the end when dragging over category but not over a specific feed -->
+
+      <!-- Drop indicator for empty category or at the end when dragging over -->
       <div
-        v-if="isDragOver && feeds.length > 0 && dropPreview && dropPreview.targetFeedId === null"
+        v-if="isDragOver && dropPreview && dropPreview.targetFeedId === null"
         class="drop-indicator end-indicator"
+        :class="{ 'empty-category-indicator': feeds.length === 0 }"
       ></div>
+
+      <!-- Child categories (multi-level support) -->
+      <template v-if="hasChildren">
+        <SidebarCategory
+          v-for="(childData, childName) in children"
+          :key="childName"
+          :name="childName"
+          :feeds="childData._feeds"
+          :children="childData._children"
+          :level="level + 1"
+          :category-path="fullPath"
+          :is-open="checkIsOpen(fullPath + '/' + childName)"
+          :is-active="false"
+          :unread-count="0"
+          :current-feed-id="currentFeedId"
+          :feed-unread-counts="feedUnreadCounts"
+          :is-drag-over="false"
+          :is-edit-mode="isEditMode"
+          :dragging-feed-id="draggingFeedId"
+          :is-category-open="props.isCategoryOpen"
+          @toggle="emit('childToggle', fullPath + '/' + childName)"
+          @select-category="(path) => emit('childSelectCategory', path)"
+          @category-context-menu="(e, path) => emit('childContextMenu', e, path)"
+          @child-toggle="(path) => emit('childToggle', path)"
+          @child-select-category="(path) => emit('childSelectCategory', path)"
+          @child-context-menu="(e, path) => emit('childContextMenu', e, path)"
+          @select-feed="(feedId) => emit('selectFeed', feedId)"
+          @feed-context-menu="(e, feed) => emit('feedContextMenu', e, feed)"
+        />
+      </template>
     </div>
   </div>
 </template>
@@ -182,6 +267,23 @@ function handleCategoryDragOver(event: DragEvent) {
   margin-right: -0.375rem;
   padding-left: calc(0.5rem + 0.375rem);
   padding-right: calc(0.75rem + 0.375rem);
+}
+
+/* Indentation for nested categories */
+.category-container[data-level='1'] .category-header {
+  padding-left: calc(0.5rem + 0.375rem + 1rem);
+}
+
+.category-container[data-level='2'] .category-header {
+  padding-left: calc(0.5rem + 0.375rem + 2rem);
+}
+
+.category-container[data-level='3'] .category-header {
+  padding-left: calc(0.5rem + 0.375rem + 3rem);
+}
+
+.category-container[data-level='4'] .category-header {
+  padding-left: calc(0.5rem + 0.375rem + 4rem);
 }
 
 /* Special styling for category header when its container is a drag target */
@@ -212,6 +314,7 @@ function handleCategoryDragOver(event: DragEvent) {
 
 .feeds-list {
   position: relative;
+  min-height: 40px; /* Ensure empty categories have a drop zone */
 }
 
 /* Wrapper to position drop indicators relative to each feed */
@@ -237,6 +340,13 @@ function handleCategoryDragOver(event: DragEvent) {
   position: relative;
   margin-top: 2px;
   margin-bottom: 2px;
+}
+
+/* Empty category indicator - more prominent */
+.drop-indicator.empty-category-indicator {
+  height: 4px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 @keyframes pulse-indicator {

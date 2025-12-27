@@ -63,7 +63,8 @@ func HandleFetchFullArticle(h *core.Handler, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Check if full-text fetching is enabled
+	// Check if full-text fetching is enabled (global setting only)
+	// auto_expand_content only affects auto-expansion behavior, not manual button clicks
 	fullTextEnabledStr, _ := h.DB.GetSetting("full_text_fetch_enabled")
 	if fullTextEnabledStr != "true" {
 		http.Error(w, "Full-text fetching is disabled", http.StatusForbidden)

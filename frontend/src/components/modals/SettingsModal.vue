@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useAppStore } from '@/stores/app';
 import { useI18n } from 'vue-i18n';
-import { ref, onMounted, type Ref } from 'vue';
+import { ref, onMounted, onUnmounted, type Ref } from 'vue';
 import GeneralTab from './settings/general/GeneralTab.vue';
 import FeedsTab from './settings/feeds/FeedsTab.vue';
+import ContentTab from './settings/content/ContentTab.vue';
 import AITab from './settings/ai/AITab.vue';
 import NetworkTab from './settings/network/NetworkTab.vue';
 import PluginsTab from './settings/plugins/PluginsTab.vue';
@@ -50,6 +51,7 @@ const emit = defineEmits<{
 
 const activeTab: Ref<TabName> = ref('general');
 const showDiscoverAllModal = ref(false);
+const tabsContainer = ref<HTMLElement>();
 
 // Modal close handling
 useModalClose(() => emit('close'));
@@ -60,6 +62,25 @@ onMounted(async () => {
     applySettings(data, (theme: string) => store.setTheme(theme as ThemePreference));
   } catch (e) {
     console.error('Error loading settings:', e);
+  }
+
+  // Add wheel event listener for horizontal scrolling
+  if (tabsContainer.value) {
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      tabsContainer.value!.scrollLeft += e.deltaY * 0.1; // Reduce scroll speed
+    };
+    tabsContainer.value.addEventListener('wheel', handleWheel);
+
+    // Store cleanup function
+    const cleanup = () => {
+      if (tabsContainer.value) {
+        tabsContainer.value.removeEventListener('wheel', handleWheel);
+      }
+    };
+
+    // Cleanup on unmount
+    onUnmounted(cleanup);
   }
 });
 
@@ -75,7 +96,7 @@ function handleDiscoverAll() {
     @click.self="emit('close')"
   >
     <div
-      class="bg-bg-primary w-full max-w-4xl h-full sm:h-[700px] sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl shadow-2xl border border-border overflow-hidden animate-fade-in"
+      class="bg-bg-primary w-full max-w-4xl h-full sm:h-[900px] sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl shadow-2xl border border-border overflow-hidden animate-fade-in"
     >
       <div class="p-3 sm:p-5 border-b border-border flex justify-between items-center shrink-0">
         <h3 class="text-text-secondary sm:text-lg font-semibold m-0 flex items-center gap-2">
@@ -90,6 +111,7 @@ function handleDiscoverAll() {
       </div>
 
       <div
+        ref="tabsContainer"
         class="flex border-b border-border bg-bg-secondary shrink-0 overflow-x-auto scrollbar-hide"
       >
         <button
@@ -103,6 +125,12 @@ function handleDiscoverAll() {
           @click="activeTab = 'feeds'"
         >
           {{ t('feeds') }}
+        </button>
+        <button
+          :class="['tab-btn', activeTab === 'content' ? 'active' : '']"
+          @click="activeTab = 'content'"
+        >
+          {{ t('content') }}
         </button>
         <button :class="['tab-btn', activeTab === 'ai' ? 'active' : '']" @click="activeTab = 'ai'">
           {{ t('ai') }}
@@ -158,6 +186,12 @@ function handleDiscoverAll() {
           @batch-delete="handleBatchDelete"
           @batch-move="handleBatchMove"
           @discover-all="handleDiscoverAll"
+          @update:settings="settings = $event"
+        />
+
+        <ContentTab
+          v-if="activeTab === 'content'"
+          :settings="settings"
           @update:settings="settings = $event"
         />
 

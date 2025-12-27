@@ -5,7 +5,7 @@ import { ref, type Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { SettingsData } from '@/types/settings';
 import type { ThemePreference } from '@/stores/app';
-import { settingsDefaults } from '@/config/defaults';
+import { generateInitialSettings, parseSettingsData } from './useSettings.generated';
 
 export function useSettings() {
   const { locale } = useI18n();
@@ -82,19 +82,8 @@ export function useSettings() {
       const res = await fetch('/api/settings');
       const data = await res.json();
 
-      settings.value = {
-        update_interval: parseInt(data.update_interval) || settingsDefaults.update_interval,
-        refresh_mode: data.refresh_mode || settingsDefaults.refresh_mode,
-        translation_enabled: data.translation_enabled === 'true',
-        target_language: data.target_language || settingsDefaults.target_language,
-        translation_provider: data.translation_provider || settingsDefaults.translation_provider,
-        deepl_api_key: data.deepl_api_key || settingsDefaults.deepl_api_key,
-        deepl_endpoint: data.deepl_endpoint || settingsDefaults.deepl_endpoint,
-        auto_cleanup_enabled: data.auto_cleanup_enabled === 'true',
-        max_cache_size_mb: parseInt(data.max_cache_size_mb) || settingsDefaults.max_cache_size_mb,
-        max_article_age_days:
-          parseInt(data.max_article_age_days) || settingsDefaults.max_article_age_days,
-        language: data.language || locale.value || settingsDefaults.language,
+      // Use generated helper to parse settings (alphabetically sorted)
+      settings.value = parseSettingsData(data);
 
         theme: data.theme || settingsDefaults.theme,
         last_article_update: data.last_article_update || settingsDefaults.last_article_update,

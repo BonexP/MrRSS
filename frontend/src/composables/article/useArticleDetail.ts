@@ -27,6 +27,26 @@ export function useArticleDetail() {
   const article = computed<Article | undefined>(() =>
     store.articles.find((a) => a.id === store.currentArticleId)
   );
+
+  // Get effective view mode based on feed settings and global settings
+  function getEffectiveViewMode(): ViewMode {
+    if (!article.value) return defaultViewMode.value;
+
+    // Find the feed for this article
+    const feed = store.feeds.find((f) => f.id === article.value!.feed_id);
+    if (!feed) return defaultViewMode.value;
+
+    // Check feed's article_view_mode
+    if (feed.article_view_mode === 'webpage') {
+      return 'original';
+    } else if (feed.article_view_mode === 'rendered') {
+      return 'rendered';
+    } else {
+      // 'global' or undefined - use global setting
+      return defaultViewMode.value;
+    }
+  }
+
   const showContent = ref(false);
   const articleContent = ref('');
   const isLoadingContent = ref(false);
@@ -59,8 +79,8 @@ export function useArticleDetail() {
           }
           pendingRenderAction.value = null; // Clear the pending action
         } else {
-          // Apply user's preferred mode or default view mode
-          const preferredMode = userPreferredMode.value || defaultViewMode.value;
+          // Apply user's preferred mode or determine from feed/global settings
+          const preferredMode = userPreferredMode.value || getEffectiveViewMode();
           if (preferredMode === 'rendered') {
             showContent.value = true;
             await fetchArticleContent();

@@ -41,7 +41,7 @@ const emit = defineEmits<{
   'download-install-update': [];
 }>();
 
-const appVersion: Ref<string> = ref('1.3.8');
+const appVersion: Ref<string> = ref('1.3.11');
 
 onMounted(async () => {
   // Fetch current version from API
@@ -166,6 +166,12 @@ function handleDownloadInstall() {
         <PhGithubLogo :size="20" class="sm:w-6 sm:h-6" />
         {{ t('viewOnGitHub') }}
       </a>
+    </div>
+
+    <!-- Copyright information at the bottom -->
+    <div class="mt-auto pt-4 text-center">
+      <p class="text-text-secondary text-xs">© 2026 MrRSS. All rights reserved.</p>
+      <p class="text-text-secondary text-xs">Open source and available under GPL-3.0 License.</p>
     </div>
   </div>
 </template>

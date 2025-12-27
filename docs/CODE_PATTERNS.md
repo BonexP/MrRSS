@@ -41,187 +41,81 @@ This ensures the application can be properly packaged and distributed.
 
 ## Settings Management
 
-**⚠️ CRITICAL**: This is the #1 source of bugs in MrRSS. Missing even ONE location will cause silent failures!
+**✅ UPDATED**: The settings system has been optimized with schema-driven code generation!
 
-### Complete Checklist for Adding/Modifying a Setting
+### Quick Method (Recommended)
 
-When adding/modifying/deleting a setting, update **ALL 8** of these locations (not 7, not 6 - ALL 8!):
+Adding a new setting now requires **only 1-3 steps**:
 
-#### 1. **Default Values** (2 files)
+#### Step 1: Edit Schema
 
-- `config/defaults.json` - Shared defaults (frontend reads this)
-- `internal/config/defaults.json` - Backend embedded defaults
-
-#### 2. **Backend Type Definition**
-
-- `internal/config/config.go`:
-  - Add field to `Defaults` struct with json tag
-  - Add case in `GetString()` switch statement
-
-#### 3. **Database Initialization**
-
-- `internal/database/db.go`:
-  - Add key to `settingsKeys` array in `Init()` method
-
-#### 4. **Backend API Handler**
-
-- `internal/handlers/settings/settings_handlers.go`:
-  - **GET**: Add `GetSetting()` call and include in response map
-  - **POST**: Add field to request struct and `SetSetting()` call
-
-#### 5. **Frontend Type Definition**
-
-- `frontend/src/types/settings.ts`:
-  - Add field to `SettingsData` interface
-
-#### 6. **Frontend Settings Management**
-
-- `frontend/src/composables/core/useSettings.ts`:
-  - Add to initial `settings` ref object
-  - Add to `fetchSettings()` data mapping
-
-#### 7. **Frontend Auto-Save**
-
-- `frontend/src/composables/core/useSettingsAutoSave.ts`:
-  - Add field to POST body in `autoSave()` function
-
-#### 8. **UI Component** (if user-facing)
-
-- Create/update Vue component in `frontend/src/components/modals/settings/general/`
-- Use `v-model="settings.your_setting"` to bind
-
-### Example: Adding `new_feature_enabled`
-
-**Step 1**: `config/defaults.json` & `internal/config/defaults.json`
+Edit `internal/config/settings_schema.json`:
 
 ```json
-{
-  "new_feature_enabled": false
+"new_feature_enabled": {
+  "type": "bool",
+  "default": false,
+  "category": "general",
+  "encrypted": false,
+  "frontend_key": "newFeatureEnabled"
 }
 ```
 
-**Step 2**: `internal/config/config.go`
-
-```go
-type Defaults struct {
-    NewFeatureEnabled bool `json:"new_feature_enabled"`
-}
-
-func GetString(key string) string {
-    case "new_feature_enabled":
-        return strconv.FormatBool(defaults.NewFeatureEnabled)
-}
-```
-
-**Step 3**: `internal/database/db.go`
-
-```go
-settingsKeys := []string{
-    // ... existing keys
-    "new_feature_enabled",
-}
-```
-
-**Step 4**: `internal/handlers/settings/settings_handlers.go`
-
-```go
-// GET
-newFeature, _ := h.DB.GetSetting("new_feature_enabled")
-// Add to response map
-"new_feature_enabled": newFeature,
-
-// POST struct
-NewFeatureEnabled string `json:"new_feature_enabled"`
-
-// POST handler
-if req.NewFeatureEnabled != "" {
-    h.DB.SetSetting("new_feature_enabled", req.NewFeatureEnabled)
-}
-```
-
-**Step 5**: `frontend/src/types/settings.ts`
-
-```typescript
-export interface SettingsData {
-  new_feature_enabled: boolean;
-}
-```
-
-**Step 6**: `frontend/src/composables/core/useSettings.ts`
-
-```typescript
-const settings = ref({
-  new_feature_enabled: settingsDefaults.new_feature_enabled,
-});
-
-// In fetchSettings()
-new_feature_enabled: data.new_feature_enabled === 'true',
-```
-
-**Step 7**: `frontend/src/composables/core/useSettingsAutoSave.ts`
-
-```typescript
-await fetch('/api/settings', {
-  body: JSON.stringify({
-    new_feature_enabled: (settings.value.new_feature_enabled ??
-                         settingsDefaults.new_feature_enabled).toString(),
-  }),
-});
-```
-
-**Step 8**: UI Component (optional)
-
-```vue
-<input type="checkbox" v-model="settings.new_feature_enabled" />
-```
-
-### Verification After Making Changes
-
-**ALWAYS verify ALL 8 locations** using these commands:
+#### Step 2: Generate Code
 
 ```bash
-# Check if setting exists in all required files
-grep -r "new_feature_enabled" config/
-grep -r "new_feature_enabled" internal/config/
-grep -r "new_feature_enabled" internal/database/
-grep -r "new_feature_enabled" internal/handlers/settings/
-grep -r "new_feature_enabled" frontend/src/types/
-grep -r "new_feature_enabled" frontend/src/composables/core/
+go run tools/settings-generator/main.go
 ```
 
-**Expected Results**:
+This automatically generates:
 
-- `config/defaults.json` - 1 match (default value)
-- `internal/config/defaults.json` - 1 match (default value)
-- `internal/config/config.go` - 2 matches (struct field + switch case)
-- `internal/database/db.go` - 1 match (settingsKeys array)
-- `internal/handlers/settings/settings_handlers.go` - 4 matches (GET call, GET response, POST struct, POST handler)
-- `frontend/src/types/settings.ts` - 1 match (interface field)
-- `frontend/src/composables/core/useSettings.ts` - 2 matches (initial ref + fetchSettings parsing)
-- `frontend/src/composables/core/useSettingsAutoSave.ts` - 1 match (POST body)
+- Backend types and handlers
+- Frontend types and composables
+- Database initialization keys
+- Default values
 
-***Total: 14 matches across 8 files***
+#### Step 3: Add UI (Optional)
 
-If any file is missing, the setting will NOT work correctly!
+Add to your settings component:
 
-### Common Mistakes to Avoid
+```vue
+<SettingItem :title="t('newFeatureEnabled')">
+  <Toggle
+    :model-value="settings.newFeatureEnabled"
+    @update:model-value="updateSetting('newFeatureEnabled', $event)"
+  />
+</SettingItem>
+```
 
-❌ **DON'T**:
+### Complete Documentation
 
-- Add to backend but forget frontend (or vice versa)
-- Add to defaults but forget API handler
-- Add to types but forget auto-save
-- Forget to add to database initialization
-- Mix up boolean/string/number types between backend and frontend
-- Forget the second defaults.json file (there are TWO!)
+See **[docs/SETTINGS.md](SETTINGS.md)** for:
 
-✅ **DO**:
+- Complete step-by-step guide
+- Detailed examples
+- Troubleshooting tips
+- Best practices
 
-- Use the checklist EVERY time
-- Verify with grep after changes
-- Test both GET and POST API endpoints
-- Check browser devtools for setting value
-- Verify database contains the setting key
+### Verification
+
+After running the generator, verify:
+
+```bash
+# Build backend
+go build
+
+# Build frontend
+cd frontend && npm run build
+
+# Run tests
+go test ./internal/config
+```
+
+### Legacy Method (Deprecated)
+
+The old manual method of editing 8+ files is **deprecated**. All new settings should use the schema-driven approach above.
+
+If you need to maintain old manually-written settings, refer to the git history for the old checklist, but note that it's highly error-prone and should be avoided.
 
 ## Backend Patterns (Go)
 

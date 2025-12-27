@@ -15,12 +15,13 @@ import (
 
 // AISummarizer implements summarization using OpenAI-compatible APIs (GPT, Claude, etc.).
 type AISummarizer struct {
-	APIKey       string
-	Endpoint     string
-	Model        string
-	SystemPrompt string
-	client       *http.Client
-	db           DBInterface
+	APIKey        string
+	Endpoint      string
+	Model         string
+	SystemPrompt  string
+	CustomHeaders string
+	client        *http.Client
+	db            DBInterface
 }
 
 // DBInterface defines the minimal database interface needed for proxy settings
@@ -64,12 +65,13 @@ func NewAISummarizer(apiKey, endpoint, model string) *AISummarizer {
 		model = defaults.AIModel
 	}
 	return &AISummarizer{
-		APIKey:       apiKey,
-		Endpoint:     strings.TrimSuffix(endpoint, "/"),
-		Model:        model,
-		SystemPrompt: "", // Will be set from settings when used
-		client:       &http.Client{Timeout: 30 * time.Second},
-		db:           nil,
+		APIKey:        apiKey,
+		Endpoint:      strings.TrimSuffix(endpoint, "/"),
+		Model:         model,
+		SystemPrompt:  "", // Will be set from settings when used
+		CustomHeaders: "", // Will be set from settings when used
+		client:        &http.Client{Timeout: 30 * time.Second},
+		db:            nil,
 	}
 }
 
@@ -88,18 +90,38 @@ func NewAISummarizerWithDB(apiKey, endpoint, model string, db DBInterface) *AISu
 		client = &http.Client{Timeout: 30 * time.Second}
 	}
 	return &AISummarizer{
-		APIKey:       apiKey,
-		Endpoint:     strings.TrimSuffix(endpoint, "/"),
-		Model:        model,
-		SystemPrompt: "",
-		client:       client,
-		db:           db,
+		APIKey:        apiKey,
+		Endpoint:      strings.TrimSuffix(endpoint, "/"),
+		Model:         model,
+		SystemPrompt:  "",
+		CustomHeaders: "", // Will be set from settings when used
+		client:        client,
+		db:            db,
 	}
 }
 
 // SetSystemPrompt sets a custom system prompt for the summarizer.
 func (s *AISummarizer) SetSystemPrompt(prompt string) {
 	s.SystemPrompt = prompt
+}
+
+// SetCustomHeaders sets custom headers for AI requests.
+func (s *AISummarizer) SetCustomHeaders(headers string) {
+	s.CustomHeaders = headers
+}
+
+// parseCustomHeaders parses the JSON string of custom headers into a map.
+func parseCustomHeaders(headersJSON string) (map[string]string, error) {
+	// Return empty map if headers string is empty
+	if headersJSON == "" {
+		return make(map[string]string), nil
+	}
+
+	var headers map[string]string
+	if err := json.Unmarshal([]byte(headersJSON), &headers); err != nil {
+		return nil, fmt.Errorf("failed to parse custom headers JSON: %w", err)
+	}
+	return headers, nil
 }
 
 // Summarize generates a summary of the given text using an OpenAI-compatible API.
@@ -169,7 +191,6 @@ func (s *AISummarizer) tryOpenAIFormat(systemPrompt, userPrompt string) (string,
 			{"role": "user", "content": userPrompt},
 		},
 		"temperature": 0.3, // Low temperature for consistent summaries
-		"max_tokens":  512, // Limit output tokens for summaries
 	}
 
 	jsonBody, err := json.Marshal(requestBody)
@@ -276,6 +297,18 @@ func (s *AISummarizer) sendRequest(jsonBody []byte) (*http.Response, error) {
 	// Only add Authorization header if API key is provided
 	if s.APIKey != "" {
 		req.Header.Set("Authorization", "Bearer "+s.APIKey)
+	}
+
+	// Parse and add custom headers if provided
+	if s.CustomHeaders != "" {
+		customHeaders, err := parseCustomHeaders(s.CustomHeaders)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse custom headers: %w", err)
+		}
+		// Apply custom headers
+		for key, value := range customHeaders {
+			req.Header.Set(key, value)
+		}
 	}
 
 	return s.client.Do(req)
