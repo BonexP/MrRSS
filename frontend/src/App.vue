@@ -30,7 +30,7 @@ const feedToEdit = ref<Feed | null>(null);
 const showSettings = ref(false);
 const showDiscoverBlogs = ref(false);
 const feedToDiscover = ref<Feed | null>(null);
-const isSidebarOpen = ref(false);
+const isSidebarOpen = ref(true);
 
 // Check if we're in image gallery mode
 const isImageGalleryMode = computed(() => store.currentFilter === 'imageGallery');

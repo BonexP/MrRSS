@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { PhShield, PhGlobe, PhPlug, PhLock, PhUser, PhKey, PhInfo } from '@phosphor-icons/vue';
+import { PhWall, PhGlobe, PhPlug, PhUsb, PhUser, PhKey, PhLink, PhInfo } from '@phosphor-icons/vue';
 import type { SettingsData } from '@/types/settings';
 
 const { t } = useI18n();
@@ -21,7 +21,7 @@ const emit = defineEmits<{
     <label
       class="font-semibold mb-2 sm:mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2"
     >
-      <PhShield :size="14" class="sm:w-4 sm:h-4" />
+      <PhWall :size="14" class="sm:w-4 sm:h-4" />
       {{ t('proxySettings') }}
     </label>
     <div class="tip-box">
@@ -94,7 +94,7 @@ const emit = defineEmits<{
       <!-- Proxy Host -->
       <div class="sub-setting-item">
         <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
-          <PhGlobe :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+          <PhLink :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
           <div class="flex-1 min-w-0">
             <div class="font-medium mb-0 sm:mb-1 text-xs sm:text-sm">
               {{ t('proxyHost') }} <span class="text-red-500">*</span>
@@ -127,7 +127,7 @@ const emit = defineEmits<{
       <!-- Proxy Port -->
       <div class="sub-setting-item">
         <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
-          <PhLock :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+          <PhUsb :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
           <div class="flex-1 min-w-0">
             <div class="font-medium mb-0 sm:mb-1 text-xs sm:text-sm">
               {{ t('proxyPort') }} <span class="text-red-500">*</span>

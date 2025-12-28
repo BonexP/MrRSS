@@ -25,6 +25,7 @@ import (
 	browser "MrRSS/internal/handlers/browser"
 	chat "MrRSS/internal/handlers/chat"
 	handlers "MrRSS/internal/handlers/core"
+	customcss "MrRSS/internal/handlers/custom_css"
 	discovery "MrRSS/internal/handlers/discovery"
 	feedhandlers "MrRSS/internal/handlers/feed"
 	freshrssHandler "MrRSS/internal/handlers/freshrss"
@@ -203,6 +204,10 @@ func main() {
 	apiMux.HandleFunc("/api/network/detect", func(w http.ResponseWriter, r *http.Request) { networkhandlers.HandleDetectNetwork(h, w, r) })
 	apiMux.HandleFunc("/api/network/info", func(w http.ResponseWriter, r *http.Request) { networkhandlers.HandleGetNetworkInfo(h, w, r) })
 	apiMux.HandleFunc("/api/browser/open", func(w http.ResponseWriter, r *http.Request) { browser.HandleOpenURL(h, w, r) })
+	apiMux.HandleFunc("/api/custom-css/upload-dialog", func(w http.ResponseWriter, r *http.Request) { customcss.HandleUploadCSSDialog(h, w, r) })
+	apiMux.HandleFunc("/api/custom-css/upload", func(w http.ResponseWriter, r *http.Request) { customcss.HandleUploadCSS(h, w, r) })
+	apiMux.HandleFunc("/api/custom-css", func(w http.ResponseWriter, r *http.Request) { customcss.HandleGetCSS(h, w, r) })
+	apiMux.HandleFunc("/api/custom-css/delete", func(w http.ResponseWriter, r *http.Request) { customcss.HandleDeleteCSS(h, w, r) })
 	apiMux.HandleFunc("/api/freshrss/sync", func(w http.ResponseWriter, r *http.Request) { freshrssHandler.HandleSync(h, w, r) })
 	apiMux.HandleFunc("/api/freshrss/test-connection", func(w http.ResponseWriter, r *http.Request) { freshrssHandler.HandleTestConnection(h, w, r) })
 

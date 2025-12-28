@@ -279,10 +279,7 @@ watch(
           <p class="text-xs text-text-secondary hidden sm:block">{{ t('shortcutsDesc') }}</p>
         </div>
       </div>
-      <button
-        class="btn-secondary text-xs sm:text-sm py-1.5 px-2.5 sm:px-3"
-        @click="resetToDefaults"
-      >
+      <button class="btn-secondary" @click="resetToDefaults">
         <PhArrowCounterClockwise :size="16" class="sm:w-5 sm:h-5" />
         {{ t('resetToDefault') }}
       </button>
@@ -319,7 +316,7 @@ watch(
 @reference "../../../../style.css";
 
 .btn-secondary {
-  @apply bg-bg-tertiary border border-border text-text-primary rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-secondary transition-colors;
+  @apply bg-bg-tertiary border border-border text-text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-secondary transition-colors;
 }
 
 .tip-box {

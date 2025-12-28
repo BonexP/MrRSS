@@ -42,6 +42,7 @@ const {
   xpathItemThumbnail,
   xpathItemCategories,
   xpathItemUid,
+  articleViewMode,
   proxyMode,
   proxyType,
   proxyHost,
@@ -50,6 +51,7 @@ const {
   proxyPassword,
   refreshMode,
   refreshInterval,
+  autoExpandContent,
   isSubmitting,
   showAdvancedSettings,
   availableScripts,
@@ -134,6 +136,12 @@ async function submit() {
       body.xpath_item_uid = xpathItemUid.value;
     }
 
+    // Add article view mode
+    body.article_view_mode = articleViewMode.value;
+
+    // Add auto expand content mode
+    body.auto_expand_content = autoExpandContent.value;
+
     if (props.mode === 'edit') {
       body.id = props.feed!.id;
     }
@@ -175,7 +183,6 @@ async function submit() {
   <div
     class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-2 sm:p-4"
     data-modal-open="true"
-    @click.self="close"
   >
     <div
       class="bg-bg-primary w-full max-w-md h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl shadow-2xl border border-border overflow-hidden animate-fade-in"
@@ -391,6 +398,8 @@ async function submit() {
           :image-gallery-enabled="imageGalleryEnabled"
           :is-image-mode="isImageMode"
           :hide-from-timeline="hideFromTimeline"
+          :article-view-mode="articleViewMode"
+          :auto-expand-content="autoExpandContent"
           :proxy-mode="proxyMode"
           :proxy-type="proxyType"
           :proxy-host="proxyHost"
@@ -401,6 +410,8 @@ async function submit() {
           :refresh-interval="refreshInterval"
           @update:is-image-mode="isImageMode = $event"
           @update:hide-from-timeline="hideFromTimeline = $event"
+          @update:article-view-mode="articleViewMode = $event"
+          @update:auto-expand-content="autoExpandContent = $event"
           @update:proxy-mode="proxyMode = $event"
           @update:proxy-type="proxyType = $event"
           @update:proxy-host="proxyHost = $event"

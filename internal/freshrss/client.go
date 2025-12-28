@@ -132,6 +132,57 @@ type Category struct {
 	Label string `json:"label"`
 }
 
+// GetCategories retrieves all categories/tags from FreshRSS
+func (c *Client) GetCategories(ctx context.Context) ([]Category, error) {
+	if c.authToken == "" {
+		return nil, fmt.Errorf("not authenticated")
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET",
+		c.baseURL+"/reader/api/0/tag/list?output=json", nil)
+	if err != nil {
+		return nil, fmt.Errorf("create categories request: %w", err)
+	}
+
+	req.Header.Set("Authorization", "GoogleLogin auth="+c.authToken)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("categories request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("categories request failed with status %d", resp.StatusCode)
+	}
+
+	var result struct {
+		Tags []struct {
+			ID   string `json:"id"`
+			Type string `json:"type"` // "folder" or "tag"
+		} `json:"tags"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("decode categories response: %w", err)
+	}
+
+	// Convert tags to categories
+	categories := make([]Category, 0, len(result.Tags))
+	for _, tag := range result.Tags {
+		// Extract label from ID (FreshRSS uses "user/-/label/LabelName" format)
+		if strings.HasPrefix(tag.ID, "user/-/label/") {
+			label := strings.TrimPrefix(tag.ID, "user/-/label/")
+			categories = append(categories, Category{
+				ID:    tag.ID,
+				Label: label,
+			})
+		}
+	}
+
+	return categories, nil
+}
+
 // GetSubscriptions retrieves all feed subscriptions
 func (c *Client) GetSubscriptions(ctx context.Context) ([]Subscription, error) {
 	if c.authToken == "" {
@@ -351,6 +402,7 @@ type Database interface {
 	GetFeeds() ([]models.Feed, error)
 	AddFeed(feed *models.Feed) (int64, error)
 	SaveArticles(ctx context.Context, articles []*models.Article) error
+	GetArticles(filter string, feedID int64, category string, showHidden bool, limit, offset int) ([]models.Article, error)
 }
 
 // NewSyncService creates a new sync service
@@ -366,6 +418,19 @@ func (s *SyncService) Sync(ctx context.Context) error {
 	// Login to FreshRSS
 	if err := s.client.Login(ctx); err != nil {
 		return fmt.Errorf("login to FreshRSS: %w", err)
+	}
+
+	// Get categories from FreshRSS to build category hierarchy
+	categories, err := s.client.GetCategories(ctx)
+	if err != nil {
+		log.Printf("Failed to get categories, continuing without category sync: %v", err)
+		categories = []Category{} // Continue without categories
+	}
+
+	// Create category map for quick lookup
+	categoryMap := make(map[string]Category)
+	for _, cat := range categories {
+		categoryMap[cat.ID] = cat
 	}
 
 	// Get subscriptions from FreshRSS
@@ -389,11 +454,8 @@ func (s *SyncService) Sync(ctx context.Context) error {
 	// Add missing feeds
 	for _, sub := range subscriptions {
 		if _, exists := localFeedMap[sub.URL]; !exists {
-			// Extract category from FreshRSS categories
-			category := ""
-			if len(sub.Categories) > 0 {
-				category = sub.Categories[0].Label
-			}
+			// Build category path from FreshRSS categories (support nested folders)
+			category := s.buildCategoryPath(sub.Categories, categoryMap)
 
 			feed := &models.Feed{
 				Title:       sub.Title,
@@ -407,7 +469,7 @@ func (s *SyncService) Sync(ctx context.Context) error {
 				log.Printf("Failed to add feed %s: %v", sub.URL, err)
 				continue
 			}
-			log.Printf("Added feed: %s", sub.Title)
+			log.Printf("Added feed: %s (category: %s)", sub.Title, category)
 		}
 	}
 
@@ -423,13 +485,31 @@ func (s *SyncService) Sync(ctx context.Context) error {
 		return fmt.Errorf("create FreshRSS feed: %w", err)
 	}
 
-	// Convert FreshRSS articles to MrRSS articles
+	// Get existing FreshRSS articles to avoid duplicates
+	existingArticles, err := s.db.GetArticles("unread", freshRSSFeedID, "", false, 1000, 0) // Get unread articles only
+	if err != nil {
+		return fmt.Errorf("get existing articles: %w", err)
+	}
+
+	// Create a map of existing article URLs for quick lookup
+	existingArticleMap := make(map[string]bool)
+	for _, article := range existingArticles {
+		existingArticleMap[article.URL] = true
+	}
+
+	// Convert FreshRSS articles to MrRSS articles (only new ones)
 	mrssArticles := make([]*models.Article, 0, len(freshArticles))
 	for _, freshArt := range freshArticles {
+		// Skip if article already exists
+		if existingArticleMap[freshArt.URL] {
+			continue
+		}
+
 		article := &models.Article{
 			FeedID:      freshRSSFeedID,
 			Title:       freshArt.Title,
 			URL:         freshArt.URL,
+			Summary:     freshArt.Content, // Store FreshRSS content as summary
 			PublishedAt: freshArt.Published,
 			IsRead:      false, // FreshRSS unread articles
 			IsFavorite:  false,
@@ -438,12 +518,12 @@ func (s *SyncService) Sync(ctx context.Context) error {
 		mrssArticles = append(mrssArticles, article)
 	}
 
-	// Save articles to database
+	// Save new articles to database
 	if len(mrssArticles) > 0 {
 		if err := s.db.SaveArticles(ctx, mrssArticles); err != nil {
 			return fmt.Errorf("save articles: %w", err)
 		}
-		log.Printf("Synced %d articles from FreshRSS", len(mrssArticles))
+		log.Printf("Synced %d new articles from FreshRSS", len(mrssArticles))
 	}
 
 	log.Printf("FreshRSS sync completed successfully")
@@ -472,4 +552,43 @@ func (s *SyncService) getOrCreateFreshRSSFeed() (int64, error) {
 	}
 
 	return s.db.AddFeed(freshRSSFeed)
+}
+
+// buildCategoryPath builds a category path from FreshRSS categories
+// Supports nested folder structure by parsing category labels that contain "/"
+func (s *SyncService) buildCategoryPath(categories []Category, categoryMap map[string]Category) string {
+	if len(categories) == 0 {
+		return ""
+	}
+
+	// Use the first category from the subscription
+	categoryID := categories[0].ID
+
+	// Look up the category in our map to get the full label
+	if cat, exists := categoryMap[categoryID]; exists {
+		label := cat.Label
+		// FreshRSS supports nested categories with "/" separator
+		// The label itself may contain "/" for hierarchy (e.g., "Tech/News")
+		// MrRSS already uses "/" as category separator, so we can use it directly
+		return label
+	}
+
+	// Fallback: try to extract label from category ID
+	if strings.HasPrefix(categoryID, "user/-/label/") {
+		label := strings.TrimPrefix(categoryID, "user/-/label/")
+		// Check if this label exists in our category map (in case of different ID formats)
+		for _, cat := range categoryMap {
+			if cat.Label == label {
+				return label
+			}
+		}
+		return label
+	}
+
+	// Last resort: use the ID as-is if it looks like a label
+	if !strings.HasPrefix(categoryID, "user/-/") {
+		return categoryID
+	}
+
+	return ""
 }

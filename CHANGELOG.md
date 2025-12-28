@@ -5,6 +5,53 @@ All notable changes to MrRSS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.11] - 2025-12-26
+
+### Fixed
+
+- Fixed the issue of some incorrect styles in settings page.
+- Fixed the issue where sidebar disappears.
+- Fixed the issue drag-and-drop will not work correctly in some cases.
+
+## [1.3.10] - 2025-12-26
+
+### Added
+
+- Supported import and export feeds in JSON format. (#317)
+- Supported choosing auto expand content for each feed. (#306)
+- Supported uploading CSS files for customized styling of articles. (#324)
+- Supported showing only unread articles in article list. (#318)
+
+### Changed
+
+- Improved I18n translations, icons, and descriptions in settings page for better clarity and user experience.
+- Improved UX of feed adding/editing modal. (#317)
+- Expand status of categories in sidebar is now persisted across application restarts. (#315)
+
+### Fixed
+
+- Fixed the issue where length limit for AI-generated summaries was not applied correctly. (#323)
+- Fixed the issue where the last time of network detect displays 739609 days ago if never detected before. (#314)
+- Fixed the issue where multi-layer categories in sidebar do not display correctly. (#322)
+- Fixed the issue of incorrect folder path in server mode. (#321)
+
+## [1.3.9] - 2025-12-25
+
+### Added
+
+- Supported customized request headers for AI services. (#301)
+- Supported enable automatically extracting full article content from original website. (#306)
+- Supported choosing article view mode for each feed. (#309)
+
+### Changed
+
+- Reorganized settings page layout for better user experience.
+
+### Fixed
+
+- Fixed the issue where some articles failed to open when filter is applied. (#304)
+- Fixed the issue where folders are not synchronized correctly and articles are duplicated when syncing with FreshRSS. (#305)
+
 ## [1.3.8] - 2025-12-24
 
 ### Added

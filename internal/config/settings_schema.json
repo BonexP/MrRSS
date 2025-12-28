@@ -1,0 +1,477 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "Settings schema definition - add new settings here only!"
+  },
+  "settings": {
+    "update_interval": {
+      "type": "int",
+      "default": 30,
+      "category": "general",
+      "encrypted": false,
+      "frontend_key": "updateInterval"
+    },
+    "refresh_mode": {
+      "type": "string",
+      "default": "fixed",
+      "category": "general",
+      "encrypted": false,
+      "frontend_key": "refreshMode"
+    },
+    "language": {
+      "type": "string",
+      "default": "en-US",
+      "category": "general",
+      "encrypted": false,
+      "frontend_key": "language"
+    },
+    "theme": {
+      "type": "string",
+      "default": "auto",
+      "category": "general",
+      "encrypted": false,
+      "frontend_key": "theme"
+    },
+    "default_view_mode": {
+      "type": "string",
+      "default": "rendered",
+      "category": "reading",
+      "encrypted": false,
+      "frontend_key": "defaultViewMode"
+    },
+    "startup_on_boot": {
+      "type": "bool",
+      "default": false,
+      "category": "general",
+      "encrypted": false,
+      "frontend_key": "startupOnBoot"
+    },
+    "close_to_tray": {
+      "type": "bool",
+      "default": true,
+      "category": "general",
+      "encrypted": false,
+      "frontend_key": "closeToTray"
+    },
+    "show_hidden_articles": {
+      "type": "bool",
+      "default": false,
+      "category": "reading",
+      "encrypted": false,
+      "frontend_key": "showHiddenArticles"
+    },
+    "hover_mark_as_read": {
+      "type": "bool",
+      "default": false,
+      "category": "reading",
+      "encrypted": false,
+      "frontend_key": "hoverMarkAsRead"
+    },
+    "translation_enabled": {
+      "type": "bool",
+      "default": false,
+      "category": "translation",
+      "encrypted": false,
+      "frontend_key": "translationEnabled"
+    },
+    "target_language": {
+      "type": "string",
+      "default": "zh",
+      "category": "translation",
+      "encrypted": false,
+      "frontend_key": "targetLanguage"
+    },
+    "translation_provider": {
+      "type": "string",
+      "default": "google",
+      "category": "translation",
+      "encrypted": false,
+      "frontend_key": "translationProvider"
+    },
+    "deepl_api_key": {
+      "type": "string",
+      "default": "",
+      "category": "translation",
+      "encrypted": true,
+      "frontend_key": "deeplAPIKey"
+    },
+    "deepl_endpoint": {
+      "type": "string",
+      "default": "",
+      "category": "translation",
+      "encrypted": false,
+      "frontend_key": "deeplEndpoint"
+    },
+    "baidu_app_id": {
+      "type": "string",
+      "default": "",
+      "category": "translation",
+      "encrypted": false,
+      "frontend_key": "baiduAppID"
+    },
+    "baidu_secret_key": {
+      "type": "string",
+      "default": "",
+      "category": "translation",
+      "encrypted": true,
+      "frontend_key": "baiduSecretKey"
+    },
+    "ai_api_key": {
+      "type": "string",
+      "default": "",
+      "category": "ai",
+      "encrypted": true,
+      "frontend_key": "aiAPIKey"
+    },
+    "ai_endpoint": {
+      "type": "string",
+      "default": "https://api.openai.com/v1/chat/completions",
+      "category": "ai",
+      "encrypted": false,
+      "frontend_key": "aiEndpoint"
+    },
+    "ai_model": {
+      "type": "string",
+      "default": "gpt-4o-mini",
+      "category": "ai",
+      "encrypted": false,
+      "frontend_key": "aiModel"
+    },
+    "ai_translation_prompt": {
+      "type": "string",
+      "default": "You are a translator. Translate the given text accurately. Output ONLY the translated text, nothing else.",
+      "category": "ai",
+      "encrypted": false,
+      "frontend_key": "aiTranslationPrompt"
+    },
+    "ai_summary_prompt": {
+      "type": "string",
+      "default": "You are a summarizer. Generate a concise summary of the given text. Output ONLY the summary, nothing else.",
+      "category": "ai",
+      "encrypted": false,
+      "frontend_key": "aiSummaryPrompt"
+    },
+    "ai_custom_headers": {
+      "type": "string",
+      "default": "",
+      "category": "ai",
+      "encrypted": false,
+      "frontend_key": "aiCustomHeaders"
+    },
+    "ai_usage_tokens": {
+      "type": "string",
+      "default": "0",
+      "category": "ai",
+      "encrypted": false,
+      "frontend_key": "aiUsageTokens"
+    },
+    "ai_usage_limit": {
+      "type": "string",
+      "default": "200",
+      "category": "ai",
+      "encrypted": false,
+      "frontend_key": "aiUsageLimit"
+    },
+    "ai_chat_enabled": {
+      "type": "bool",
+      "default": false,
+      "category": "ai",
+      "encrypted": false,
+      "frontend_key": "aiChatEnabled"
+    },
+    "summary_enabled": {
+      "type": "bool",
+      "default": true,
+      "category": "summary",
+      "encrypted": false,
+      "frontend_key": "summaryEnabled"
+    },
+    "summary_length": {
+      "type": "string",
+      "default": "medium",
+      "category": "summary",
+      "encrypted": false,
+      "frontend_key": "summaryLength"
+    },
+    "summary_provider": {
+      "type": "string",
+      "default": "local",
+      "category": "summary",
+      "encrypted": false,
+      "frontend_key": "summaryProvider"
+    },
+    "summary_trigger_mode": {
+      "type": "string",
+      "default": "manual",
+      "category": "summary",
+      "encrypted": false,
+      "frontend_key": "summaryTriggerMode"
+    },
+    "auto_cleanup_enabled": {
+      "type": "bool",
+      "default": false,
+      "category": "storage",
+      "encrypted": false,
+      "frontend_key": "autoCleanupEnabled"
+    },
+    "max_cache_size_mb": {
+      "type": "int",
+      "default": 20,
+      "category": "storage",
+      "encrypted": false,
+      "frontend_key": "maxCacheSizeMB"
+    },
+    "max_article_age_days": {
+      "type": "int",
+      "default": 30,
+      "category": "storage",
+      "encrypted": false,
+      "frontend_key": "maxArticleAgeDays"
+    },
+    "media_cache_enabled": {
+      "type": "bool",
+      "default": false,
+      "category": "storage",
+      "encrypted": false,
+      "frontend_key": "mediaCacheEnabled"
+    },
+    "media_cache_max_size_mb": {
+      "type": "int",
+      "default": 100,
+      "category": "storage",
+      "encrypted": false,
+      "frontend_key": "mediaCacheMaxSizeMB"
+    },
+    "media_cache_max_age_days": {
+      "type": "int",
+      "default": 7,
+      "category": "storage",
+      "encrypted": false,
+      "frontend_key": "mediaCacheMaxAgeDays"
+    },
+    "proxy_enabled": {
+      "type": "bool",
+      "default": false,
+      "category": "network",
+      "encrypted": false,
+      "frontend_key": "proxyEnabled"
+    },
+    "proxy_type": {
+      "type": "string",
+      "default": "https",
+      "category": "network",
+      "encrypted": false,
+      "frontend_key": "proxyType"
+    },
+    "proxy_host": {
+      "type": "string",
+      "default": "127.0.0.1",
+      "category": "network",
+      "encrypted": false,
+      "frontend_key": "proxyHost"
+    },
+    "proxy_port": {
+      "type": "string",
+      "default": "7890",
+      "category": "network",
+      "encrypted": false,
+      "frontend_key": "proxyPort"
+    },
+    "proxy_username": {
+      "type": "string",
+      "default": "",
+      "category": "network",
+      "encrypted": true,
+      "frontend_key": "proxyUsername"
+    },
+    "proxy_password": {
+      "type": "string",
+      "default": "",
+      "category": "network",
+      "encrypted": true,
+      "frontend_key": "proxyPassword"
+    },
+    "shortcuts": {
+      "type": "string",
+      "default": "",
+      "category": "general",
+      "encrypted": false,
+      "frontend_key": "shortcuts"
+    },
+    "rules": {
+      "type": "string",
+      "default": "",
+      "category": "general",
+      "encrypted": false,
+      "frontend_key": "rules"
+    },
+    "last_article_update": {
+      "type": "string",
+      "default": "",
+      "category": "internal",
+      "encrypted": false,
+      "frontend_key": "lastArticleUpdate"
+    },
+    "google_translate_endpoint": {
+      "type": "string",
+      "default": "translate.googleapis.com",
+      "category": "translation",
+      "encrypted": false,
+      "frontend_key": "googleTranslateEndpoint"
+    },
+    "show_article_preview_images": {
+      "type": "bool",
+      "default": true,
+      "category": "reading",
+      "encrypted": false,
+      "frontend_key": "showArticlePreviewImages"
+    },
+    "obsidian_enabled": {
+      "type": "bool",
+      "default": false,
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "obsidianEnabled"
+    },
+    "obsidian_vault": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "obsidianVault"
+    },
+    "obsidian_vault_path": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "obsidianVaultPath"
+    },
+    "window_x": {
+      "type": "string",
+      "default": "0",
+      "category": "internal",
+      "encrypted": false,
+      "frontend_key": "windowX"
+    },
+    "window_y": {
+      "type": "string",
+      "default": "0",
+      "category": "internal",
+      "encrypted": false,
+      "frontend_key": "windowY"
+    },
+    "window_width": {
+      "type": "string",
+      "default": "1024",
+      "category": "internal",
+      "encrypted": false,
+      "frontend_key": "windowWidth"
+    },
+    "window_height": {
+      "type": "string",
+      "default": "768",
+      "category": "internal",
+      "encrypted": false,
+      "frontend_key": "windowHeight"
+    },
+    "window_maximized": {
+      "type": "string",
+      "default": "false",
+      "category": "internal",
+      "encrypted": false,
+      "frontend_key": "windowMaximized"
+    },
+    "network_speed": {
+      "type": "string",
+      "default": "medium",
+      "category": "network",
+      "encrypted": false,
+      "frontend_key": "networkSpeed"
+    },
+    "network_bandwidth_mbps": {
+      "type": "string",
+      "default": "0",
+      "category": "network",
+      "encrypted": false,
+      "frontend_key": "networkBandwidth"
+    },
+    "network_latency_ms": {
+      "type": "string",
+      "default": "0",
+      "category": "network",
+      "encrypted": false,
+      "frontend_key": "networkLatency"
+    },
+    "max_concurrent_refreshes": {
+      "type": "string",
+      "default": "5",
+      "category": "network",
+      "encrypted": false,
+      "frontend_key": "maxConcurrentRefreshes"
+    },
+    "last_network_test": {
+      "type": "string",
+      "default": "",
+      "category": "network",
+      "encrypted": false,
+      "frontend_key": "lastNetworkTest"
+    },
+    "image_gallery_enabled": {
+      "type": "bool",
+      "default": false,
+      "category": "general",
+      "encrypted": false,
+      "frontend_key": "imageGalleryEnabled"
+    },
+    "freshrss_enabled": {
+      "type": "bool",
+      "default": false,
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "freshRSSSyncEnabled"
+    },
+    "freshrss_server_url": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "freshRSSServerURL"
+    },
+    "freshrss_username": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "freshRSSUsername"
+    },
+    "freshrss_api_password": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": true,
+      "frontend_key": "freshRSSAPIPassword"
+    },
+    "full_text_fetch_enabled": {
+      "type": "bool",
+      "default": true,
+      "category": "reading",
+      "encrypted": false,
+      "frontend_key": "fullTextFetchEnabled"
+    },
+    "auto_show_all_content": {
+      "type": "bool",
+      "default": false,
+      "category": "reading",
+      "encrypted": false,
+      "frontend_key": "autoShowAllContent"
+    },
+    "custom_css_file": {
+      "type": "string",
+      "default": "",
+      "category": "reading",
+      "encrypted": false,
+      "frontend_key": "customCSSFile"
+    }
+  }
+}

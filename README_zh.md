@@ -3,7 +3,7 @@
   <h1>MrRSS</h1>
   <p><strong>一个现代化的跨平台桌面 RSS 阅读器</strong></p>
 
-   [![Version](https://img.shields.io/badge/version-1.3.8-blue.svg)](https://github.com/WCY-dt/MrRSS/releases)
+   [![Version](https://img.shields.io/badge/version-1.3.11-blue.svg)](https://github.com/WCY-dt/MrRSS/releases)
   [![License](https://img.shields.io/badge/license-GPLv3-green.svg)](LICENSE)
    [![Go](https://img.shields.io/badge/Go-1.24+-00ADD8?logo=go)](https://go.dev/)
   [![Wails](https://img.shields.io/badge/Wails-v3%20alpha-red)](https://wails.io/)
@@ -13,6 +13,9 @@
     <a href="README.md">English</a> | <strong>简体中文</strong>
   </p>
 </div>
+
+> [!TIP]
+> 如果您在使用中遇到了问题，可以先查阅 [Q&A 页面](https://github.com/WCY-dt/MrRSS/discussions/210)。如果没有找到解决方案，请随时在 [Issues](https://github.com/WCY-dt/MrRSS/issues) 中报告问题。
 
 ---
 

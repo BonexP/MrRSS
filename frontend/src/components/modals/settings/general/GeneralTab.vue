@@ -2,21 +2,16 @@
 import { computed } from 'vue';
 import type { SettingsData } from '@/types/settings';
 import { useSettingsAutoSave } from '@/composables/core/useSettingsAutoSave';
-import { useSettingsValidation } from '@/composables/core/useSettingsValidation';
-import { useI18n } from 'vue-i18n';
-import { PhWarning } from '@phosphor-icons/vue';
-import AppearanceSettings from './AppearanceSettings.vue';
+import ApplicationSettings from './ApplicationSettings.vue';
+import ReadingSettings from './ReadingSettings.vue';
 import UpdateSettings from './UpdateSettings.vue';
-import DatabaseSettings from './DatabaseSettings.vue';
-import TranslationSettings from './TranslationSettings.vue';
-import SummarySettings from './SummarySettings.vue';
+import DataManagementSettings from './DataManagementSettings.vue';
 
 interface Props {
   settings: SettingsData;
 }
 
 const props = defineProps<Props>();
-const { t } = useI18n();
 
 const emit = defineEmits<{
   'update:settings': [settings: SettingsData];
@@ -29,9 +24,6 @@ const settingsRef = computed(() => props.settings);
 // Use composable for auto-save with reactivity
 useSettingsAutoSave(settingsRef);
 
-// Use validation composable
-const { isValid, isTranslationValid, isSummaryValid } = useSettingsValidation(settingsRef);
-
 // Handler for settings updates from child components
 function handleUpdateSettings(updatedSettings: SettingsData) {
   // Emit the updated settings to parent
@@ -41,37 +33,13 @@ function handleUpdateSettings(updatedSettings: SettingsData) {
 
 <template>
   <div class="space-y-4 sm:space-y-6">
-    <!-- Validation Warning -->
-    <div
-      v-if="!isValid"
-      class="p-3 sm:p-4 rounded-lg border-2 border-red-500 bg-red-500/10 flex items-start gap-3"
-    >
-      <PhWarning :size="20" class="text-red-500 shrink-0 mt-0.5" :weight="'fill'" />
-      <div class="flex-1">
-        <div class="font-semibold text-red-500 text-sm sm:text-base mb-1">
-          {{ t('requiredField') }}
-        </div>
-        <div class="text-xs sm:text-sm text-text-secondary">
-          <span v-if="!isTranslationValid">
-            {{ t('translationCredentialsRequired') }}
-          </span>
-          <span v-if="!isTranslationValid && !isSummaryValid"> • </span>
-          <span v-if="!isSummaryValid">
-            {{ t('summaryCredentialsRequired') }}
-          </span>
-        </div>
-      </div>
-    </div>
+    <ApplicationSettings :settings="settings" @update:settings="handleUpdateSettings" />
 
-    <AppearanceSettings :settings="settings" @update:settings="handleUpdateSettings" />
+    <ReadingSettings :settings="settings" @update:settings="handleUpdateSettings" />
 
     <UpdateSettings :settings="settings" @update:settings="handleUpdateSettings" />
 
-    <DatabaseSettings :settings="settings" @update:settings="handleUpdateSettings" />
-
-    <TranslationSettings :settings="settings" @update:settings="handleUpdateSettings" />
-
-    <SummarySettings :settings="settings" @update:settings="handleUpdateSettings" />
+    <DataManagementSettings :settings="settings" @update:settings="handleUpdateSettings" />
   </div>
 </template>
 
@@ -93,9 +61,6 @@ function handleUpdateSettings(updatedSettings: SettingsData) {
 }
 .setting-item {
   @apply flex items-center sm:items-start justify-between gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-bg-secondary border border-border;
-}
-.sub-setting-item {
-  @apply flex items-center sm:items-start justify-between gap-2 sm:gap-4 p-2 sm:p-2.5 rounded-md bg-bg-tertiary;
 }
 .info-display {
   @apply px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-border;

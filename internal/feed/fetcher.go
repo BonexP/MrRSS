@@ -184,6 +184,11 @@ func (f *Fetcher) setupTranslator() {
 		model, _ := f.db.GetSetting("ai_model")
 		if apiKey != "" {
 			t = translation.NewAITranslatorWithDB(apiKey, endpoint, model, f.db)
+			// Set custom headers if available
+			if aiTranslator, ok := t.(*translation.AITranslator); ok {
+				customHeaders, _ := f.db.GetSetting("ai_custom_headers")
+				aiTranslator.SetCustomHeaders(customHeaders)
+			}
 		} else {
 			t = translation.NewGoogleFreeTranslatorWithDB(f.db)
 		}

@@ -13,12 +13,13 @@ import (
 
 // AITranslator implements translation using OpenAI-compatible APIs (GPT, Claude, etc.).
 type AITranslator struct {
-	APIKey       string
-	Endpoint     string
-	Model        string
-	SystemPrompt string
-	client       *http.Client
-	db           DBInterface
+	APIKey        string
+	Endpoint      string
+	Model         string
+	SystemPrompt  string
+	CustomHeaders string
+	client        *http.Client
+	db            DBInterface
 }
 
 // NewAITranslator creates a new AI translator with the given credentials.
@@ -36,12 +37,13 @@ func NewAITranslator(apiKey, endpoint, model string) *AITranslator {
 		model = defaults.AIModel
 	}
 	return &AITranslator{
-		APIKey:       apiKey,
-		Endpoint:     strings.TrimSuffix(endpoint, "/"),
-		Model:        model,
-		SystemPrompt: "", // Will be set from settings when used
-		client:       &http.Client{Timeout: 30 * time.Second},
-		db:           nil,
+		APIKey:        apiKey,
+		Endpoint:      strings.TrimSuffix(endpoint, "/"),
+		Model:         model,
+		SystemPrompt:  "", // Will be set from settings when used
+		CustomHeaders: "", // Will be set from settings when used
+		client:        &http.Client{Timeout: 30 * time.Second},
+		db:            nil,
 	}
 }
 
@@ -60,18 +62,38 @@ func NewAITranslatorWithDB(apiKey, endpoint, model string, db DBInterface) *AITr
 		client = &http.Client{Timeout: 30 * time.Second}
 	}
 	return &AITranslator{
-		APIKey:       apiKey,
-		Endpoint:     strings.TrimSuffix(endpoint, "/"),
-		Model:        model,
-		SystemPrompt: "",
-		client:       client,
-		db:           db,
+		APIKey:        apiKey,
+		Endpoint:      strings.TrimSuffix(endpoint, "/"),
+		Model:         model,
+		SystemPrompt:  "",
+		CustomHeaders: "", // Will be set from settings when used
+		client:        client,
+		db:            db,
 	}
 }
 
 // SetSystemPrompt sets a custom system prompt for the translator.
 func (t *AITranslator) SetSystemPrompt(prompt string) {
 	t.SystemPrompt = prompt
+}
+
+// SetCustomHeaders sets custom headers for AI requests.
+func (t *AITranslator) SetCustomHeaders(headers string) {
+	t.CustomHeaders = headers
+}
+
+// parseCustomHeaders parses the JSON string of custom headers into a map.
+func parseCustomHeaders(headersJSON string) (map[string]string, error) {
+	// Return empty map if headers string is empty
+	if headersJSON == "" {
+		return make(map[string]string), nil
+	}
+
+	var headers map[string]string
+	if err := json.Unmarshal([]byte(headersJSON), &headers); err != nil {
+		return nil, fmt.Errorf("failed to parse custom headers JSON: %w", err)
+	}
+	return headers, nil
 }
 
 // Translate translates text to the target language using an OpenAI-compatible API.
@@ -212,6 +234,18 @@ func (t *AITranslator) sendRequest(jsonBody []byte) (*http.Response, error) {
 	// Only add Authorization header if API key is provided
 	if t.APIKey != "" {
 		req.Header.Set("Authorization", "Bearer "+t.APIKey)
+	}
+
+	// Parse and add custom headers if provided
+	if t.CustomHeaders != "" {
+		customHeaders, err := parseCustomHeaders(t.CustomHeaders)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse custom headers: %w", err)
+		}
+		// Apply custom headers
+		for key, value := range customHeaders {
+			req.Header.Set(key, value)
+		}
 	}
 
 	return t.client.Do(req)

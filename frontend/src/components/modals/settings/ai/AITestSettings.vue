@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { PhCheckCircle, PhArrowClockwise, PhWarningCircle, PhBookOpen } from '@phosphor-icons/vue';
+import {
+  PhTestTube,
+  PhCheckCircle,
+  PhArrowClockwise,
+  PhWarningCircle,
+  PhBookOpen,
+} from '@phosphor-icons/vue';
 import type { AITestInfo } from '@/types/settings';
 
 const { t } = useI18n();
@@ -65,8 +71,6 @@ function formatTime(timeStr: string): string {
     return t('justNow');
   }
 }
-
-// Removed onMounted auto-test trigger - test is now manual only
 </script>
 
 <template>
@@ -74,7 +78,7 @@ function formatTime(timeStr: string): string {
     <label
       class="font-semibold mb-2 sm:mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2"
     >
-      <PhCheckCircle :size="14" class="sm:w-4 sm:h-4" />
+      <PhTestTube :size="14" class="sm:w-4 sm:h-4" />
       {{ t('aiConfigTest') }}
     </label>
 
@@ -151,7 +155,7 @@ function formatTime(timeStr: string): string {
       <!-- Right: Test Button and Test Time -->
       <div class="flex flex-col sm:justify-between flex-1 gap-2 sm:gap-0">
         <div class="flex justify-center sm:justify-end">
-          <button class="btn-primary" :disabled="isTesting" @click="testAIConfig">
+          <button class="btn-secondary" :disabled="isTesting" @click="testAIConfig">
             <PhArrowClockwise
               :size="16"
               :class="{ 'animate-spin': isTesting, 'sm:w-5 sm:h-5': true }"
@@ -209,12 +213,12 @@ function formatTime(timeStr: string): string {
 <style scoped>
 @reference "../../../../style.css";
 
-.btn-primary {
-  @apply bg-accent text-white border-none px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg cursor-pointer flex items-center gap-1 sm:gap-2 font-medium hover:bg-accent-hover transition-colors text-sm sm:text-base;
+.btn-secondary {
+  @apply bg-bg-tertiary border border-border text-text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-secondary transition-colors;
 }
 
-.btn-primary:disabled {
-  @apply opacity-50 cursor-not-allowed;
+.btn-secondary:disabled {
+  @apply cursor-not-allowed opacity-50;
 }
 
 .setting-group {

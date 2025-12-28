@@ -9,21 +9,25 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"MrRSS/internal/handlers/core"
+	"MrRSS/internal/jsonimport"
+	"MrRSS/internal/models"
 	"MrRSS/internal/opml"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-// HandleOPMLImport handles OPML file import.
+// HandleOPMLImport handles OPML/JSON file import based on file extension.
 func HandleOPMLImport(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 	log.Printf("HandleOPMLImport: ContentLength: %d", r.ContentLength)
 	contentType := r.Header.Get("Content-Type")
 	log.Printf("HandleOPMLImport: Content-Type: %s", contentType)
 
 	var file io.Reader
+	var filename string
 
 	if strings.Contains(contentType, "multipart/form-data") {
 		f, header, err := r.FormFile("file")
@@ -33,7 +37,8 @@ func HandleOPMLImport(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer f.Close()
-		log.Printf("HandleOPMLImport: Received file %s, size: %d", header.Filename, header.Size)
+		filename = header.Filename
+		log.Printf("HandleOPMLImport: Received file %s, size: %d", filename, header.Size)
 
 		if header.Size == 0 {
 			http.Error(w, "Uploaded file is empty", http.StatusBadRequest)
@@ -46,9 +51,23 @@ func HandleOPMLImport(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 		defer r.Body.Close()
 	}
 
-	feeds, err := opml.Parse(file)
+	// Determine format based on file extension
+	ext := strings.ToLower(filepath.Ext(filename))
+	isJSON := ext == ".json"
+
+	var feeds []models.Feed
+	var err error
+
+	if isJSON {
+		log.Printf("HandleOPMLImport: Detected JSON format from extension %s", ext)
+		feeds, err = jsonimport.Parse(file)
+	} else {
+		log.Printf("HandleOPMLImport: Using OPML format (extension: %s)", ext)
+		feeds, err = opml.Parse(file)
+	}
+
 	if err != nil {
-		log.Printf("Error parsing OPML: %v", err)
+		log.Printf("Error parsing file: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -132,11 +151,19 @@ func HandleOPMLImportDialog(h *core.Handler, w http.ResponseWriter, r *http.Requ
 	}
 
 	filePath, err := app.Dialog.OpenFileWithOptions(&application.OpenFileDialogOptions{
-		Title: "Select OPML File",
+		Title: "Import Subscriptions",
 		Filters: []application.FileFilter{
+			{
+				DisplayName: "Supported Files (*.opml;*.xml;*.json)",
+				Pattern:     "*.opml;*.xml;*.json",
+			},
 			{
 				DisplayName: "OPML Files (*.opml;*.xml)",
 				Pattern:     "*.opml;*.xml",
+			},
+			{
+				DisplayName: "JSON Files (*.json)",
+				Pattern:     "*.json",
 			},
 			{
 				DisplayName: "All Files (*)",
@@ -176,10 +203,22 @@ func HandleOPMLImportDialog(h *core.Handler, w http.ResponseWriter, r *http.Requ
 	}
 	defer file.Close()
 
-	// Parse OPML content
-	feeds, err := opml.Parse(file)
+	// Determine format based on file extension
+	ext := strings.ToLower(filepath.Ext(filePath))
+	isJSON := ext == ".json"
+
+	var feeds []models.Feed
+
+	if isJSON {
+		log.Printf("HandleOPMLImportDialog: Detected JSON format from extension %s", ext)
+		feeds, err = jsonimport.Parse(file)
+	} else {
+		log.Printf("HandleOPMLImportDialog: Using OPML format (extension: %s)", ext)
+		feeds, err = opml.Parse(file)
+	}
+
 	if err != nil {
-		log.Printf("Error parsing OPML: %v", err)
+		log.Printf("Error parsing file: %v", err)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -251,17 +290,6 @@ func HandleOPMLExportDialog(h *core.Handler, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Generate OPML content
-	data, err := opml.Generate(feeds)
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"error": err.Error(),
-		})
-		return
-	}
-
 	// Type assert to *application.App to access Dialog
 	app, ok := h.App.(*application.App)
 	if !ok {
@@ -275,12 +303,16 @@ func HandleOPMLExportDialog(h *core.Handler, w http.ResponseWriter, r *http.Requ
 	}
 
 	filePath, err := app.Dialog.SaveFileWithOptions(&application.SaveFileDialogOptions{
-		Title:    "Save OPML File",
+		Title:    "Export Subscriptions",
 		Filename: "subscriptions.opml",
 		Filters: []application.FileFilter{
 			{
 				DisplayName: "OPML Files (*.opml)",
 				Pattern:     "*.opml",
+			},
+			{
+				DisplayName: "JSON Files (*.json)",
+				Pattern:     "*.json",
 			},
 			{
 				DisplayName: "XML Files (*.xml)",
@@ -310,14 +342,37 @@ func HandleOPMLExportDialog(h *core.Handler, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Write OPML content to selected file
-	err = os.WriteFile(filePath, data, 0644)
+	// Determine format based on file extension
+	ext := strings.ToLower(filepath.Ext(filePath))
+	isJSON := ext == ".json"
+
+	var data []byte
+	if isJSON {
+		log.Printf("HandleOPMLExportDialog: Generating JSON format")
+		data, err = jsonimport.Generate(feeds)
+	} else {
+		log.Printf("HandleOPMLExportDialog: Generating OPML format (extension: %s)", ext)
+		data, err = opml.Generate(feeds)
+	}
+
 	if err != nil {
-		log.Printf("Error writing OPML file: %v", err)
+		log.Printf("Error generating export data: %v", err)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"error": "Failed to write OPML file",
+			"error": err.Error(),
+		})
+		return
+	}
+
+	// Write content to selected file
+	err = os.WriteFile(filePath, data, 0644)
+	if err != nil {
+		log.Printf("Error writing file: %v", err)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"error": "Failed to write file",
 		})
 		return
 	}

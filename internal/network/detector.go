@@ -56,7 +56,6 @@ func NewDetector(httpClient *http.Client) *Detector {
 // DetectSpeed performs network speed detection
 func (d *Detector) DetectSpeed(ctx context.Context) DetectionResult {
 	result := DetectionResult{
-		DetectionTime:  time.Now(),
 		SpeedLevel:     SpeedMedium, // Default fallback
 		MaxConcurrency: 5,           // Default fallback
 	}
@@ -84,6 +83,7 @@ func (d *Detector) DetectSpeed(ctx context.Context) DetectionResult {
 	// Determine speed level and concurrency based on results
 	result.SpeedLevel, result.MaxConcurrency = d.calculateSpeedLevel(latency, bandwidth)
 	result.DetectionSuccess = true
+	result.DetectionTime = time.Now() // Only set time on successful detection
 
 	log.Printf("Network detection complete: %s (%.2f Mbps, %d ms latency, max concurrency: %d)",
 		result.SpeedLevel, result.BandwidthMbps, result.LatencyMs, result.MaxConcurrency)

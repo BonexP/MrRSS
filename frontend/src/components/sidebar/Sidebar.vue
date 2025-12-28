@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useAppStore } from '@/stores/app';
 import { useI18n } from 'vue-i18n';
 import { PhPlus, PhGear, PhMagnifyingGlass, PhX, PhPencil, PhCheck } from '@phosphor-icons/vue';
@@ -13,6 +13,11 @@ const { t } = useI18n();
 
 // Edit mode for drag reordering
 const isEditMode = ref(false);
+
+// Local state to track if user is actively dragging (independent of drop operation)
+const isDragging = ref(false);
+// Track if drop was handled to clear isDragging correctly
+let dropHandled = false;
 
 function toggleEditMode() {
   isEditMode.value = !isEditMode.value;
@@ -57,7 +62,7 @@ const {
   tree,
   categoryUnreadCounts,
   toggleCategory,
-  isCategoryOpen,
+  isCategoryOpen: checkIsCategoryOpen,
   searchQuery,
   onFeedContextMenu,
   onCategoryContextMenu,
@@ -70,44 +75,84 @@ const {
   dropPreview,
   onDragStart,
   onDragEnd,
-  onDragOver,
-  onDragLeave,
+  onDragOver: onDragOverComposable,
+  onDragLeave: onDragLeaveComposable,
   onDrop,
 } = useDragDrop();
 
 // Handle drag events from categories
 function handleDragStart(feedId: number, event: Event) {
+  console.log('[handleDragStart] Starting drag for feed:', feedId);
+  isDragging.value = true;
+  dropHandled = false;
   onDragStart(feedId, event);
 }
 
 function handleDragEnd() {
+  // Don't clear isDragging here - let handleDrop or a timeout handle it
+  // This prevents premature clearing if drop is still being processed
   onDragEnd();
 }
 
 function handleDragOver(categoryName: string, feedId: number | null, event: Event) {
   console.log('[Sidebar] handleDragOver called with:', { categoryName, feedId, event });
-  onDragOver(categoryName, feedId, event);
+  onDragOverComposable(categoryName, feedId, event);
 }
 
 function handleDragLeave(categoryName: string, event: Event) {
-  onDragLeave(categoryName, event);
+  onDragLeaveComposable(categoryName, event);
 }
 
 async function handleDrop(categoryName: string, feeds: any[]) {
-  if (!draggingFeedId.value) return;
-
-  const result = await onDrop(categoryName, feeds);
-
-  if (result.success) {
-    // Refresh feeds to show updated order
-    store.fetchFeeds();
-    window.showToast(t('feedReordered'), 'success');
-  } else {
-    window.showToast(t('errorReorderingFeed') + ': ' + result.error, 'error');
+  if (dropHandled) {
+    console.log('[handleDrop] Drop already handled, skipping');
+    return;
   }
 
-  onDragEnd();
+  dropHandled = true;
+
+  console.log('[handleDrop] Starting drop operation:', {
+    categoryName,
+    feedsCount: feeds.length,
+    feeds: feeds.map((f) => ({ id: f.id, title: f.title, category: f.category })),
+    draggingFeedId: draggingFeedId.value,
+  });
+
+  try {
+    // Keep isDragging true until after the data refreshes
+    const result = await onDrop(categoryName, feeds);
+
+    console.log('[handleDrop] Drop result:', result);
+
+    if (result.success) {
+      // Refresh feeds to show updated order
+      await store.fetchFeeds();
+      console.log(
+        '[handleDrop] Feeds refreshed, tree.uncategorized.length:',
+        tree.value.uncategorized.length
+      );
+      window.showToast(t('feedReordered'), 'success');
+    } else {
+      window.showToast(t('errorReorderingFeed') + ': ' + result.error, 'error');
+    }
+  } finally {
+    // Always clear dragging state, even if there's an error
+    console.log('[handleDrop] Clearing isDragging');
+    isDragging.value = false;
+  }
 }
+
+// Watch for drag end to clear isDragging if no drop occurred
+// This handles the case where user drags outside sidebar and cancels
+watch(draggingFeedId, (newValue, oldValue) => {
+  // If draggingFeedId changes from non-null to null, but handleDrop wasn't called
+  // (which would clear isDragging), we need to clear isDragging after a short delay
+  if (oldValue !== null && newValue === null && !dropHandled) {
+    setTimeout(() => {
+      isDragging.value = false;
+    }, 100);
+  }
+});
 
 const emitShowAddFeed = () => window.dispatchEvent(new CustomEvent('show-add-feed'));
 const emitShowSettings = () => window.dispatchEvent(new CustomEvent('show-settings'));
@@ -116,8 +161,10 @@ const emitShowSettings = () => window.dispatchEvent(new CustomEvent('show-settin
 <template>
   <aside
     :class="[
-      'sidebar flex flex-col bg-bg-secondary border-r border-border h-full transition-transform duration-300 absolute z-20 md:relative md:translate-x-0',
+      'sidebar flex flex-col bg-bg-secondary border-r border-border h-full transition-transform duration-300',
+      'absolute z-20',
       isOpen ? 'translate-x-0' : '-translate-x-full',
+      'md:relative md:translate-x-0',
     ]"
   >
     <div class="p-3 sm:p-5 border-b border-border flex justify-between items-center">
@@ -194,7 +241,9 @@ const emitShowSettings = () => window.dispatchEvent(new CustomEvent('show-settin
         :key="name"
         :name="name"
         :feeds="data._feeds"
-        :is-open="isCategoryOpen(name)"
+        :children="data._children"
+        :level="0"
+        :is-open="checkIsCategoryOpen(name)"
         :is-active="store.currentCategory === name"
         :unread-count="categoryUnreadCounts[name] || 0"
         :current-feed-id="store.currentFeedId"
@@ -203,10 +252,14 @@ const emitShowSettings = () => window.dispatchEvent(new CustomEvent('show-settin
         :is-edit-mode="isEditMode"
         :drop-preview="dropPreview"
         :dragging-feed-id="draggingFeedId"
+        :is-category-open="checkIsCategoryOpen"
         @toggle="toggleCategory(name)"
         @select-category="store.setCategory(name)"
         @select-feed="store.setFeed"
         @category-context-menu="(e) => onCategoryContextMenu(e, name)"
+        @child-toggle="toggleCategory"
+        @child-select-category="store.setCategory"
+        @child-context-menu="(e, path) => onCategoryContextMenu(e, path)"
         @feed-context-menu="onFeedContextMenu"
         @dragstart="(feedId, e) => handleDragStart(feedId, e)"
         @dragend="handleDragEnd"
@@ -217,10 +270,12 @@ const emitShowSettings = () => window.dispatchEvent(new CustomEvent('show-settin
 
       <!-- Uncategorized -->
       <SidebarCategory
-        v-if="tree.uncategorized.length > 0"
+        v-if="tree.uncategorized.length > 0 || isDragging"
         :name="t('uncategorized')"
         :feeds="tree.uncategorized"
-        :is-open="isCategoryOpen('uncategorized')"
+        :is-open="
+          checkIsCategoryOpen('uncategorized') || (tree.uncategorized.length === 0 && isDragging)
+        "
         :is-active="false"
         :is-uncategorized="true"
         :unread-count="categoryUnreadCounts['uncategorized'] || 0"
@@ -230,6 +285,7 @@ const emitShowSettings = () => window.dispatchEvent(new CustomEvent('show-settin
         :is-edit-mode="isEditMode"
         :drop-preview="dropPreview"
         :dragging-feed-id="draggingFeedId"
+        :is-category-open="checkIsCategoryOpen"
         @toggle="toggleCategory('uncategorized')"
         @select-feed="store.setFeed"
         @category-context-menu="(e) => onCategoryContextMenu(e, 'uncategorized')"

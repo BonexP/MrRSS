@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import {
-  PhHardDrives,
-  PhUpload,
-  PhDownload,
-  PhBroom,
-  PhMagnifyingGlass,
-} from '@phosphor-icons/vue';
+import { PhHardDrives, PhUpload, PhDownload, PhBroom } from '@phosphor-icons/vue';
 
 const { t } = useI18n();
 
@@ -14,7 +8,6 @@ const emit = defineEmits<{
   'import-opml': [];
   'export-opml': [];
   'cleanup-database': [];
-  'discover-all': [];
 }>();
 
 function handleImportOPML() {
@@ -27,10 +20,6 @@ function handleExportOPML() {
 
 function handleCleanupDatabase() {
   emit('cleanup-database');
-}
-
-function handleDiscoverAll() {
-  emit('discover-all');
 }
 </script>
 
@@ -64,18 +53,6 @@ function handleDiscoverAll() {
         <PhBroom :size="18" class="sm:w-5 sm:h-5" /> {{ t('cleanDatabase') }}
       </button>
     </div>
-    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-2 sm:mb-3">
-      <button
-        class="btn-primary flex-1 justify-center text-sm sm:text-base"
-        @click="handleDiscoverAll"
-      >
-        <PhMagnifyingGlass :size="18" class="sm:w-5 sm:h-5" />
-        {{ t('discoverAllFeeds') }}
-      </button>
-    </div>
-    <p class="text-xs text-text-secondary mb-2">
-      {{ t('discoverAllFeedsDesc') }}
-    </p>
   </div>
 </template>
 

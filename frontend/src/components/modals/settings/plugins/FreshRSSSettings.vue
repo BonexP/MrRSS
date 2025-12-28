@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { PhGlobe, PhUser, PhKey, PhWifiHigh, PhArrowClockwise } from '@phosphor-icons/vue';
+import { PhLink, PhUser, PhKey, PhTestTube, PhArrowClockwise } from '@phosphor-icons/vue';
 import type { SettingsData } from '@/types/settings';
 
 const { t } = useI18n();
@@ -81,10 +81,10 @@ async function syncNow() {
     <!-- Server URL -->
     <div class="sub-setting-item">
       <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
-        <PhGlobe :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+        <PhLink :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
         <div class="flex-1 min-w-0">
           <div class="font-medium mb-0 sm:mb-1 text-sm sm:text-base">
-            {{ t('freshrssServerUrl') }}
+            {{ t('freshrssServerUrl') }} <span class="text-red-500">*</span>
           </div>
           <div class="text-xs text-text-secondary hidden sm:block">
             {{ t('freshrssServerUrlDesc') }}
@@ -112,7 +112,7 @@ async function syncNow() {
         <PhUser :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
         <div class="flex-1 min-w-0">
           <div class="font-medium mb-0 sm:mb-1 text-sm sm:text-base">
-            {{ t('freshrssUsername') }}
+            {{ t('freshrssUsername') }} <span class="text-red-500">*</span>
           </div>
           <div class="text-xs text-text-secondary hidden sm:block">
             {{ t('freshrssUsernameDesc') }}
@@ -165,7 +165,7 @@ async function syncNow() {
     <!-- Connection Test and Sync Buttons -->
     <div class="sub-setting-item">
       <div class="flex-1 flex items-center sm:items-start gap-2 sm:gap-3 min-w-0">
-        <PhWifiHigh :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
+        <PhTestTube :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
         <div class="flex-1 min-w-0">
           <div class="font-medium mb-0 sm:mb-1 text-sm sm:text-base">
             {{ t('testConnection') }}
@@ -176,11 +176,7 @@ async function syncNow() {
         </div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
-        <button
-          :disabled="isSyncing"
-          class="btn-primary text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5"
-          @click="syncNow"
-        >
+        <button :disabled="isSyncing" class="btn-secondary" @click="syncNow">
           <PhArrowClockwise
             :size="16"
             :class="{ 'animate-spin': isSyncing, 'sm:w-5 sm:h-5': true }"
@@ -198,6 +194,7 @@ async function syncNow() {
 .input-field {
   @apply p-1.5 sm:p-2.5 border border-border rounded-md bg-bg-secondary text-text-primary focus:border-accent focus:outline-none transition-colors;
 }
+
 .toggle {
   @apply w-10 h-5 appearance-none bg-bg-tertiary rounded-full relative cursor-pointer border border-border transition-colors checked:bg-accent checked:border-accent shrink-0;
 }
@@ -208,18 +205,23 @@ async function syncNow() {
 .toggle:checked::after {
   transform: translateX(20px);
 }
+
 .setting-item {
   @apply flex items-center sm:items-start justify-between gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-bg-secondary border border-border;
 }
+
 .sub-setting-item {
   @apply flex items-center sm:items-start justify-between gap-2 sm:gap-4 p-2 sm:p-2.5 rounded-md bg-bg-tertiary;
 }
-.btn-primary {
-  @apply bg-accent text-white border-none px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg cursor-pointer flex items-center gap-1 sm:gap-2 font-medium hover:bg-accent-hover transition-colors text-sm sm:text-base;
-}
+
 .btn-secondary {
-  @apply bg-bg-secondary text-text-primary border border-border px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg cursor-pointer flex items-center gap-1 sm:gap-2 font-medium hover:bg-bg-primary transition-colors text-sm sm:text-base;
+  @apply bg-bg-tertiary border border-border text-text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-secondary transition-colors;
 }
+
+.btn-secondary:disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+
 .setting-group {
   @apply space-y-2 sm:space-y-3;
 }

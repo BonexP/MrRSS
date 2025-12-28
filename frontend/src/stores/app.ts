@@ -22,6 +22,7 @@ export interface AppState {
   themePreference: Ref<ThemePreference>;
   theme: Ref<Theme>;
   refreshProgress: Ref<RefreshProgress>;
+  showOnlyUnread: Ref<boolean>;
 }
 
 export interface AppActions {
@@ -42,6 +43,7 @@ export interface AppActions {
   pollProgress: () => void;
   checkForAppUpdates: () => Promise<void>;
   startAutoRefresh: (minutes: number) => void;
+  toggleShowOnlyUnread: () => void;
 }
 
 export const useAppStore = defineStore('app', () => {
@@ -66,6 +68,7 @@ export const useAppStore = defineStore('app', () => {
     (localStorage.getItem('themePreference') as ThemePreference) || 'auto'
   );
   const theme = ref<Theme>('light');
+  const showOnlyUnread = ref<boolean>(false);
 
   // Refresh progress
   const refreshProgress = ref<RefreshProgress>({ current: 0, total: 0, isRunning: false });
@@ -396,6 +399,10 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  function toggleShowOnlyUnread(): void {
+    showOnlyUnread.value = !showOnlyUnread.value;
+  }
+
   return {
     // State
     articles,
@@ -412,6 +419,7 @@ export const useAppStore = defineStore('app', () => {
     themePreference,
     theme,
     refreshProgress,
+    showOnlyUnread,
 
     // Actions
     setFilter,
@@ -431,5 +439,6 @@ export const useAppStore = defineStore('app', () => {
     pollProgress,
     checkForAppUpdates,
     startAutoRefresh,
+    toggleShowOnlyUnread,
   };
 });

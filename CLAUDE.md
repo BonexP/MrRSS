@@ -189,16 +189,20 @@ Important: The database uses SQLite with WAL mode for better concurrency.
 
 ### Settings Management
 
-When modifying settings, update ALL required locations:
+**IMPORTANT:** The settings system has been optimized! Adding new settings is now much simpler.
 
-1. Frontend defaults: `config/defaults.json`
-2. Backend defaults: `internal/config/defaults.json`
-3. Backend types: `internal/config/config.go`
-4. Database initialization: `internal/database/db.go`
-5. API handlers: `internal/handlers/settings/settings_handlers.go`
-6. Frontend types: `frontend/src/types/settings.ts`
-7. Frontend composables: `frontend/src/composables/core/useSettings.ts`
-8. Auto-save logic: `frontend/src/composables/core/useSettingsAutoSave.ts`
+**Instead of manually editing 11+ files, you only need to edit 1 file:**
+
+1. Edit `internal/config/settings_schema.json` to add your setting (5 lines)
+2. Run `go run tools/settings-generator/main.go` to generate all boilerplate code
+3. Add translations and UI (optional but recommended)
+
+**See [docs/SETTINGS.md](docs/SETTINGS.md) for complete guide.**
+
+**Key Points:**
+- **Frontend uses snake_case** (e.g., `settings.ai_api_key`, `settings.update_interval`)
+- All generated files are sorted alphabetically for stable diffs
+- The generator handles all boilerplate automatically
 
 ## Testing
 

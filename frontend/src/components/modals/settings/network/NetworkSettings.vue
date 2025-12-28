@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { PhNetworkX, PhArrowClockwise } from '@phosphor-icons/vue';
+import { PhNetwork, PhArrowClockwise } from '@phosphor-icons/vue';
 import type { NetworkInfo } from '@/types/settings';
 
 const { t } = useI18n();
@@ -61,9 +61,24 @@ async function detectNetwork() {
 
 function formatTime(timeStr: string): string {
   if (!timeStr) return '';
+
   const date = new Date(timeStr);
+
+  // Check if the date is invalid or is the Unix epoch (zero time)
+  if (isNaN(date.getTime()) || date.getTime() === 0) {
+    return '';
+  }
+
   const now = new Date();
   const diff = now.getTime() - date.getTime();
+
+  // If the date is in the future or too far in the past (more than 10 years),
+  // it's likely an invalid/uninitialized timestamp
+  const maxReasonableDiff = 10 * 365 * 24 * 60 * 60 * 1000; // 10 years in milliseconds
+  if (diff < 0 || diff > maxReasonableDiff) {
+    return '';
+  }
+
   const minutes = Math.floor(diff / 60000);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
@@ -89,7 +104,7 @@ onMounted(() => {
     <label
       class="font-semibold mb-2 sm:mb-3 text-text-secondary uppercase text-xs tracking-wider flex items-center gap-2"
     >
-      <PhNetworkX :size="14" class="sm:w-4 sm:h-4" />
+      <PhNetwork :size="14" class="sm:w-4 sm:h-4" />
       {{ t('networkSettings') }}
     </label>
 
@@ -133,7 +148,7 @@ onMounted(() => {
       <!-- Bottom/Right: Button and Detection Time -->
       <div class="flex flex-col sm:justify-between flex-1 gap-2 sm:gap-0">
         <div class="flex justify-center sm:justify-end">
-          <button class="btn-primary" :disabled="isDetecting" @click="detectNetwork">
+          <button class="btn-secondary" :disabled="isDetecting" @click="detectNetwork">
             <PhArrowClockwise
               :size="16"
               :class="{ 'animate-spin': isDetecting, 'sm:w-5 sm:h-5': true }"
@@ -167,20 +182,12 @@ onMounted(() => {
 <style scoped>
 @reference "../../../../style.css";
 
-.btn-primary {
-  @apply bg-accent text-white border-none px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg cursor-pointer flex items-center gap-1 sm:gap-2 font-medium hover:bg-accent-hover transition-colors text-sm sm:text-base;
-}
-
-.btn-primary:disabled {
-  @apply opacity-50 cursor-not-allowed;
-}
-
 .btn-secondary {
-  @apply px-3 py-1.5 bg-bg-primary border border-border text-text-primary rounded-md cursor-pointer font-medium hover:bg-bg-secondary transition-all text-sm;
+  @apply bg-bg-tertiary border border-border text-text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-secondary transition-colors;
 }
 
 .btn-secondary:disabled {
-  @apply opacity-50 cursor-not-allowed;
+  @apply cursor-not-allowed opacity-50;
 }
 
 .setting-group {

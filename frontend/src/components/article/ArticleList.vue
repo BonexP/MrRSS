@@ -3,12 +3,14 @@ import { useAppStore } from '@/stores/app';
 import { useI18n } from 'vue-i18n';
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick, type Ref } from 'vue';
 import {
-  PhCheckCircle,
   PhArrowClockwise,
   PhList,
   PhSpinner,
   PhFunnel,
   PhTrash,
+  PhCheckCircle,
+  PhEye,
+  PhEyeSlash,
 } from '@phosphor-icons/vue';
 import ArticleFilterModal from '../modals/filter/ArticleFilterModal.vue';
 import ArticleItem from './ArticleItem.vue';
@@ -62,8 +64,14 @@ const { showArticleContextMenu } = useArticleActions(t, defaultViewMode, () =>
 
 // Computed filtered articles
 const filteredArticles = computed(() => {
-  // If filters are active, use server-filtered articles
-  return activeFilters.value.length > 0 ? filteredArticlesFromServer.value : store.articles;
+  let articles = activeFilters.value.length > 0 ? filteredArticlesFromServer.value : store.articles;
+
+  // If show only unread is enabled, filter out read articles
+  if (store.showOnlyUnread) {
+    articles = articles.filter((article) => !article.is_read);
+  }
+
+  return articles;
 });
 
 // Initialize show preview images setting
@@ -312,6 +320,18 @@ function handleHoverMarkAsRead(articleId: number): void {
             @click="markAllAsRead"
           >
             <PhCheckCircle :size="20" class="sm:w-6 sm:h-6" />
+          </button>
+          <button
+            class="text-text-secondary hover:text-text-primary hover:bg-bg-tertiary p-1 sm:p-1.5 rounded transition-colors"
+            :class="store.showOnlyUnread ? 'text-accent' : ''"
+            :title="t('showOnlyUnread')"
+            @click="store.toggleShowOnlyUnread()"
+          >
+            <component
+              :is="store.showOnlyUnread ? PhEye : PhEyeSlash"
+              :size="20"
+              class="sm:w-6 sm:h-6"
+            />
           </button>
           <div class="relative">
             <button

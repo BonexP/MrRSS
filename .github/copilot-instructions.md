@@ -266,88 +266,50 @@ func (db *DB) CleanupOldArticles(maxAgeDays int) (int64, error) {
 }
 ```
 
-## Settings Management (CRITICAL)
+## Settings Management (OPTIMIZED)
 
-**IMPORTANT**: When adding/modifying/deleting a setting, you MUST update ALL 8 locations below. Missing even ONE will cause bugs!
+✅ **The settings system has been optimized with schema-driven code generation!**
 
-### Required Updates Checklist
+### Quick Method (3 Steps)
 
-Use this checklist for EVERY settings change:
-
-- [ ] **1. Default Values** (2 files)
-  - `config/defaults.json` - Frontend default values
-  - `internal/config/defaults.json` - Backend default values
-
-- [ ] **2. Backend Type Definition**
-  - `internal/config/config.go` - Add field to `Defaults` struct
-  - `internal/config/config.go` - Add case in `GetString()` switch
-
-- [ ] **3. Database Initialization**
-  - `internal/database/db.go` - Add key to `settingsKeys` array
-
-- [ ] **4. Backend API Handler** (4 sub-tasks)
-  - `internal/handlers/settings/settings_handlers.go` - GET: Add `GetSetting()` call
-  - `internal/handlers/settings/settings_handlers.go` - GET: Add to response map
-  - `internal/handlers/settings/settings_handlers.go` - POST: Add field to request struct
-  - `internal/handlers/settings/settings_handlers.go` - POST: Add `SetSetting()` call
-
-- [ ] **5. Frontend Type Definition**
-  - `frontend/src/types/settings.ts` - Add field to `SettingsData` interface
-
-- [ ] **6. Frontend Settings Management** (2 sub-tasks)
-  - `frontend/src/composables/core/useSettings.ts` - Add to initial `settings` ref
-  - `frontend/src/composables/core/useSettings.ts` - Add to `fetchSettings()` parsing
-
-- [ ] **7. Frontend Auto-Save**
-  - `frontend/src/composables/core/useSettingsAutoSave.ts` - Add to POST body
-
-- [ ] **8. UI Component** (if user-facing)
-  - Create/update in `frontend/src/components/modals/settings/`
-
-### Quick Example: Adding `new_feature_enabled`
-
-```typescript
-// 1. config/defaults.json & internal/config/defaults.json
-"new_feature_enabled": false
-
-// 2. internal/config/config.go
-type Defaults struct {
-    NewFeatureEnabled bool `json:"new_feature_enabled"`
+**Step 1**: Edit `internal/config/settings_schema.json`
+```json
+"new_feature_enabled": {
+  "type": "bool",
+  "default": false,
+  "category": "general",
+  "encrypted": false,
+  "frontend_key": "newFeatureEnabled"
 }
-case "new_feature_enabled":
-    return strconv.FormatBool(defaults.NewFeatureEnabled)
-
-// 3. internal/database/db.go
-settingsKeys := []string{"new_feature_enabled", /*...*/}
-
-// 4. internal/handlers/settings/settings_handlers.go
-// GET:
-newFeature, _ := h.DB.GetSetting("new_feature_enabled")
-"new_feature_enabled": newFeature,
-// POST struct:
-NewFeatureEnabled string `json:"new_feature_enabled"`
-// POST handler:
-if req.NewFeatureEnabled != "" {
-    h.DB.SetSetting("new_feature_enabled", req.NewFeatureEnabled)
-}
-
-// 5. frontend/src/types/settings.ts
-export interface SettingsData {
-  new_feature_enabled: boolean;
-}
-
-// 6. frontend/src/composables/core/useSettings.ts
-const settings = ref({
-  new_feature_enabled: settingsDefaults.new_feature_enabled,
-});
-new_feature_enabled: data.new_feature_enabled === 'true',
-
-// 7. frontend/src/composables/core/useSettingsAutoSave.ts
-new_feature_enabled: (settings.value.new_feature_enabled ??
-                     settingsDefaults.new_feature_enabled).toString(),
 ```
 
-📚 **Detailed Guide**: See [CODE_PATTERNS.md](../docs/CODE_PATTERNS.md#settings-management)
+**Step 2**: Generate all code
+```bash
+go run tools/settings-generator/main.go
+```
+
+**Step 3**: Add UI (optional)
+```vue
+<SettingItem :title="t('newFeatureEnabled')">
+  <Toggle
+    :model-value="settings.newFeatureEnabled"
+    @update:model-value="updateSetting('newFeatureEnabled', $event)"
+  />
+</SettingItem>
+```
+
+### What Gets Generated Automatically
+
+- ✅ Backend types and handlers
+- ✅ Frontend types and composables
+- ✅ Database initialization keys
+- ✅ Default values
+
+### Old Method (Deprecated)
+
+The manual 8-file checklist is **no longer needed**. All new settings should use the schema-driven approach.
+
+📚 **Complete Guide**: See [docs/SETTINGS.md](../docs/SETTINGS.md)
 
 ## Security Best Practices
 

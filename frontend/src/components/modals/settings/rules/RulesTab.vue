@@ -191,7 +191,7 @@ async function applyRule(rule: Rule): Promise<void> {
             <div class="text-xs text-text-secondary hidden sm:block">{{ t('rulesDesc') }}</div>
           </div>
         </div>
-        <button class="btn-primary" @click="addRule">
+        <button class="btn-secondary" @click="addRule">
           <PhPlus :size="16" class="sm:w-5 sm:h-5" />
           <span class="hidden sm:inline">{{ t('addRule') }}</span>
         </button>
@@ -237,8 +237,8 @@ async function applyRule(rule: Rule): Promise<void> {
   @apply flex items-center sm:items-start justify-between gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-bg-secondary border border-border;
 }
 
-.btn-primary {
-  @apply bg-accent text-white border-none px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg cursor-pointer flex items-center gap-1 sm:gap-2 font-medium hover:bg-accent-hover transition-colors text-sm sm:text-base;
+.btn-secondary {
+  @apply bg-bg-tertiary border border-border text-text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-md cursor-pointer flex items-center gap-1.5 sm:gap-2 font-medium hover:bg-bg-secondary transition-colors;
 }
 
 .empty-state {

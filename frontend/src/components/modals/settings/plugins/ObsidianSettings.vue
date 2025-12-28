@@ -101,7 +101,7 @@ function handleObsidianVaultPathChange(event: Event) {
         <PhFolders :size="20" class="text-text-secondary mt-0.5 shrink-0 sm:w-6 sm:h-6" />
         <div class="flex-1 min-w-0">
           <div class="font-medium mb-0 sm:mb-1 text-sm sm:text-base">
-            {{ t('obsidianVaultPath') }}
+            {{ t('obsidianVaultPath') }} <span class="text-red-500">*</span>
           </div>
           <div class="text-xs text-text-secondary hidden sm:block">
             {{ t('obsidianVaultPathDesc') }}
