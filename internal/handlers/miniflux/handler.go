@@ -20,7 +20,7 @@ func HandleSync(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 
 	// Get Miniflux settings
 	serverURL, _ := h.DB.GetSetting("miniflux_server_url")
-	apiKey, _ := h.DB.GetSetting("miniflux_api_key")
+	apiKey, _ := h.DB.GetEncryptedSetting("miniflux_api_key")
 
 	if serverURL == "" || apiKey == "" {
 		http.Error(w, "Miniflux settings incomplete", http.StatusBadRequest)

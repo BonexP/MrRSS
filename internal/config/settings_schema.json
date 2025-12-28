@@ -472,6 +472,20 @@
       "category": "reading",
       "encrypted": false,
       "frontend_key": "customCSSFile"
+    },
+    "miniflux_server_url": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "minifluxServerURL"
+    },
+    "miniflux_api_key": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": true,
+      "frontend_key": "minifluxAPIKey"
     }
   }
 }

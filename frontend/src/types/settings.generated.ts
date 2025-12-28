@@ -40,6 +40,8 @@ export interface SettingsData {
   media_cache_enabled: boolean;
   media_cache_max_age_days: number;
   media_cache_max_size_mb: number;
+  miniflux_api_key: string;
+  miniflux_server_url: string;
   network_bandwidth_mbps: string;
   network_latency_ms: string;
   network_speed: string;
