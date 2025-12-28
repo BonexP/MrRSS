@@ -452,6 +452,20 @@
       "encrypted": true,
       "frontend_key": "freshRSSAPIPassword"
     },
+    "miniflux_server_url": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "minifluxServerURL"
+    },
+    "miniflux_api_key": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": true,
+      "frontend_key": "minifluxAPIKey"
+    },
     "full_text_fetch_enabled": {
       "type": "bool",
       "default": true,

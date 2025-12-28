@@ -1,8 +1,5 @@
 /**
  * Settings types for SettingsModal and related components
- *
- * Note: SettingsData interface is auto-generated in settings.generated.ts
- * This file contains non-settings-related types and re-exports SettingsData for convenience
  */
 
 export interface SettingsData {
@@ -64,8 +61,6 @@ export interface SettingsData {
   freshrss_server_url: string;
   freshrss_username: string;
   freshrss_api_password: string;
-  miniflux_server_url: string;
-  miniflux_api_key: string;
   full_text_fetch_enabled: boolean;
   [key: string]: unknown; // Allow additional properties
 }
@@ -111,7 +106,6 @@ export interface InstallResponse {
 export type TabName =
   | 'general'
   | 'feeds'
-  | 'content'
   | 'ai'
   | 'rules'
   | 'network'
