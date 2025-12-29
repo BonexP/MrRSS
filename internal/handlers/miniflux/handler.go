@@ -14,7 +14,12 @@ import (
 // HandleSync performs synchronization with Miniflux server
 func HandleSync(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Method not allowed",
+		})
 		return
 	}
 
@@ -23,7 +28,12 @@ func HandleSync(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 	apiKey, _ := h.DB.GetEncryptedSetting("miniflux_api_key")
 
 	if serverURL == "" || apiKey == "" {
-		http.Error(w, "Miniflux settings incomplete", http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Miniflux settings incomplete",
+		})
 		return
 	}
 
@@ -55,7 +65,12 @@ func HandleSync(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 // HandleTestConnection tests the connection to Miniflux server
 func HandleTestConnection(h *core.Handler, w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": "Method not allowed",
+		})
 		return
 	}
 
