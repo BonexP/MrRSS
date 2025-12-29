@@ -70,6 +70,8 @@ export function useSettings() {
     freshrss_username: settingsDefaults.freshrss_username,
     freshrss_api_password: settingsDefaults.freshrss_api_password,
     full_text_fetch_enabled: settingsDefaults.full_text_fetch_enabled,
+    miniflux_server_url: settingsDefaults.miniflux_server_url,
+    miniflux_api_key: settingsDefaults.miniflux_api_key,
   } as SettingsData);
 
   /**
@@ -147,6 +149,8 @@ export function useSettings() {
         freshrss_username: data.freshrss_username || settingsDefaults.freshrss_username,
         freshrss_api_password: data.freshrss_api_password || settingsDefaults.freshrss_api_password,
         full_text_fetch_enabled: data.full_text_fetch_enabled === 'true',
+        miniflux_server_url: data.miniflux_server_url || settingsDefaults.miniflux_server_url,
+        miniflux_api_key: data.miniflux_api_key || settingsDefaults.miniflux_api_key,
       } as SettingsData;
 
       return settings.value;
