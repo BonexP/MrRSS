@@ -196,6 +196,7 @@ type Database interface {
 	GetFeeds() ([]models.Feed, error)
 	AddFeed(feed *models.Feed) (int64, error)
 	SaveArticles(ctx context.Context, articles []*models.Article) error
+	GetArticles(filter string, feedID int64, category string, showHidden bool, limit, offset int) ([]models.Article, error)
 }
 
 // NewSyncService creates a new sync service
@@ -258,12 +259,29 @@ func (s *SyncService) Sync(ctx context.Context) error {
 		return fmt.Errorf("create Miniflux feed: %w", err)
 	}
 
+	// Get existing Miniflux articles to avoid duplicates
+	existingArticles, err := s.db.GetArticles("unread", minifluxFeedID, "", false, 1000, 0)
+	if err != nil {
+		return fmt.Errorf("get existing articles: %w", err)
+	}
+
+	// Create a map of existing article URLs for quick lookup
+	existingArticleMap := make(map[string]bool)
+	for _, article := range existingArticles {
+		existingArticleMap[article.URL] = true
+	}
+
 	// Convert Miniflux entries to MrRSS articles
 	// Note: MrRSS stores article content in the Summary field, which is used for
 	// displaying article previews and full content. The Content field from Miniflux
 	// contains the full article HTML/text.
 	articles := make([]*models.Article, 0, len(entries))
 	for _, entry := range entries {
+		// Skip if article already exists
+		if existingArticleMap[entry.URL] {
+			continue
+		}
+
 		article := &models.Article{
 			FeedID:      minifluxFeedID,
 			Title:       entry.Title,
@@ -282,7 +300,7 @@ func (s *SyncService) Sync(ctx context.Context) error {
 		if err := s.db.SaveArticles(ctx, articles); err != nil {
 			return fmt.Errorf("save articles: %w", err)
 		}
-		log.Printf("Synced %d articles from Miniflux", len(articles))
+		log.Printf("Synced %d new articles from Miniflux", len(articles))
 	}
 
 	log.Printf("Miniflux sync completed successfully")
