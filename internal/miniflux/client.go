@@ -260,7 +260,8 @@ func (s *SyncService) Sync(ctx context.Context) error {
 	}
 
 	// Get existing Miniflux articles to avoid duplicates
-	existingArticles, err := s.db.GetArticles("unread", minifluxFeedID, "", false, 1000, 0)
+	// Use 'all' filter to check against all existing articles, not just unread
+	existingArticles, err := s.db.GetArticles("all", minifluxFeedID, "", false, 1000, 0)
 	if err != nil {
 		return fmt.Errorf("get existing articles: %w", err)
 	}
