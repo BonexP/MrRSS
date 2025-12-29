@@ -31,6 +31,7 @@ import (
 	discovery "MrRSS/internal/handlers/discovery"
 	feedhandlers "MrRSS/internal/handlers/feed"
 	freshrssHandler "MrRSS/internal/handlers/freshrss"
+	minifluxHandler "MrRSS/internal/handlers/miniflux"
 	media "MrRSS/internal/handlers/media"
 	networkhandlers "MrRSS/internal/handlers/network"
 	opml "MrRSS/internal/handlers/opml"
@@ -235,6 +236,8 @@ func main() {
 	apiMux.HandleFunc("/api/custom-css/delete", func(w http.ResponseWriter, r *http.Request) { customcss.HandleDeleteCSS(h, w, r) })
 	apiMux.HandleFunc("/api/freshrss/sync", func(w http.ResponseWriter, r *http.Request) { freshrssHandler.HandleSync(h, w, r) })
 	apiMux.HandleFunc("/api/freshrss/test-connection", func(w http.ResponseWriter, r *http.Request) { freshrssHandler.HandleTestConnection(h, w, r) })
+	apiMux.HandleFunc("/api/miniflux/sync", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleSync(h, w, r) })
+	apiMux.HandleFunc("/api/miniflux/test-connection", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleTestConnection(h, w, r) })
 
 	// Static Files
 	log.Println("Setting up static files...")

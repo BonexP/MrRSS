@@ -34,6 +34,8 @@
   "media_cache_enabled": false,
   "media_cache_max_age_days": 7,
   "media_cache_max_size_mb": 100,
+  "miniflux_api_key": "",
+  "miniflux_server_url": "",
   "network_bandwidth_mbps": "0",
   "network_latency_ms": "0",
   "network_speed": "medium",
