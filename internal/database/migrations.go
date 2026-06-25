@@ -282,7 +282,9 @@ func migrateDropUniqueConstraintOnFeeds(db *sql.DB) error {
 				email_folder TEXT DEFAULT 'INBOX',
 				email_last_uid INTEGER DEFAULT 0,
 				is_freshrss_source BOOLEAN DEFAULT 0,
-				freshrss_stream_id TEXT DEFAULT ''
+				freshrss_stream_id TEXT DEFAULT '',
+				is_miniflux_source BOOLEAN DEFAULT 0,
+				miniflux_feed_id INTEGER DEFAULT 0
 			)
 		`)
 		if err == nil {
@@ -295,7 +297,8 @@ func migrateDropUniqueConstraintOnFeeds(db *sql.DB) error {
 					xpath_item_author, xpath_item_timestamp, xpath_item_time_format, xpath_item_thumbnail,
 					xpath_item_categories, xpath_item_uid, article_view_mode, auto_expand_content,
 					email_address, email_imap_server, email_imap_port, email_username, email_password,
-					email_folder, email_last_uid, is_freshrss_source, freshrss_stream_id
+					email_folder, email_last_uid, is_freshrss_source, freshrss_stream_id,
+					is_miniflux_source, miniflux_feed_id
 				)
 				SELECT
 					id, title, url, link, description, category, image_url,
@@ -329,7 +332,9 @@ func migrateDropUniqueConstraintOnFeeds(db *sql.DB) error {
 					COALESCE(email_folder, 'INBOX') as email_folder,
 					COALESCE(email_last_uid, 0) as email_last_uid,
 					COALESCE(is_freshrss_source, 0) as is_freshrss_source,
-					COALESCE(freshrss_stream_id, '') as freshrss_stream_id
+					COALESCE(freshrss_stream_id, '') as freshrss_stream_id,
+					COALESCE(is_miniflux_source, 0) as is_miniflux_source,
+					COALESCE(miniflux_feed_id, 0) as miniflux_feed_id
 				FROM feeds
 			`)
 			if err != nil {

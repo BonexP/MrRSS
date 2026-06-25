@@ -406,13 +406,19 @@ export const useAppStore = defineStore('app', () => {
         throw new Error(`Invalid JSON response from refresh API: ${e}`);
       }
 
-      // Also trigger FreshRSS sync if enabled
+      // Also trigger FreshRSS and Miniflux sync if enabled
       if (settingsRef.value.freshrss_enabled === true) {
         try {
           await fetch('/api/freshrss/sync', { method: 'POST' });
         } catch (e) {
-          // If FreshRSS sync fails, it's okay - just log it
           console.log('FreshRSS sync failed:', e);
+        }
+      }
+      if (settingsRef.value.miniflux_enabled === true) {
+        try {
+          await fetch('/api/miniflux/sync', { method: 'POST' });
+        } catch (e) {
+          console.log('Miniflux sync failed:', e);
         }
       }
 
@@ -606,6 +612,64 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  let minifluxPollInterval: ReturnType<typeof setInterval> | null = null;
+  let lastKnownMinifluxSyncTime: string | null = null;
+
+  async function startMinifluxStatusPolling(): Promise<void> {
+    if (minifluxPollInterval) {
+      clearInterval(minifluxPollInterval);
+    }
+
+    try {
+      const res = await fetch('/api/settings');
+      if (!res.ok) return;
+      const settings = await res.json();
+
+      if (settings.miniflux_enabled !== 'true') {
+        return;
+      }
+
+      const statusRes = await fetch('/api/miniflux/status');
+      if (statusRes.ok) {
+        const statusData = await statusRes.json();
+        lastKnownMinifluxSyncTime = statusData.last_sync_time;
+      }
+    } catch (e) {
+      console.error('[Miniflux] Error checking status:', e);
+      return;
+    }
+
+    minifluxPollInterval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/miniflux/status');
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        if (
+          lastKnownMinifluxSyncTime !== null &&
+          data.last_sync_time !== lastKnownMinifluxSyncTime
+        ) {
+          console.log('[Miniflux] Sync completed detected, refreshing data...');
+          await fetchFeeds();
+          await fetchArticles();
+          await fetchUnreadCounts();
+        }
+
+        lastKnownMinifluxSyncTime = data.last_sync_time;
+      } catch (e) {
+        console.error('[Miniflux] Error polling status:', e);
+      }
+    }, 5000);
+  }
+
+  function stopMinifluxStatusPolling(): void {
+    if (minifluxPollInterval) {
+      clearInterval(minifluxPollInterval);
+      minifluxPollInterval = null;
+    }
+  }
+
   async function checkForAppUpdates(): Promise<void> {
     try {
       const res = await fetch('/api/check-updates');
@@ -779,6 +843,8 @@ export const useAppStore = defineStore('app', () => {
     pollProgress,
     startFreshRSSStatusPolling,
     stopFreshRSSStatusPolling,
+    startMinifluxStatusPolling,
+    stopMinifluxStatusPolling,
     checkForAppUpdates,
     startAutoRefresh,
     toggleShowOnlyUnread,

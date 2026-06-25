@@ -7,6 +7,7 @@ import (
 	customcss "MrRSS/internal/handlers/custom_css"
 	freshrssHandler "MrRSS/internal/handlers/freshrss"
 	media "MrRSS/internal/handlers/media"
+	minifluxHandler "MrRSS/internal/handlers/miniflux"
 	networkhandlers "MrRSS/internal/handlers/network"
 	opml "MrRSS/internal/handlers/opml"
 	rules "MrRSS/internal/handlers/rules"
@@ -71,4 +72,10 @@ func registerOtherRoutes(mux *http.ServeMux, h *core.Handler) {
 	mux.HandleFunc("/api/freshrss/sync", func(w http.ResponseWriter, r *http.Request) { freshrssHandler.HandleSync(h, w, r) })
 	mux.HandleFunc("/api/freshrss/sync-feed", func(w http.ResponseWriter, r *http.Request) { freshrssHandler.HandleSyncFeed(h, w, r) })
 	mux.HandleFunc("/api/freshrss/status", func(w http.ResponseWriter, r *http.Request) { freshrssHandler.HandleSyncStatus(h, w, r) })
+
+	// Miniflux
+	mux.HandleFunc("/api/miniflux/sync", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleSync(h, w, r) })
+	mux.HandleFunc("/api/miniflux/sync-feed", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleSyncFeed(h, w, r) })
+	mux.HandleFunc("/api/miniflux/test-connection", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleTestConnection(h, w, r) })
+	mux.HandleFunc("/api/miniflux/status", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleSyncStatus(h, w, r) })
 }

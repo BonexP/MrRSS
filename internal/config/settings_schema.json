@@ -655,6 +655,48 @@
       "encrypted": false,
       "frontend_key": "freshRSSLastSyncTime"
     },
+    "miniflux_api_key": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": true,
+      "frontend_key": "minifluxAPIKey"
+    },
+    "miniflux_auto_sync_interval": {
+      "type": "int",
+      "default": 0,
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "minifluxAutoSyncInterval"
+    },
+    "miniflux_enabled": {
+      "type": "bool",
+      "default": false,
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "minifluxEnabled"
+    },
+    "miniflux_last_sync_time": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "minifluxLastSyncTime"
+    },
+    "miniflux_server_url": {
+      "type": "string",
+      "default": "",
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "minifluxServerURL"
+    },
+    "miniflux_sync_on_startup": {
+      "type": "bool",
+      "default": false,
+      "category": "integrations",
+      "encrypted": false,
+      "frontend_key": "minifluxSyncOnStartup"
+    },
     "rsshub_enabled": {
       "type": "bool",
       "default": false,

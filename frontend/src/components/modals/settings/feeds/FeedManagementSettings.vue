@@ -194,7 +194,8 @@ const selectedCount = computed(() => selectedFeeds.value.length);
 const isAllSelected = computed(() => {
   if (!store.feeds || store.feeds.length === 0) return false;
   // Get non-FreshRSS feeds (RSSHub feeds can be selected)
-  const nonManagedFeeds = store.feeds.filter((f) => !f.is_freshrss_source);
+  // Get non-managed feeds (FreshRSS and Miniflux feeds cannot be selected)
+  const nonManagedFeeds = store.feeds.filter((f) => !isManagedFeed(f));
   if (nonManagedFeeds.length === 0) return false;
   // Check if all non-managed feeds are selected
   return nonManagedFeeds.every((f) => selectedFeeds.value.includes(f.id));
@@ -214,7 +215,7 @@ function toggleSelectAll(e: Event) {
   if (!store.feeds) return;
   if (target.checked) {
     // Select only non-FreshRSS feeds (RSSHub feeds can be selected)
-    selectedFeeds.value = store.feeds.filter((f) => !f.is_freshrss_source).map((f) => f.id);
+    selectedFeeds.value = store.feeds.filter((f) => !isManagedFeed(f)).map((f) => f.id);
   } else {
     selectedFeeds.value = [];
   }
@@ -284,6 +285,14 @@ function isEmailFeed(feed: Feed): boolean {
 
 function isFreshRSSFeed(feed: Feed): boolean {
   return !!feed.is_freshrss_source;
+}
+
+function isMinifluxFeed(feed: Feed): boolean {
+  return !!feed.is_miniflux_source;
+}
+
+function isManagedFeed(feed: Feed): boolean {
+  return isFreshRSSFeed(feed) || isMinifluxFeed(feed);
 }
 
 function isRSSHubFeed(feed: Feed): boolean {
@@ -509,7 +518,7 @@ function handleManageTags() {
           :key="feed.id"
           :class="[
             'grid grid-cols-[auto,auto,1fr,auto] sm:grid-cols-[16px,16px,1fr,90px,100px,40px,44px,52px] lg:grid-cols-[16px,16px,2fr,100px,110px,40px,44px,52px] gap-1.5 sm:gap-2 p-1.5 sm:p-2 border-b border-border last:border-0 items-center',
-            feed.is_freshrss_source ? 'bg-info/10' : 'bg-bg-primary',
+            isManagedFeed(feed) ? 'bg-info/10' : 'bg-bg-primary',
           ]"
         >
           <!-- Checkbox -->
@@ -517,10 +526,10 @@ function handleManageTags() {
             v-model="selectedFeeds"
             type="checkbox"
             :value="feed.id"
-            :disabled="feed.is_freshrss_source"
+            :disabled="isManagedFeed(feed)"
             class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 rounded border-border text-accent focus:ring-2 focus:ring-accent cursor-pointer"
             :class="{
-              'cursor-not-allowed opacity-50': feed.is_freshrss_source,
+              'cursor-not-allowed opacity-50': isManagedFeed(feed),
             }"
           />
 
@@ -547,11 +556,18 @@ function handleManageTags() {
               <span class="truncate" :title="feed.title">{{ feed.title }}</span>
               <!-- Feed Type Indicators -->
               <img
-                v-if="feed.is_freshrss_source"
+                v-if="isFreshRSSFeed(feed)"
                 src="/assets/plugin_icons/freshrss.svg"
                 class="w-4 h-4 sm:w-4 sm:h-4 shrink-0 inline"
                 :title="t('setting.freshrss.syncedFeed')"
                 alt="FreshRSS"
+              />
+              <img
+                v-if="isMinifluxFeed(feed)"
+                src="/assets/plugin_icons/miniflux.svg"
+                class="w-4 h-4 sm:w-4 sm:h-4 shrink-0 inline"
+                :title="t('setting.miniflux.syncedFeed')"
+                alt="Miniflux"
               />
               <img
                 v-if="isRSSHubFeed(feed)"
@@ -718,25 +734,35 @@ function handleManageTags() {
           <div class="flex gap-0.5 sm:gap-1 shrink-0">
             <button
               class="text-accent hover:bg-bg-tertiary p-1 rounded text-sm"
-              :title="feed.is_freshrss_source ? t('setting.freshrss.feedLocked') : t('common.edit')"
-              :disabled="feed.is_freshrss_source"
+              :title="
+                isFreshRSSFeed(feed)
+                  ? t('setting.freshrss.feedLocked')
+                  : isMinifluxFeed(feed)
+                    ? t('setting.miniflux.feedLocked')
+                    : t('common.edit')
+              "
+              :disabled="isManagedFeed(feed)"
               :class="{
-                'cursor-not-allowed opacity-50': feed.is_freshrss_source,
+                'cursor-not-allowed opacity-50': isManagedFeed(feed),
               }"
-              @click="!feed.is_freshrss_source && handleEditFeed(feed)"
+              @click="!isManagedFeed(feed) && handleEditFeed(feed)"
             >
               <PhPencil :size="16" class="sm:w-4 sm:h-4" />
             </button>
             <button
               class="text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 p-1 rounded text-sm"
               :title="
-                feed.is_freshrss_source ? t('setting.freshrss.feedLocked') : t('common.delete')
+                isFreshRSSFeed(feed)
+                  ? t('setting.freshrss.feedLocked')
+                  : isMinifluxFeed(feed)
+                    ? t('setting.miniflux.feedLocked')
+                    : t('common.delete')
               "
-              :disabled="feed.is_freshrss_source"
+              :disabled="isManagedFeed(feed)"
               :class="{
-                'cursor-not-allowed opacity-50': feed.is_freshrss_source,
+                'cursor-not-allowed opacity-50': isManagedFeed(feed),
               }"
-              @click="!feed.is_freshrss_source && handleDeleteFeed(feed.id)"
+              @click="!isManagedFeed(feed) && handleDeleteFeed(feed.id)"
             >
               <PhTrash :size="16" class="sm:w-4 sm:h-4" />
             </button>

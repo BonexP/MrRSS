@@ -80,6 +80,12 @@ type Defaults struct {
 	MicrosoftAPIKey               string `json:"microsoft_api_key"`
 	MicrosoftEndpoint             string `json:"microsoft_endpoint"`
 	MicrosoftRegion               string `json:"microsoft_region"`
+	MinifluxAPIKey                string `json:"miniflux_api_key"`
+	MinifluxAutoSyncInterval      int    `json:"miniflux_auto_sync_interval"`
+	MinifluxEnabled               bool   `json:"miniflux_enabled"`
+	MinifluxLastSyncTime          string `json:"miniflux_last_sync_time"`
+	MinifluxServerUrl             string `json:"miniflux_server_url"`
+	MinifluxSyncOnStartup         bool   `json:"miniflux_sync_on_startup"`
 	NetworkBandwidthMbps          string `json:"network_bandwidth_mbps"`
 	NetworkLatencyMs              string `json:"network_latency_ms"`
 	NetworkSpeed                  string `json:"network_speed"`
@@ -270,6 +276,18 @@ func GetString(key string) string {
 		return defaults.MicrosoftEndpoint
 	case "microsoft_region":
 		return defaults.MicrosoftRegion
+	case "miniflux_api_key":
+		return defaults.MinifluxAPIKey
+	case "miniflux_auto_sync_interval":
+		return strconv.Itoa(defaults.MinifluxAutoSyncInterval)
+	case "miniflux_enabled":
+		return strconv.FormatBool(defaults.MinifluxEnabled)
+	case "miniflux_last_sync_time":
+		return defaults.MinifluxLastSyncTime
+	case "miniflux_server_url":
+		return defaults.MinifluxServerUrl
+	case "miniflux_sync_on_startup":
+		return strconv.FormatBool(defaults.MinifluxSyncOnStartup)
 	case "network_bandwidth_mbps":
 		return defaults.NetworkBandwidthMbps
 	case "network_latency_ms":

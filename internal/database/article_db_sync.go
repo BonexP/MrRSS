@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-// This file adds FreshRSS sync tracking to article operations
-// When FreshRSS sync is enabled, article changes trigger immediate sync
+// This file adds FreshRSS and Miniflux sync tracking to article operations
+// When FreshRSS or Miniflux sync is enabled, article changes trigger immediate sync
 
 // SyncRequest represents a request to sync an article status to FreshRSS
 type SyncRequest struct {
@@ -44,16 +44,31 @@ func (db *DB) MarkArticleReadWithSync(id int64, read bool) (*SyncRequest, error)
 		_ = db.IncrementStat("article_read")
 	}
 
-	// Check if this article belongs to a FreshRSS feed
-	var isFreshRSSFeed bool
-	err = db.QueryRow("SELECT COALESCE(is_freshrss_source, 0) FROM feeds WHERE id = ?", feedID).Scan(&isFreshRSSFeed)
+	// Check if this article belongs to a FreshRSS or Miniflux feed
+	var isFreshRSSFeed, isMinifluxFeed bool
+	err = db.QueryRow("SELECT COALESCE(is_freshrss_source, 0), COALESCE(is_miniflux_source, 0) FROM feeds WHERE id = ?", feedID).Scan(&isFreshRSSFeed, &isMinifluxFeed)
 	if err != nil {
 		return nil, err
 	}
 
-	// Return sync request only if FreshRSS is enabled and this is a FreshRSS feed
-	enabled, _ := db.GetSetting("freshrss_enabled")
-	if enabled == "true" && isFreshRSSFeed {
+	// Handle Miniflux sync: enqueue directly
+	if isMinifluxFeed {
+		minifluxEnabled, _ := db.GetSetting("miniflux_enabled")
+		if minifluxEnabled == "true" {
+			action := SyncActionMarkRead
+			if !read {
+				action = SyncActionMarkUnread
+			}
+			log.Printf("[Miniflux Sync] Article %d needs sync: %s", id, action)
+			if err := db.EnqueueMinifluxSyncChange(id, url, action); err != nil {
+				log.Printf("[Miniflux Sync] Error enqueuing article %d: %v", id, err)
+			}
+		}
+	}
+
+	// Handle FreshRSS sync: return sync request
+	freshrssEnabled, _ := db.GetSetting("freshrss_enabled")
+	if freshrssEnabled == "true" && isFreshRSSFeed {
 		action := SyncActionMarkRead
 		if !read {
 			action = SyncActionMarkUnread
@@ -85,16 +100,31 @@ func (db *DB) SetArticleFavoriteWithSync(id int64, favorite bool) (*SyncRequest,
 		return nil, err
 	}
 
-	// Check if this article belongs to a FreshRSS feed
-	var isFreshRSSFeed bool
-	err = db.QueryRow("SELECT COALESCE(is_freshrss_source, 0) FROM feeds WHERE id = ?", feedID).Scan(&isFreshRSSFeed)
+	// Check if this article belongs to a FreshRSS or Miniflux feed
+	var isFreshRSSFeed, isMinifluxFeed bool
+	err = db.QueryRow("SELECT COALESCE(is_freshrss_source, 0), COALESCE(is_miniflux_source, 0) FROM feeds WHERE id = ?", feedID).Scan(&isFreshRSSFeed, &isMinifluxFeed)
 	if err != nil {
 		return nil, err
 	}
 
-	// Return sync request only if FreshRSS is enabled and this is a FreshRSS feed
-	enabled, _ := db.GetSetting("freshrss_enabled")
-	if enabled == "true" && isFreshRSSFeed {
+	// Handle Miniflux sync: enqueue directly
+	if isMinifluxFeed {
+		minifluxEnabled, _ := db.GetSetting("miniflux_enabled")
+		if minifluxEnabled == "true" {
+			action := SyncActionStar
+			if !favorite {
+				action = SyncActionUnstar
+			}
+			log.Printf("[Miniflux Sync] Article %d needs sync: %s", id, action)
+			if err := db.EnqueueMinifluxSyncChange(id, url, action); err != nil {
+				log.Printf("[Miniflux Sync] Error enqueuing article %d: %v", id, err)
+			}
+		}
+	}
+
+	// Handle FreshRSS sync: return sync request
+	freshrssEnabled, _ := db.GetSetting("freshrss_enabled")
+	if freshrssEnabled == "true" && isFreshRSSFeed {
 		action := SyncActionStar
 		if !favorite {
 			action = SyncActionUnstar
@@ -132,19 +162,33 @@ func (db *DB) ToggleFavoriteWithSync(id int64) (*SyncRequest, error) {
 		_ = db.IncrementStat("article_favorite")
 	}
 
-	// Check if this article belongs to a FreshRSS feed
-	var isFreshRSSFeed bool
-	err = db.QueryRow("SELECT COALESCE(is_freshrss_source, 0) FROM feeds WHERE id = ?", feedID).Scan(&isFreshRSSFeed)
+	// Check if this article belongs to a FreshRSS or Miniflux feed
+	var isFreshRSSFeed, isMinifluxFeed bool
+	err = db.QueryRow("SELECT COALESCE(is_freshrss_source, 0), COALESCE(is_miniflux_source, 0) FROM feeds WHERE id = ?", feedID).Scan(&isFreshRSSFeed, &isMinifluxFeed)
 	if err != nil {
 		return nil, err
 	}
 
-	// Return sync request only if FreshRSS is enabled and this is a FreshRSS feed
-	enabled, _ := db.GetSetting("freshrss_enabled")
-	if enabled == "true" && isFreshRSSFeed {
+	// Handle Miniflux sync: enqueue directly
+	if isMinifluxFeed {
+		minifluxEnabled, _ := db.GetSetting("miniflux_enabled")
+		if minifluxEnabled == "true" {
+			action := SyncActionStar
+			if isFav {
+				action = SyncActionUnstar
+			}
+			log.Printf("[Miniflux Sync] Article %d needs sync: %s", id, action)
+			if err := db.EnqueueMinifluxSyncChange(id, url, action); err != nil {
+				log.Printf("[Miniflux Sync] Error enqueuing article %d: %v", id, err)
+			}
+		}
+	}
+
+	// Handle FreshRSS sync: return sync request
+	freshrssEnabled, _ := db.GetSetting("freshrss_enabled")
+	if freshrssEnabled == "true" && isFreshRSSFeed {
 		action := SyncActionStar
 		if isFav {
-			// Was favorited, now unfavorited
 			action = SyncActionUnstar
 		}
 		log.Printf("[FreshRSS Sync] Article %d needs sync: %s", id, action)
@@ -163,7 +207,7 @@ func (db *DB) GetArticleByURL(url string) (*Article, error) {
 	db.WaitForReady()
 
 	query := `
-		SELECT id, feed_id, title, url, is_read, is_favorite, published_at, freshrss_item_id
+		SELECT id, feed_id, title, url, is_read, is_favorite, published_at, freshrss_item_id, miniflux_entry_id
 		FROM articles
 		WHERE url = ?
 		LIMIT 1
@@ -172,6 +216,7 @@ func (db *DB) GetArticleByURL(url string) (*Article, error) {
 	var article Article
 	var publishedAt interface{}
 	var freshRSSItemID sql.NullString
+	var minifluxEntryID sql.NullInt64
 	err := db.QueryRow(query, url).Scan(
 		&article.ID,
 		&article.FeedID,
@@ -181,6 +226,7 @@ func (db *DB) GetArticleByURL(url string) (*Article, error) {
 		&article.IsFavorite,
 		&publishedAt,
 		&freshRSSItemID,
+		&minifluxEntryID,
 	)
 
 	if err != nil {
@@ -188,19 +234,23 @@ func (db *DB) GetArticleByURL(url string) (*Article, error) {
 	}
 
 	article.FreshRSSItemID = freshRSSItemID.String
+	if minifluxEntryID.Valid {
+		article.MinifluxEntryID = minifluxEntryID.Int64
+	}
 	return &article, nil
 }
 
 // Article represents a simplified article for sync operations
 type Article struct {
-	ID             int64
-	FeedID         int64
-	Title          string
-	URL            string
-	IsRead         bool
-	IsFavorite     bool
-	PublishedAt    interface{}
-	FreshRSSItemID string
+	ID              int64
+	FeedID          int64
+	Title           string
+	URL             string
+	IsRead          bool
+	IsFavorite      bool
+	PublishedAt     interface{}
+	FreshRSSItemID  string
+	MinifluxEntryID int64
 }
 
 // MarkArticlesReadWithSync marks multiple articles as read and returns sync requests if FreshRSS is enabled
@@ -237,18 +287,18 @@ func (db *DB) MarkArticlesReadWithSync(ids []int64, read bool) ([]SyncRequest, e
 		}
 	}
 
-	// Check if FreshRSS is enabled
-	enabled, _ := db.GetSetting("freshrss_enabled")
+	// Check if FreshRSS or Miniflux is enabled
+	freshrssEnabled, _ := db.GetSetting("freshrss_enabled")
+	minifluxEnabled, _ := db.GetSetting("miniflux_enabled")
 	var syncRequests []SyncRequest
-	if enabled == "true" {
-		action := SyncActionMarkRead
-		if !read {
-			action = SyncActionMarkUnread
-		}
+	action := SyncActionMarkRead
+	if !read {
+		action = SyncActionMarkUnread
+	}
 
-		// Collect sync requests
+	// Collect sync requests for FreshRSS feeds
+	if freshrssEnabled == "true" {
 		for id, info := range articles {
-			// Check if this article belongs to a FreshRSS feed
 			var isFreshRSSFeed bool
 			err := db.QueryRow("SELECT COALESCE(is_freshrss_source, 0) FROM feeds WHERE id = ?", info.feedID).Scan(&isFreshRSSFeed)
 			if err == nil && isFreshRSSFeed {
@@ -258,6 +308,20 @@ func (db *DB) MarkArticlesReadWithSync(ids []int64, read bool) ([]SyncRequest, e
 					Action:     action,
 				})
 				log.Printf("[FreshRSS Sync] Article %d needs sync: %s", id, action)
+			}
+		}
+	}
+
+	// Enqueue Miniflux sync changes directly
+	if minifluxEnabled == "true" {
+		for id, info := range articles {
+			var isMinifluxFeed bool
+			err := db.QueryRow("SELECT COALESCE(is_miniflux_source, 0) FROM feeds WHERE id = ?", info.feedID).Scan(&isMinifluxFeed)
+			if err == nil && isMinifluxFeed {
+				log.Printf("[Miniflux Sync] Article %d needs sync: %s", id, action)
+				if err := db.EnqueueMinifluxSyncChange(id, info.url, action); err != nil {
+					log.Printf("[Miniflux Sync] Error enqueuing article %d: %v", id, err)
+				}
 			}
 		}
 	}
@@ -316,6 +380,40 @@ func (db *DB) UpdateFreshRSSItemID(articleID int64, freshRSSItemID string) error
 	}
 
 	log.Printf("[UpdateFreshRSSItemID] Updated article %d with FreshRSS Item ID: %s", articleID, freshRSSItemID)
+	return nil
+}
+
+// ShouldSyncWithMiniflux checks if Miniflux sync is enabled and configured
+func (db *DB) ShouldSyncWithMiniflux() bool {
+	enabled, _ := db.GetSetting("miniflux_enabled")
+	if enabled != "true" {
+		return false
+	}
+
+	serverURL, _ := db.GetSetting("miniflux_server_url")
+	apiKey, _ := db.GetEncryptedSetting("miniflux_api_key")
+
+	return serverURL != "" && apiKey != ""
+}
+
+// GetMinifluxConfig retrieves Miniflux configuration
+func (db *DB) GetMinifluxConfig() (serverURL, apiKey string, err error) {
+	serverURL, _ = db.GetSetting("miniflux_server_url")
+	apiKey, err = db.GetEncryptedSetting("miniflux_api_key")
+	return
+}
+
+// UpdateMinifluxEntryID updates the Miniflux entry ID for an article
+func (db *DB) UpdateMinifluxEntryID(articleID int64, minifluxEntryID int64) error {
+	db.WaitForReady()
+
+	query := `UPDATE articles SET miniflux_entry_id = ? WHERE id = ?`
+	_, err := db.Exec(query, minifluxEntryID, articleID)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("[UpdateMinifluxEntryID] Updated article %d with Miniflux Entry ID: %d", articleID, minifluxEntryID)
 	return nil
 }
 
@@ -516,17 +614,16 @@ func (db *DB) MarkArticlesRelativeToPublishedTimeWithSync(referencePublishedAt t
 		return 0, nil, err
 	}
 
-	// Collect sync requests for FreshRSS feeds
+	// Collect sync requests for FreshRSS and Miniflux feeds
 	syncRequests := db.collectSyncRequests(articles)
 	return count, syncRequests, nil
 }
 
 // collectSyncRequests collects sync requests for articles that belong to FreshRSS feeds
+// and enqueues Miniflux sync changes for articles belonging to Miniflux feeds
 func (db *DB) collectSyncRequests(articles []articleInfo) []SyncRequest {
-	enabled, _ := db.GetSetting("freshrss_enabled")
-	if enabled != "true" {
-		return nil
-	}
+	freshrssEnabled, _ := db.GetSetting("freshrss_enabled")
+	minifluxEnabled, _ := db.GetSetting("miniflux_enabled")
 
 	var syncRequests []SyncRequest
 	action := SyncActionMarkRead
@@ -535,13 +632,23 @@ func (db *DB) collectSyncRequests(articles []articleInfo) []SyncRequest {
 		// Check if this article belongs to a FreshRSS feed
 		var isFreshRSSFeed bool
 		err := db.QueryRow("SELECT COALESCE(is_freshrss_source, 0) FROM feeds WHERE id = ?", article.feedID).Scan(&isFreshRSSFeed)
-		if err == nil && isFreshRSSFeed {
+		if err == nil && isFreshRSSFeed && freshrssEnabled == "true" {
 			syncRequests = append(syncRequests, SyncRequest{
 				ArticleID:  article.id,
 				ArticleURL: article.url,
 				Action:     action,
 			})
 			log.Printf("[FreshRSS Sync] Article %d needs sync: %s", article.id, action)
+		}
+
+		// Check if this article belongs to a Miniflux feed
+		var isMinifluxFeed bool
+		err = db.QueryRow("SELECT COALESCE(is_miniflux_source, 0) FROM feeds WHERE id = ?", article.feedID).Scan(&isMinifluxFeed)
+		if err == nil && isMinifluxFeed && minifluxEnabled == "true" {
+			log.Printf("[Miniflux Sync] Article %d needs sync: %s", article.id, action)
+			if enqueueErr := db.EnqueueMinifluxSyncChange(article.id, article.url, action); enqueueErr != nil {
+				log.Printf("[Miniflux Sync] Error enqueuing article %d: %v", article.id, enqueueErr)
+			}
 		}
 	}
 

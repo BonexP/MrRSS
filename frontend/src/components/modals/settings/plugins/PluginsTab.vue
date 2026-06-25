@@ -8,6 +8,7 @@ import ObsidianSettings from './ObsidianSettings.vue';
 import NotionSettings from './NotionSettings.vue';
 import ZoteroSettings from './ZoteroSettings.vue';
 import FreshRSSSettings from './FreshRSSSettings.vue';
+import MinifluxSettings from './MinifluxSettings.vue';
 import RSSHubSettings from './RSSHubSettings.vue';
 
 interface Props {
@@ -46,6 +47,8 @@ function handleUpdateSettings(updatedSettings: SettingsData) {
     <ZoteroSettings :settings="settings" @update:settings="handleUpdateSettings" />
 
     <FreshRSSSettings :settings="settings" @update:settings="handleUpdateSettings" />
+
+    <MinifluxSettings :settings="settings" @update:settings="handleUpdateSettings" />
 
     <RSSHubSettings :settings="settings" @update:settings="handleUpdateSettings" />
   </div>
