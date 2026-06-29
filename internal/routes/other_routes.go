@@ -74,8 +74,16 @@ func registerOtherRoutes(mux *http.ServeMux, h *core.Handler) {
 	mux.HandleFunc("/api/freshrss/status", func(w http.ResponseWriter, r *http.Request) { freshrssHandler.HandleSyncStatus(h, w, r) })
 
 	// Miniflux
-	mux.HandleFunc("/api/miniflux/sync", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleSync(h, w, r) })
-	mux.HandleFunc("/api/miniflux/sync-feed", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleSyncFeed(h, w, r) })
+	mux.HandleFunc("/api/miniflux/feeds", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleFeeds(h, w, r) })
+	mux.HandleFunc("/api/miniflux/categories", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleCategories(h, w, r) })
+	mux.HandleFunc("/api/miniflux/counters", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleCounters(h, w, r) })
+	mux.HandleFunc("/api/miniflux/articles", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleArticles(h, w, r) })
+	mux.HandleFunc("/api/miniflux/articles/detail", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleArticle(h, w, r) })
+	mux.HandleFunc("/api/miniflux/articles/status", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleUpdateStatus(h, w, r) })
+	mux.HandleFunc("/api/miniflux/feeds/mark-read", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleMarkFeedRead(h, w, r) })
+	mux.HandleFunc("/api/miniflux/categories/mark-read", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleMarkCategoryRead(h, w, r) })
+	mux.HandleFunc("/api/miniflux/mark-all-read", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleMarkAllRead(h, w, r) })
 	mux.HandleFunc("/api/miniflux/test-connection", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleTestConnection(h, w, r) })
+	mux.HandleFunc("/api/miniflux/sync", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleSync(h, w, r) })
 	mux.HandleFunc("/api/miniflux/status", func(w http.ResponseWriter, r *http.Request) { minifluxHandler.HandleSyncStatus(h, w, r) })
 }

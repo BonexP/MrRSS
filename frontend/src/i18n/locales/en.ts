@@ -197,6 +197,7 @@ const en: TranslationMessages = {
       invalidURLScheme: 'Invalid URL scheme',
       networkErrorCheckingUpdates:
         'Unable to connect to GitHub servers. If you are in mainland China, please try using a proxy or VPN.',
+      notAvailable: 'Not available for {source} feeds',
       reorderingFeed: 'Failed to reorder feed',
       savingSettings: 'Error saving settings',
       subscribingFeeds: 'Error subscribing to feeds',
@@ -948,6 +949,7 @@ const en: TranslationMessages = {
       serverUrlPlaceholder: 'https://miniflux.example.com',
       sync: 'Sync Now',
       syncedFeed: 'Synced from Miniflux',
+      sourceFeed: 'From Miniflux',
       syncing: 'Syncing...',
       syncFailed: 'Sync failed',
       syncNow: 'Sync Subscription Status',

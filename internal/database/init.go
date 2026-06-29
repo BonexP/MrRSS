@@ -26,11 +26,6 @@ func (db *DB) Init() error {
 			return
 		}
 
-		// Initialize Miniflux sync queue table
-		if err = InitMinifluxSyncTable(db.DB); err != nil {
-			return
-		}
-
 		// Initialize statistics table
 		if err = InitStatisticsTable(db.DB); err != nil {
 			return
@@ -97,13 +92,13 @@ func applyAdditionalMigrations(db *DB) error {
 	// Migration: Add freshrss_stream_id column to feeds table to store FreshRSS stream ID
 	_, _ = db.Exec(`ALTER TABLE feeds ADD COLUMN freshrss_stream_id TEXT DEFAULT ''`)
 
-	// Migration: Add is_miniflux_source column to feeds table to mark feeds from Miniflux
+	// Migration: Add is_miniflux_source column to feeds table (deprecated, kept for compatibility)
 	_, _ = db.Exec(`ALTER TABLE feeds ADD COLUMN is_miniflux_source BOOLEAN DEFAULT 0`)
 
-	// Migration: Add miniflux_feed_id column to feeds table to store Miniflux feed ID
+	// Migration: Add miniflux_feed_id column to feeds table (deprecated, kept for compatibility)
 	_, _ = db.Exec(`ALTER TABLE feeds ADD COLUMN miniflux_feed_id INTEGER DEFAULT 0`)
 
-	// Migration: Add miniflux_entry_id column to articles table to store Miniflux entry ID
+	// Migration: Add miniflux_entry_id column to articles table (deprecated, kept for compatibility)
 	_, _ = db.Exec(`ALTER TABLE articles ADD COLUMN miniflux_entry_id INTEGER DEFAULT 0`)
 
 	// Migration: Add summary column to articles table for AI-generated summaries

@@ -45,9 +45,6 @@ type Feed struct {
 	// FreshRSS integration
 	IsFreshRSSSource bool   `json:"is_freshrss_source"` // Whether this feed is from FreshRSS sync
 	FreshRSSStreamID string `json:"freshrss_stream_id"` // FreshRSS stream ID (e.g., "feed/http://...")
-	// Miniflux integration
-	IsMinifluxSource bool  `json:"is_miniflux_source"` // Whether this feed is from Miniflux sync
-	MinifluxFeedID   int64 `json:"miniflux_feed_id"`   // Miniflux feed ID
 	// Statistics
 	LatestArticleTime *time.Time `json:"latest_article_time,omitempty"` // Latest article publish time
 	ArticlesPerMonth  float64    `json:"articles_per_month,omitempty"`  // Average articles per month (last 90 days / 3)
@@ -73,10 +70,9 @@ type Article struct {
 	FeedTitle             string    `json:"feed_title,omitempty"` // Joined field
 	Author                string    `json:"author,omitempty"`     // Article author
 	TranslatedTitle       string    `json:"translated_title"`
-	Summary               string    `json:"summary"`           // Cached AI-generated summary
-	UniqueID              string    `json:"unique_id"`         // Unique identifier for deduplication (title+feed_id+published_date)
-	FreshRSSItemID        string    `json:"freshrss_item_id"`  // FreshRSS/Google Reader item ID for API operations
-	MinifluxEntryID       int64     `json:"miniflux_entry_id"` // Miniflux entry ID for API operations
+	Summary               string    `json:"summary"`          // Cached AI-generated summary
+	UniqueID              string    `json:"unique_id"`        // Unique identifier for deduplication (title+feed_id+published_date)
+	FreshRSSItemID        string    `json:"freshrss_item_id"` // FreshRSS/Google Reader item ID for API operations
 }
 
 // SavedFilter represents a user-saved article filter

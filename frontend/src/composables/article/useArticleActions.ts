@@ -1,6 +1,7 @@
 import { openInBrowser } from '@/utils/browser';
 import { copyArticleLink, copyArticleTitle } from '@/utils/clipboard';
 import { useAppStore } from '@/stores/app';
+import { useMinifluxStore } from '@/stores/miniflux';
 import type { Article } from '@/types/models';
 import type { Composer } from 'vue-i18n';
 
@@ -187,6 +188,25 @@ export function useArticleActions(
     );
   }
 
+  // Mark article as read (handles both local and Miniflux articles)
+  async function markArticleAsRead(article: Article, onReadStatusChange?: () => void): Promise<void> {
+    if (article.is_read) return;
+    article.is_read = true;
+    try {
+      if (store.isMinifluxArticle(article)) {
+        const minifluxStore = useMinifluxStore();
+        await minifluxStore.updateStatus([-article.id], 'read');
+      } else {
+        await fetch(`/api/articles/read?id=${article.id}&read=true`, { method: 'POST' });
+      }
+      if (onReadStatusChange) {
+        onReadStatusChange();
+      }
+    } catch (e) {
+      console.error('Error marking as read:', e);
+    }
+  }
+
   // Handle article actions
   async function handleArticleAction(
     action: string,
@@ -197,20 +217,27 @@ export function useArticleActions(
       const newState = !article.is_read;
       article.is_read = newState;
       try {
-        await fetch(`/api/articles/read?id=${article.id}&read=${newState}`, {
-          method: 'POST',
-        });
-        // Update unread counts after toggling read status
+        if (store.isMinifluxArticle(article)) {
+          const minifluxStore = useMinifluxStore();
+          await minifluxStore.updateStatus([-article.id], newState ? 'read' : 'unread');
+        } else {
+          await fetch(`/api/articles/read?id=${article.id}&read=${newState}`, {
+            method: 'POST',
+          });
+        }
         if (onReadStatusChange) {
           onReadStatusChange();
         }
       } catch (e) {
         console.error('Error toggling read status:', e);
-        // Revert the state change on error
         article.is_read = !newState;
         window.showToast(t('common.errors.savingSettings'), 'error');
       }
     } else if (action === 'markAboveAsRead' || action === 'markBelowAsRead') {
+      if (store.isMinifluxArticle(article)) {
+        window.showToast(t('common.errors.notAvailable', { source: 'Miniflux' }), 'info');
+        return;
+      }
       try {
         const direction = action === 'markAboveAsRead' ? 'above' : 'below';
 
@@ -279,18 +306,25 @@ export function useArticleActions(
       const newState = !article.is_favorite;
       article.is_favorite = newState;
       try {
-        await fetch(`/api/articles/favorite?id=${article.id}`, { method: 'POST' });
-        // Update filter counts after toggling favorite status
+        if (store.isMinifluxArticle(article)) {
+          const minifluxStore = useMinifluxStore();
+          await minifluxStore.updateStatus([-article.id], '', newState);
+        } else {
+          await fetch(`/api/articles/favorite?id=${article.id}`, { method: 'POST' });
+        }
         if (onReadStatusChange) {
           onReadStatusChange();
         }
       } catch (e) {
         console.error('Error toggling favorite:', e);
-        // Revert the state change on error
         article.is_favorite = !newState;
         window.showToast(t('common.errors.savingSettings'), 'error');
       }
     } else if (action === 'toggleReadLater') {
+      if (store.isMinifluxArticle(article)) {
+        window.showToast(t('common.errors.notAvailable', { source: 'Miniflux' }), 'info');
+        return;
+      }
       const newState = !article.is_read_later;
       article.is_read_later = newState;
       // When adding to read later, also mark as unread
@@ -333,19 +367,7 @@ export function useArticleActions(
       );
 
       // Mark as read
-      if (!article.is_read) {
-        article.is_read = true;
-        try {
-          await fetch(`/api/articles/read?id=${article.id}&read=true`, {
-            method: 'POST',
-          });
-          if (onReadStatusChange) {
-            onReadStatusChange();
-          }
-        } catch (e) {
-          console.error('Error marking as read:', e);
-        }
-      }
+      await markArticleAsRead(article, onReadStatusChange);
 
       // Trigger the render action
       window.dispatchEvent(
@@ -365,19 +387,7 @@ export function useArticleActions(
       );
 
       // Mark as read
-      if (!article.is_read) {
-        article.is_read = true;
-        try {
-          await fetch(`/api/articles/read?id=${article.id}&read=true`, {
-            method: 'POST',
-          });
-          if (onReadStatusChange) {
-            onReadStatusChange();
-          }
-        } catch (e) {
-          console.error('Error marking as read:', e);
-        }
-      }
+      await markArticleAsRead(article, onReadStatusChange);
 
       // Trigger the render action
       window.dispatchEvent(
@@ -397,19 +407,7 @@ export function useArticleActions(
       );
 
       // Mark as read
-      if (!article.is_read) {
-        article.is_read = true;
-        try {
-          await fetch(`/api/articles/read?id=${article.id}&read=true`, {
-            method: 'POST',
-          });
-          if (onReadStatusChange) {
-            onReadStatusChange();
-          }
-        } catch (e) {
-          console.error('Error marking as read:', e);
-        }
-      }
+      await markArticleAsRead(article, onReadStatusChange);
 
       // Trigger the render action
       window.dispatchEvent(

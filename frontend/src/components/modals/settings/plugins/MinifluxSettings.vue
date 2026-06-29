@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { PhLink, PhKey, PhArrowClockwise, PhCloudCheck, PhTestTube } from '@phosphor-icons/vue';
+import { PhLink, PhKey, PhTestTube, PhArrowClockwise, PhCloudCheck } from '@phosphor-icons/vue';
 import type { SettingsData } from '@/types/settings';
 import { useAppStore } from '@/stores/app';
 import { NestedSettingsContainer, SubSettingItem, InputControl } from '@/components/settings';
@@ -20,21 +20,10 @@ const emit = defineEmits<{
   'settings-changed': [];
 }>();
 
-function updateSetting(key: keyof SettingsData, value: any) {
-  emit('update:settings', {
-    ...props.settings,
-    [key]: value,
-  });
-}
-
 const isSyncing = ref(false);
 const syncStatus = ref<{
-  pending_changes: number;
-  failed_items: { article_id: number; article_url: string; action: string; error: string }[];
   last_sync_time: string | null;
 }>({
-  pending_changes: 0,
-  failed_items: [],
   last_sync_time: null,
 });
 
@@ -46,9 +35,11 @@ async function fetchSyncStatus() {
     if (response.ok) {
       const data = await response.json();
       syncStatus.value = data;
+    } else {
+      console.error('[Miniflux Settings] fetchSyncStatus failed:', response.status, response.statusText);
     }
-  } catch (error) {
-    console.error('Failed to fetch sync status:', error);
+  } catch (e) {
+    console.error('[Miniflux Settings] fetchSyncStatus error:', e);
   }
 }
 
@@ -74,26 +65,11 @@ onUnmounted(() => {
   stopStatusPolling();
 });
 
-async function syncNow() {
-  isSyncing.value = true;
-  try {
-    const response = await fetch('/api/miniflux/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (response.ok) {
-      window.showToast(t('setting.miniflux.syncStarted'), 'success');
-    } else {
-      throw new Error(t('setting.miniflux.syncFailed'));
-    }
-  } catch (error) {
-    window.showToast(
-      error instanceof Error ? error.message : t('setting.miniflux.syncFailed'),
-      'error'
-    );
-  } finally {
-    isSyncing.value = false;
-  }
+function updateSetting(key: keyof SettingsData, value: any) {
+  emit('update:settings', {
+    ...props.settings,
+    [key]: value,
+  });
 }
 
 async function testConnection() {
@@ -104,12 +80,41 @@ async function testConnection() {
     });
     const data = await response.json();
     if (data.success) {
+      console.log('[Miniflux Settings] testConnection: success');
       window.showToast(t('setting.miniflux.connectionSuccess'), 'success');
     } else {
+      console.error('[Miniflux Settings] testConnection: failed -', data.error);
       window.showToast(data.error || t('setting.miniflux.connectionFailed'), 'error');
     }
-  } catch (error) {
+  } catch (e) {
+    console.error('[Miniflux Settings] testConnection error:', e);
     window.showToast(t('setting.miniflux.connectionFailed'), 'error');
+  }
+}
+
+async function syncNow() {
+  isSyncing.value = true;
+  try {
+    const response = await fetch('/api/miniflux/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (response.ok) {
+      console.log('[Miniflux Settings] syncNow: sync started');
+      window.showToast(t('setting.miniflux.syncStarted'), 'success');
+    } else {
+      const errMsg = `sync failed (${response.status})`;
+      console.error('[Miniflux Settings] syncNow:', errMsg);
+      throw new Error(t('setting.miniflux.syncFailed'));
+    }
+  } catch (error) {
+    console.error('[Miniflux Settings] syncNow error:', error);
+    window.showToast(
+      error instanceof Error ? error.message : t('setting.miniflux.syncFailed'),
+      'error'
+    );
+  } finally {
+    isSyncing.value = false;
   }
 }
 
@@ -129,6 +134,7 @@ async function handleMinifluxToggle(event: Event) {
     }
   }
 
+  console.log('[Miniflux Settings] handleMinifluxToggle:', newEnabled ? 'enabled' : 'disabled');
   updateSetting('miniflux_enabled', newEnabled);
 }
 
@@ -136,14 +142,17 @@ watch(
   () => props.settings.miniflux_enabled,
   async (newVal: boolean, oldVal: boolean) => {
     if (oldVal && !newVal) {
+      console.log('[Miniflux Settings] Miniflux disabled, stopping polling');
       appStore.stopMinifluxStatusPolling();
+      stopStatusPolling();
       setTimeout(async () => {
         await appStore.fetchFeeds();
         await appStore.fetchArticles();
         await appStore.fetchUnreadCounts();
-        stopStatusPolling();
       }, 1000);
     } else if (!oldVal && newVal) {
+      console.log('[Miniflux Settings] Miniflux enabled, starting polling');
+      await appStore.fetchFeeds();
       await appStore.startMinifluxStatusPolling();
       startStatusPolling();
       emit('settings-changed');

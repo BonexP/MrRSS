@@ -6,6 +6,7 @@ import {
   PhImage,
   PhDotsSixVertical,
   PhLock,
+  PhDatabase,
 } from '@phosphor-icons/vue';
 import type { Feed } from '@/types/models';
 import { useI18n } from 'vue-i18n';
@@ -102,9 +103,9 @@ function handleDragEnd() {
     @click="emit('click')"
     @contextmenu="(e) => emit('contextmenu', e)"
   >
-    <!-- Drag handle (only visible in edit mode and not for FreshRSS feeds) -->
+    <!-- Drag handle (only visible in edit mode and not for FreshRSS/Miniflux feeds) -->
     <div
-      v-if="isEditMode && !feed.is_freshrss_source"
+      v-if="isEditMode && !feed.is_freshrss_source && !feed.is_miniflux_source"
       class="drag-handle"
       draggable="true"
       :title="t('modal.feed.dragToReorder')"
@@ -123,6 +124,15 @@ function handleDragEnd() {
       <PhLock :size="14" />
     </div>
 
+    <!-- Miniflux lock icon (for Miniflux feeds in edit mode) -->
+    <div
+      v-if="isEditMode && feed.is_miniflux_source"
+      class="miniflux-lock"
+      :title="t('setting.miniflux.feedLocked')"
+    >
+      <PhLock :size="14" />
+    </div>
+
     <div class="w-4 h-4 flex items-center justify-center shrink-0">
       <img
         :src="feed.image_url || getFavicon(feed.url)"
@@ -130,6 +140,15 @@ function handleDragEnd() {
         @error="($event.target as HTMLElement).style.display = 'none'"
       />
     </div>
+
+    <!-- Miniflux source indicator -->
+    <PhDatabase
+      v-if="feed.is_miniflux_source"
+      :size="14"
+      class="text-accent shrink-0"
+      :title="t('setting.miniflux.sourceFeed')"
+    />
+
     <span class="truncate flex-1">{{ feed.title }}</span>
 
     <!-- RSSHub indicator -->
@@ -303,6 +322,13 @@ function handleDragEnd() {
 }
 
 .freshrss-lock {
+  @apply cursor-not-allowed text-text-secondary transition-colors flex items-center justify-center;
+  padding: 2px;
+  margin-right: 2px;
+  border-radius: 2px;
+}
+
+.miniflux-lock {
   @apply cursor-not-allowed text-text-secondary transition-colors flex items-center justify-center;
   padding: 2px;
   margin-right: 2px;

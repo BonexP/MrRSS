@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref, computed, type Ref } from 'vue';
-import type { Article, Feed, Tag, UnreadCounts, RefreshProgress } from '@/types/models';
+import type { Article, Feed, Tag, UnreadCounts, RefreshProgress, MinifluxFeed, MinifluxEntry, MinifluxCategory } from '@/types/models';
 import type { FilterCondition } from '@/types/filter';
 import { useSettings } from '@/composables/core/useSettings';
+import { useMinifluxStore } from '@/stores/miniflux';
 
 export type Filter = 'all' | 'unread' | 'favorites' | 'readLater' | 'imageGallery' | '';
 export type ThemePreference = 'light' | 'dark' | 'auto';
@@ -107,6 +108,43 @@ export const useAppStore = defineStore('app', () => {
   const refreshProgress = ref<RefreshProgress>({ isRunning: false });
   let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
+  // Miniflux helpers
+  function isMinifluxFeedId(id: number): boolean {
+    return id < 0;
+  }
+
+  function isMinifluxArticle(article: Article): boolean {
+    return article.feed_id < 0;
+  }
+
+  function convertMinifluxFeedToFeed(mf: MinifluxFeed): Feed {
+    return {
+      id: -mf.id,
+      url: mf.feed_url,
+      title: mf.title,
+      category: mf.category?.title || '',
+      last_fetched_at: mf.checked_at || '',
+      website_url: mf.site_url || '',
+      is_miniflux_source: true,
+      miniflux_feed_id: mf.id,
+    };
+  }
+
+  function convertMinifluxEntryToArticle(entry: MinifluxEntry): Article {
+    return {
+      id: -entry.id,
+      feed_id: -entry.feed_id,
+      title: entry.title,
+      url: entry.url,
+      published_at: entry.published_at,
+      is_read: entry.status === 'read',
+      is_favorite: entry.starred,
+      is_hidden: false,
+      is_read_later: false,
+      author: entry.author || '',
+    };
+  }
+
   // Actions - Article Management
   async function setFilter(filter: Filter): Promise<void> {
     currentFilter.value = filter;
@@ -130,7 +168,12 @@ export const useAppStore = defineStore('app', () => {
       tempSelection.value = { feedId, category: null };
       // Clear and reset will be handled by fetchArticles
     } else {
-      // For regular feeds, keep currentFilter and set tempSelection
+      // For Miniflux feeds, reset filter to 'all' since entries are fetched live
+      // and don't support all local filter states (unread, favorites, etc.)
+      if (isMinifluxFeedId(feedId)) {
+        console.log('[App Store] setFeed: Miniflux feed %d, resetting filter to all', feedId);
+        currentFilter.value = 'all';
+      }
       currentFeedId.value = feedId;
       currentCategory.value = null;
       tempSelection.value = { feedId, category: null };
@@ -183,6 +226,43 @@ export const useAppStore = defineStore('app', () => {
     isLoading.value = true;
     const limit = 50;
 
+    // Route to Miniflux proxy if current feed is a Miniflux feed
+    if (currentFeedId.value !== null && isMinifluxFeedId(currentFeedId.value)) {
+      try {
+        const minifluxStore = useMinifluxStore();
+        const realFeedId = -currentFeedId.value;
+        const filter: Record<string, unknown> = {
+          feed_id: realFeedId,
+          limit,
+          offset: (page.value - 1) * limit,
+        };
+        if (currentFilter.value === 'unread') filter.status = 'unread';
+        if (currentFilter.value === 'favorites') filter.starred = true;
+
+        const result = await minifluxStore.fetchEntries(filter as any);
+        if (result) {
+          const converted = result.entries.map(convertMinifluxEntryToArticle);
+          if (append) {
+            articles.value = [...articles.value, ...converted];
+          } else {
+            articles.value = converted;
+          }
+          hasMore.value = result.entries.length >= limit;
+          console.log('[App Store] fetchArticles: Miniflux feed %d, %d articles (total=%d)',
+            realFeedId, converted.length, result.total);
+        } else {
+          console.error('[App Store] fetchArticles: Miniflux feed %d returned null', realFeedId);
+          window.showToast('Failed to fetch Miniflux articles', 'error');
+        }
+      } catch (e) {
+        console.error('[App Store] Error fetching Miniflux articles:', e);
+        window.showToast('Error fetching Miniflux articles', 'error');
+      } finally {
+        isLoading.value = false;
+      }
+      return;
+    }
+
     let url = `/api/articles?page=${page.value}&limit=${limit}`;
     if (currentFilter.value) url += `&filter=${currentFilter.value}`;
     if (currentFeedId.value) url += `&feed_id=${currentFeedId.value}`;
@@ -231,6 +311,20 @@ export const useAppStore = defineStore('app', () => {
         throw e;
       }
 
+      // Merge Miniflux feeds if enabled
+      try {
+        const minifluxStore = useMinifluxStore();
+        const mfFeeds = await minifluxStore.fetchFeeds();
+        if (mfFeeds.length > 0) {
+          await minifluxStore.fetchCategories();
+          const converted = mfFeeds.map(convertMinifluxFeedToFeed);
+          data = [...data, ...converted];
+          console.log('[App Store] fetchFeeds: merged %d Miniflux feeds', mfFeeds.length);
+        }
+      } catch (e) {
+        console.error('[App Store] Error fetching Miniflux feeds:', e);
+      }
+
       feeds.value = data;
 
       // Fetch unread counts and filter counts after fetching feeds
@@ -259,9 +353,30 @@ export const useAppStore = defineStore('app', () => {
     try {
       const res = await fetch('/api/articles/unread-counts');
       const data = await res.json();
+      const feedCounts: Record<number, number> = data.feed_counts || {};
+
+      // Merge Miniflux counters if enabled
+      try {
+        const minifluxStore = useMinifluxStore();
+        const counters = await minifluxStore.fetchCounters();
+        if (counters?.unreads) {
+          let merged = 0;
+          for (const [strId, count] of Object.entries(counters.unreads)) {
+            const mfId = parseInt(strId, 10);
+            if (!isNaN(mfId)) {
+              feedCounts[-mfId] = count;
+              merged++;
+            }
+          }
+          console.log('[App Store] fetchUnreadCounts: merged %d Miniflux feed counters', merged);
+        }
+      } catch (e) {
+        console.error('[App Store] Error fetching Miniflux counters:', e);
+      }
+
       unreadCounts.value = {
         total: data.total || 0,
-        feedCounts: data.feed_counts || {},
+        feedCounts,
       };
     } catch {
       unreadCounts.value = { total: 0, feedCounts: {} };
@@ -308,6 +423,16 @@ export const useAppStore = defineStore('app', () => {
 
   async function markAllAsRead(feedId?: number, category?: string): Promise<void> {
     try {
+      // Handle Miniflux feed
+      if (feedId && isMinifluxFeedId(feedId)) {
+        const minifluxStore = useMinifluxStore();
+        const realFeedId = -feedId;
+        await minifluxStore.markFeedAsRead(realFeedId);
+        await fetchArticles();
+        await fetchUnreadCounts();
+        return;
+      }
+
       const params = new URLSearchParams();
       if (feedId) params.append('feed_id', String(feedId));
       if (category) params.append('category', category);
@@ -406,7 +531,7 @@ export const useAppStore = defineStore('app', () => {
         throw new Error(`Invalid JSON response from refresh API: ${e}`);
       }
 
-      // Also trigger FreshRSS and Miniflux sync if enabled
+      // Also trigger FreshRSS sync if enabled
       if (settingsRef.value.freshrss_enabled === true) {
         try {
           await fetch('/api/freshrss/sync', { method: 'POST' });
@@ -414,12 +539,15 @@ export const useAppStore = defineStore('app', () => {
           console.log('FreshRSS sync failed:', e);
         }
       }
-      if (settingsRef.value.miniflux_enabled === true) {
-        try {
-          await fetch('/api/miniflux/sync', { method: 'POST' });
-        } catch (e) {
-          console.log('Miniflux sync failed:', e);
+      try {
+        const syncRes = await fetch('/api/miniflux/sync', { method: 'POST' });
+        if (syncRes.ok) {
+          console.log('[App Store] refreshFeeds: Miniflux sync triggered');
+        } else {
+          console.error('[App Store] refreshFeeds: Miniflux sync failed:', syncRes.status, syncRes.statusText);
         }
+      } catch (e) {
+        console.error('[App Store] refreshFeeds: Miniflux sync error:', e);
       }
 
       // Wait a moment to check if refresh is actually running
@@ -613,60 +741,34 @@ export const useAppStore = defineStore('app', () => {
   }
 
   let minifluxPollInterval: ReturnType<typeof setInterval> | null = null;
-  let lastKnownMinifluxSyncTime: string | null = null;
 
-  async function startMinifluxStatusPolling(): Promise<void> {
+  function startMinifluxStatusPolling(): void {
     if (minifluxPollInterval) {
       clearInterval(minifluxPollInterval);
     }
 
-    try {
-      const res = await fetch('/api/settings');
-      if (!res.ok) return;
-      const settings = await res.json();
+    console.log('[App Store] startMinifluxStatusPolling: polling every 60s');
 
-      if (settings.miniflux_enabled !== 'true') {
-        return;
-      }
-
-      const statusRes = await fetch('/api/miniflux/status');
-      if (statusRes.ok) {
-        const statusData = await statusRes.json();
-        lastKnownMinifluxSyncTime = statusData.last_sync_time;
-      }
-    } catch (e) {
-      console.error('[Miniflux] Error checking status:', e);
-      return;
-    }
-
+    // Periodically refresh Miniflux feeds and counters
     minifluxPollInterval = setInterval(async () => {
       try {
-        const res = await fetch('/api/miniflux/status');
-        if (!res.ok) return;
-
-        const data = await res.json();
-
-        if (
-          lastKnownMinifluxSyncTime !== null &&
-          data.last_sync_time !== lastKnownMinifluxSyncTime
-        ) {
-          console.log('[Miniflux] Sync completed detected, refreshing data...');
-          await fetchFeeds();
-          await fetchArticles();
-          await fetchUnreadCounts();
-        }
-
-        lastKnownMinifluxSyncTime = data.last_sync_time;
+        const minifluxStore = useMinifluxStore();
+        await minifluxStore.fetchFeeds();
+        await minifluxStore.fetchCounters();
+        // Re-merge feeds and unread counts
+        await fetchFeeds();
+        await fetchUnreadCounts();
       } catch (e) {
-        console.error('[Miniflux] Error polling status:', e);
+        console.error('[App Store] startMinifluxStatusPolling: error:', e);
       }
-    }, 5000);
+    }, 60000); // Refresh every 60 seconds
   }
 
   function stopMinifluxStatusPolling(): void {
     if (minifluxPollInterval) {
       clearInterval(minifluxPollInterval);
       minifluxPollInterval = null;
+      console.log('[App Store] stopMinifluxStatusPolling: stopped');
     }
   }
 
@@ -822,6 +924,10 @@ export const useAppStore = defineStore('app', () => {
     filteredArticlesFromServer,
     isFilterLoading,
     articleViewModePreferences,
+
+    // Miniflux helpers
+    isMinifluxFeedId,
+    isMinifluxArticle,
 
     // Actions
     setFilter,

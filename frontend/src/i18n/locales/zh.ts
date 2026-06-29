@@ -192,6 +192,7 @@ const zh: TranslationMessages = {
       invalidURLScheme: '无效的 URL 格式',
       networkErrorCheckingUpdates:
         '无法连接到 GitHub 服务器。如果您在中国大陆，请尝试使用代理或VPN。',
+      notAvailable: '{source} 订阅源不支持此操作',
       reorderingFeed: '重新排序订阅源失败',
       savingSettings: '保存设置时出错',
       subscribingFeeds: '订阅时出错',
@@ -929,6 +930,7 @@ const zh: TranslationMessages = {
       serverUrlPlaceholder: 'https://miniflux.example.com',
       sync: '立即同步',
       syncedFeed: '从 Miniflux 同步',
+      sourceFeed: '来自 Miniflux',
       syncing: '同步中...',
       syncFailed: '同步失败',
       syncNow: '同步订阅状态',

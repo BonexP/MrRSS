@@ -134,6 +134,66 @@ export interface Settings {
   startup_on_boot: string;
 }
 
+// Miniflux types (proxy mode)
+export interface MinifluxCategory {
+  id: number;
+  title: string;
+  feed_count?: number;
+  total_unread?: number;
+}
+
+export interface MinifluxFeedIcon {
+  feed_id: number;
+  icon_id: number;
+}
+
+export interface MinifluxEnclosure {
+  url: string;
+  mime_type: string;
+}
+
+export interface MinifluxEntry {
+  id: number;
+  user_id: number;
+  feed_id: number;
+  title: string;
+  url: string;
+  comments_url?: string;
+  published_at: string;
+  created_at: string;
+  updated_at?: string;
+  status: string;
+  starred: boolean;
+  content?: string;
+  author?: string;
+  categories?: string[];
+  tags?: string[];
+  feed?: MinifluxFeed;
+  enclosures?: MinifluxEnclosure[];
+  reading_time?: number;
+}
+
+export interface MinifluxFeed {
+  id: number;
+  user_id: number;
+  feed_url: string;
+  site_url: string;
+  title: string;
+  checked_at: string;
+  category: MinifluxCategory;
+  icon?: MinifluxFeedIcon;
+}
+
+export interface MinifluxEntriesResponse {
+  total: number;
+  entries: MinifluxEntry[];
+}
+
+export interface MinifluxCounters {
+  reads: Record<string, number>;
+  unreads: Record<string, number>;
+}
+
 export interface DiscoveredFeed {
   url: string;
   title: string;

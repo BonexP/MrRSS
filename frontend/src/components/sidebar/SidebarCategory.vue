@@ -173,6 +173,14 @@ const isFreshRSSCategory = computed(() => {
   return props.feeds.every((feed) => feed.is_freshrss_source);
 });
 
+// Check if this category is exclusively for Miniflux feeds
+const isMinifluxCategory = computed(() => {
+  if (!props.feeds || props.feeds.length === 0) {
+    return false;
+  }
+  return props.feeds.every((feed) => feed.is_miniflux_source);
+});
+
 // Handle category header click - delays to distinguish from double click
 function handleCategoryClick() {
   // Clear any existing timeout
@@ -238,6 +246,14 @@ function handleCaretClick() {
           class="w-3.5 h-3.5 shrink-0"
           :title="t('setting.freshrss.syncedFeed')"
           alt="FreshRSS"
+        />
+        <!-- Miniflux indicator on category -->
+        <img
+          v-if="isMinifluxCategory"
+          src="/assets/plugin_icons/miniflux.svg"
+          class="w-3.5 h-3.5 shrink-0"
+          :title="t('setting.miniflux.sourceFeed')"
+          alt="Miniflux"
         />
       </span>
       <span v-if="unreadCount > 0" class="unread-badge mr-1">{{ unreadCount }}</span>

@@ -51,8 +51,7 @@ func (db *DB) AddFeed(feed *models.Feed) (int64, error) {
 	// Check if feed already exists with same URL AND same source type
 	var existingID int64
 	var existingIsFreshRSS bool
-	var existingIsMiniflux bool
-	err := db.QueryRow("SELECT id, COALESCE(is_freshrss_source, 0), COALESCE(is_miniflux_source, 0) FROM feeds WHERE url = ?", feed.URL).Scan(&existingID, &existingIsFreshRSS, &existingIsMiniflux)
+	err := db.QueryRow("SELECT id, COALESCE(is_freshrss_source, 0) FROM feeds WHERE url = ?", feed.URL).Scan(&existingID, &existingIsFreshRSS)
 
 	if err == sql.ErrNoRows {
 		// Feed doesn't exist, insert new
@@ -65,7 +64,6 @@ func (db *DB) AddFeed(feed *models.Feed) (int64, error) {
 			}
 		}
 
-		// 38 columns to insert (added is_freshrss_source, freshrss_stream_id, is_miniflux_source, miniflux_feed_id)
 		query := `INSERT INTO feeds (
 			title, url, link, description, category, image_url, position,
 			script_path, hide_from_timeline, proxy_url, proxy_enabled, refresh_interval,
@@ -77,9 +75,8 @@ func (db *DB) AddFeed(feed *models.Feed) (int64, error) {
 			email_address, email_imap_server, email_imap_port,
 			email_username, email_password, email_folder, email_last_uid,
 			is_freshrss_source, freshrss_stream_id,
-			is_miniflux_source, miniflux_feed_id,
 			last_updated
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		result, err := db.Exec(query,
 			feed.Title, feed.URL, feed.Link, feed.Description, feed.Category, feed.ImageURL, position,
 			feed.ScriptPath, feed.HideFromTimeline, feed.ProxyURL, feed.ProxyEnabled, feed.RefreshInterval,
@@ -91,7 +88,6 @@ func (db *DB) AddFeed(feed *models.Feed) (int64, error) {
 			feed.EmailAddress, feed.EmailIMAPServer, feed.EmailIMAPPort,
 			feed.EmailUsername, feed.EmailPassword, feed.EmailFolder, feed.EmailLastUID,
 			feed.IsFreshRSSSource, feed.FreshRSSStreamID,
-			feed.IsMinifluxSource, feed.MinifluxFeedID,
 			time.Now())
 		if err != nil {
 			return 0, err
@@ -106,7 +102,7 @@ func (db *DB) AddFeed(feed *models.Feed) (int64, error) {
 	}
 
 	// Feed with same URL exists, check if source type matches
-	sameSource := (existingIsFreshRSS == feed.IsFreshRSSSource) && (existingIsMiniflux == feed.IsMinifluxSource)
+	sameSource := (existingIsFreshRSS == feed.IsFreshRSSSource)
 	if !sameSource {
 		// Different source types - create a new feed instead of updating
 		position := feed.Position
@@ -128,9 +124,8 @@ func (db *DB) AddFeed(feed *models.Feed) (int64, error) {
 			email_address, email_imap_server, email_imap_port,
 			email_username, email_password, email_folder, email_last_uid,
 			is_freshrss_source, freshrss_stream_id,
-			is_miniflux_source, miniflux_feed_id,
 			last_updated
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 		result, err := db.Exec(query,
 			feed.Title, feed.URL, feed.Link, feed.Description, feed.Category, feed.ImageURL, position,
 			feed.ScriptPath, feed.HideFromTimeline, feed.ProxyURL, feed.ProxyEnabled, feed.RefreshInterval,
@@ -142,7 +137,6 @@ func (db *DB) AddFeed(feed *models.Feed) (int64, error) {
 			feed.EmailAddress, feed.EmailIMAPServer, feed.EmailIMAPPort,
 			feed.EmailUsername, feed.EmailPassword, feed.EmailFolder, feed.EmailLastUID,
 			feed.IsFreshRSSSource, feed.FreshRSSStreamID,
-			feed.IsMinifluxSource, feed.MinifluxFeedID,
 			time.Now())
 		if err != nil {
 			return 0, err
@@ -195,7 +189,6 @@ func (db *DB) GetFeeds() ([]models.Feed, error) {
 			COALESCE(f.email_password, ''), COALESCE(f.email_folder, 'INBOX'),
 			COALESCE(f.email_last_uid, 0), COALESCE(f.is_freshrss_source, 0),
 			COALESCE(f.freshrss_stream_id, ''),
-			COALESCE(f.is_miniflux_source, 0), COALESCE(f.miniflux_feed_id, 0),
 			(SELECT MAX(a.published_at) FROM articles a WHERE a.feed_id = f.id) as latest_article_time,
 			CAST(COALESCE((
 				SELECT
@@ -238,7 +231,6 @@ func (db *DB) GetFeeds() ([]models.Feed, error) {
 			&autoExpandContent, &emailAddress, &emailIMAPServer, &f.EmailIMAPPort,
 			&emailUsername, &emailPassword, &emailFolder, &f.EmailLastUID,
 			&f.IsFreshRSSSource, &freshRSSStreamID,
-			&f.IsMinifluxSource, &f.MinifluxFeedID,
 			&latestArticleTimeStr, &f.ArticlesPerMonth,
 		); err != nil {
 			return nil, err
@@ -331,12 +323,12 @@ func (db *DB) GetFeeds() ([]models.Feed, error) {
 // GetFeedByID retrieves a specific feed by its ID.
 func (db *DB) GetFeedByID(id int64) (*models.Feed, error) {
 	db.WaitForReady()
-	row := db.QueryRow("SELECT id, title, url, link, description, category, image_url, COALESCE(position, 0), last_updated, last_error, COALESCE(discovery_completed, 0), COALESCE(script_path, ''), COALESCE(hide_from_timeline, 0), COALESCE(proxy_url, ''), COALESCE(proxy_enabled, 0), COALESCE(refresh_interval, 0), COALESCE(is_image_mode, 0), COALESCE(type, ''), COALESCE(xpath_item, ''), COALESCE(xpath_item_title, ''), COALESCE(xpath_item_content, ''), COALESCE(xpath_item_uri, ''), COALESCE(xpath_item_author, ''), COALESCE(xpath_item_timestamp, ''), COALESCE(xpath_item_time_format, ''), COALESCE(xpath_item_thumbnail, ''), COALESCE(xpath_item_categories, ''), COALESCE(xpath_item_uid, ''), COALESCE(article_view_mode, 'global'), COALESCE(auto_expand_content, 'global'), COALESCE(email_address, ''), COALESCE(email_imap_server, ''), COALESCE(email_imap_port, 993), COALESCE(email_username, ''), COALESCE(email_password, ''), COALESCE(email_folder, 'INBOX'), COALESCE(email_last_uid, 0), COALESCE(is_freshrss_source, 0), COALESCE(freshrss_stream_id, ''), COALESCE(is_miniflux_source, 0), COALESCE(miniflux_feed_id, 0) FROM feeds WHERE id = ?", id)
+	row := db.QueryRow("SELECT id, title, url, link, description, category, image_url, COALESCE(position, 0), last_updated, last_error, COALESCE(discovery_completed, 0), COALESCE(script_path, ''), COALESCE(hide_from_timeline, 0), COALESCE(proxy_url, ''), COALESCE(proxy_enabled, 0), COALESCE(refresh_interval, 0), COALESCE(is_image_mode, 0), COALESCE(type, ''), COALESCE(xpath_item, ''), COALESCE(xpath_item_title, ''), COALESCE(xpath_item_content, ''), COALESCE(xpath_item_uri, ''), COALESCE(xpath_item_author, ''), COALESCE(xpath_item_timestamp, ''), COALESCE(xpath_item_time_format, ''), COALESCE(xpath_item_thumbnail, ''), COALESCE(xpath_item_categories, ''), COALESCE(xpath_item_uid, ''), COALESCE(article_view_mode, 'global'), COALESCE(auto_expand_content, 'global'), COALESCE(email_address, ''), COALESCE(email_imap_server, ''), COALESCE(email_imap_port, 993), COALESCE(email_username, ''), COALESCE(email_password, ''), COALESCE(email_folder, 'INBOX'), COALESCE(email_last_uid, 0), COALESCE(is_freshrss_source, 0), COALESCE(freshrss_stream_id, '') FROM feeds WHERE id = ?", id)
 
 	var f models.Feed
 	var link, category, imageURL, lastError, scriptPath, proxyURL, feedType, xpathItem, xpathItemTitle, xpathItemContent, xpathItemUri, xpathItemAuthor, xpathItemTimestamp, xpathItemTimeFormat, xpathItemThumbnail, xpathItemCategories, xpathItemUid, articleViewMode, autoExpandContent, emailAddress, emailIMAPServer, emailUsername, emailPassword, emailFolder, freshRSSStreamID sql.NullString
 	var lastUpdated sql.NullTime
-	if err := row.Scan(&f.ID, &f.Title, &f.URL, &link, &f.Description, &category, &imageURL, &f.Position, &lastUpdated, &lastError, &f.DiscoveryCompleted, &scriptPath, &f.HideFromTimeline, &proxyURL, &f.ProxyEnabled, &f.RefreshInterval, &f.IsImageMode, &feedType, &xpathItem, &xpathItemTitle, &xpathItemContent, &xpathItemUri, &xpathItemAuthor, &xpathItemTimestamp, &xpathItemTimeFormat, &xpathItemThumbnail, &xpathItemCategories, &xpathItemUid, &articleViewMode, &autoExpandContent, &emailAddress, &emailIMAPServer, &f.EmailIMAPPort, &emailUsername, &emailPassword, &emailFolder, &f.EmailLastUID, &f.IsFreshRSSSource, &freshRSSStreamID, &f.IsMinifluxSource, &f.MinifluxFeedID); err != nil {
+	if err := row.Scan(&f.ID, &f.Title, &f.URL, &link, &f.Description, &category, &imageURL, &f.Position, &lastUpdated, &lastError, &f.DiscoveryCompleted, &scriptPath, &f.HideFromTimeline, &proxyURL, &f.ProxyEnabled, &f.RefreshInterval, &f.IsImageMode, &feedType, &xpathItem, &xpathItemTitle, &xpathItemContent, &xpathItemUri, &xpathItemAuthor, &xpathItemTimestamp, &xpathItemTimeFormat, &xpathItemThumbnail, &xpathItemCategories, &xpathItemUid, &articleViewMode, &autoExpandContent, &emailAddress, &emailIMAPServer, &f.EmailIMAPPort, &emailUsername, &emailPassword, &emailFolder, &f.EmailLastUID, &f.IsFreshRSSSource, &freshRSSStreamID); err != nil {
 		return nil, err
 	}
 	f.Link = link.String
@@ -815,16 +807,4 @@ func (db *DB) GetNextPositionInCategory(category string) (int, error) {
 		return 0, err
 	}
 	return maxPos + 1, nil
-}
-
-// GetFeedByMinifluxID returns a local feed by its Miniflux feed ID
-func (db *DB) GetFeedByMinifluxID(minifluxFeedID int64) (*models.Feed, error) {
-	db.WaitForReady()
-	query := `SELECT id, is_miniflux_source, miniflux_feed_id FROM feeds WHERE miniflux_feed_id = ? AND COALESCE(is_miniflux_source, 0) = 1 LIMIT 1`
-	var feed models.Feed
-	err := db.QueryRow(query, minifluxFeedID).Scan(&feed.ID, &feed.IsMinifluxSource, &feed.MinifluxFeedID)
-	if err != nil {
-		return nil, err
-	}
-	return &feed, nil
 }

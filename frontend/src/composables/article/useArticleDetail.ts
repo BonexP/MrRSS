@@ -1,5 +1,6 @@
-import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useAppStore } from '@/stores/app';
+import { useMinifluxStore } from '@/stores/miniflux';
 import { useI18n } from 'vue-i18n';
 import { openInBrowser } from '@/utils/browser';
 import type { Article } from '@/types/models';
@@ -77,9 +78,14 @@ export function useArticleDetail() {
     if (!article.is_read) {
       article.is_read = true;
       try {
-        await fetch(`/api/articles/read?id=${article.id}&read=true`, {
-          method: 'POST',
-        });
+        if (store.isMinifluxArticle(article)) {
+          const minifluxStore = useMinifluxStore();
+          await minifluxStore.updateStatus([-article.id], 'read');
+        } else {
+          await fetch(`/api/articles/read?id=${article.id}&read=true`, {
+            method: 'POST',
+          });
+        }
         store.fetchUnreadCounts();
       } catch (e) {
         console.error('Error marking as read:', e);
@@ -206,16 +212,27 @@ export function useArticleDetail() {
     if (!article.value) return;
     const newState = !article.value.is_read;
     article.value.is_read = newState;
-    fetch(`/api/articles/read?id=${article.value.id}&read=${newState}`, {
-      method: 'POST',
-    });
+    if (store.isMinifluxArticle(article.value)) {
+      const minifluxStore = useMinifluxStore();
+      const status = newState ? 'read' : 'unread';
+      minifluxStore.updateStatus([-article.value.id], status);
+    } else {
+      fetch(`/api/articles/read?id=${article.value.id}&read=${newState}`, {
+        method: 'POST',
+      });
+    }
   }
 
   function toggleFavorite() {
     if (!article.value) return;
     const newState = !article.value.is_favorite;
     article.value.is_favorite = newState;
-    fetch(`/api/articles/favorite?id=${article.value.id}`, { method: 'POST' });
+    if (store.isMinifluxArticle(article.value)) {
+      const minifluxStore = useMinifluxStore();
+      minifluxStore.updateStatus([-article.value.id], '', newState);
+    } else {
+      fetch(`/api/articles/favorite?id=${article.value.id}`, { method: 'POST' });
+    }
   }
 
   async function toggleReadLater() {
@@ -270,40 +287,42 @@ export function useArticleDetail() {
   async function fetchArticleContent() {
     if (!article.value) return;
 
-    currentArticleId.value = article.value.id; // Track which article we're loading
+    currentArticleId.value = article.value.id;
+    isLoadingContent.value = true;
 
     try {
-      const res = await fetch(`/api/articles/content?id=${article.value.id}`);
-      if (res.ok) {
-        const data = await res.json();
-        let content = data.content || '';
+      let content = '';
 
-        // Proxy images if media cache is enabled
-        const cacheEnabled = await isMediaCacheEnabled();
-        if (cacheEnabled && content) {
-          // Use feed URL as referer for anti-hotlinking (more reliable than article URL)
-          const feedUrl = data.feed_url || article.value.url;
-          content = proxyImagesInHtml(content, feedUrl);
+      if (store.isMinifluxArticle(article.value)) {
+        const minifluxStore = useMinifluxStore();
+        const entry = await minifluxStore.fetchEntry(-article.value.id);
+        if (entry?.content) {
+          content = entry.content;
         }
-
-        articleContent.value = content;
-
-        // Only show loading animation for non-cached content
-        if (!data.cached) {
-          // Content was fetched from feed, show loading and trigger watch
-          isLoadingContent.value = true;
-          await nextTick(); // Ensure content is rendered first
-          isLoadingContent.value = false;
-        }
-        // If cached, we don't touch isLoadingContent at all - no animation!
       } else {
-        console.error('Failed to fetch article content');
+        const res = await fetch(`/api/articles/content?id=${article.value.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          content = data.content || '';
+          if (content) {
+            const cacheEnabled = await isMediaCacheEnabled();
+            if (cacheEnabled) {
+              const feedUrl = data.feed_url || article.value.url;
+              content = proxyImagesInHtml(content, feedUrl);
+            }
+          }
+        }
+      }
+
+      if (content) {
+        articleContent.value = content;
+      } else {
         articleContent.value = '';
-        isLoadingContent.value = false;
       }
     } catch (e) {
       console.error('Error fetching article content:', e);
       articleContent.value = '';
+    } finally {
       isLoadingContent.value = false;
     }
   }

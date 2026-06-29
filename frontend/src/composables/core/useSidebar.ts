@@ -1,5 +1,6 @@
 import { computed, ref, watch, type Ref } from 'vue';
 import { useAppStore } from '@/stores/app';
+import { useMinifluxStore } from '@/stores/miniflux';
 import { useI18n } from 'vue-i18n';
 import { openInBrowser } from '@/utils/browser';
 import type { Feed } from '@/types/models';
@@ -211,8 +212,15 @@ export function useSidebar() {
     } else if (action === 'refreshFeed') {
       await fetch(`/api/feeds/refresh?id=${feed.id}`, { method: 'POST' });
       window.showToast(t('modal.feed.feedRefreshStarted'), 'success');
-      // Start polling for progress as the backend is now fetching articles for this feed
       store.pollProgress();
+    } else if (action === 'refreshMinifluxFeed') {
+      // Refresh Miniflux feed data by re-fetching from proxy
+      if (feed.miniflux_feed_id) {
+        const minifluxStore = useMinifluxStore();
+        await minifluxStore.fetchFeeds();
+        await store.fetchFeeds();
+        window.showToast(t('modal.feed.feedRefreshStarted'), 'success');
+      }
     } else if (action === 'syncFeed') {
       // Sync individual FreshRSS feed
       await fetch(`/api/freshrss/sync-feed?stream_id=${feed.freshrss_stream_id}`, {
@@ -298,7 +306,6 @@ export function useSidebar() {
     e.preventDefault();
     e.stopPropagation();
 
-    // Build menu items dynamically based on whether this is a FreshRSS feed
     const items: Array<{
       label?: string;
       action?: string;
@@ -312,6 +319,12 @@ export function useSidebar() {
       items.push({
         label: t('modal.feed.syncFeed'),
         action: 'syncFeed',
+        icon: 'PhArrowsClockwise',
+      });
+    } else if (feed.is_miniflux_source) {
+      items.push({
+        label: t('modal.feed.refreshFeed'),
+        action: 'refreshMinifluxFeed',
         icon: 'PhArrowsClockwise',
       });
     } else {
@@ -330,8 +343,8 @@ export function useSidebar() {
     items.push({ separator: true });
     items.push({ label: t('common.action.openWebsite'), action: 'openWebsite', icon: 'PhGlobe' });
 
-    // Only add discover for non-FreshRSS feeds
-    if (!feed.is_freshrss_source) {
+    // Only add discover for non-FreshRSS and non-Miniflux feeds
+    if (!feed.is_freshrss_source && !feed.is_miniflux_source) {
       items.push({
         label: t('modal.discovery.discoverFeeds'),
         action: 'discover',
@@ -339,8 +352,8 @@ export function useSidebar() {
       });
     }
 
-    // Only add edit and delete options for non-FreshRSS feeds
-    if (!feed.is_freshrss_source) {
+    // Only add edit and delete options for non-FreshRSS and non-Miniflux feeds
+    if (!feed.is_freshrss_source && !feed.is_miniflux_source) {
       items.push({ separator: true });
       items.push({ label: t('modal.feed.editSubscription'), action: 'edit', icon: 'PhPencil' });
       items.push({
